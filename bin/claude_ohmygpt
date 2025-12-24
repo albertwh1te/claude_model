@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Wrapper for Claude Code CLI using OhmyGPT API
+
+# 指向我们刚刚安装的 claude 可执行文件
+CLAUDE_BIN="$HOME/Dropbox/code/claude_model/node_modules/.bin/claude"
+
+# --- 核心配置区 ---
+# 注入豆包的 API Key (填写你的 Key)
+export ANTHROPIC_AUTH_TOKEN="sk-9I4Pd46efb89E3bFbB15T3BLbkFJa6e66de523e84fcD867F"
+
+# 强制将 Base URL 指向ohmygpt的兼容接口
+# export ANTHROPIC_BASE_URL="https://cn2us02.opapi.win"
+export ANTHROPIC_BASE_URL="https://apic1.ohmycdn.com"
+
+# 指定使用的模型名称
+export ANTHROPIC_MODEL="gpt-5.1-codex-max"
+
+# 设置超长超时时间 (防止生成长代码时断开，单位毫秒)
+export API_TIMEOUT_MS=3000000
+
+# 指定配置文件目录 (避免与官方配置冲突)
+export CLAUDE_CONFIG_DIR="$HOME/claude-model/.claude_ohmygpt"
+
+# --- 启动 ---
+exec "$CLAUDE_BIN" "$@"

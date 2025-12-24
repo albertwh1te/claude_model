@@ -1,0 +1,24 @@
+{
+  "name": "claude_model",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/albertwh1te/claude_model.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/albertwh1te/claude_model/issues"
+  },
+  "homepage": "https://github.com/albertwh1te/claude_model#readme",
+  "dependencies": {
+    "@anthropic-ai/claude-code": "^2.0.76"
+  }
+}
