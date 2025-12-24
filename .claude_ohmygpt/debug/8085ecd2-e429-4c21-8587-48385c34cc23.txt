@@ -1,0 +1,211 @@
+2025-12-24T18:14:44.871Z [DEBUG] [SLOW OPERATION DETECTED] execSyncWithDefaults_DEPRECATED (35.8ms): security find-generic-password -a $USER -w -s "Claude Code-9e995fe3"
+2025-12-24T18:14:44.905Z [DEBUG] [SLOW OPERATION DETECTED] execSyncWithDefaults_DEPRECATED (28.7ms): security find-generic-password -a "matianjun" -w -s "Claude Code-credentials-9e995fe3"
+2025-12-24T18:14:44.929Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2025-12-24T18:14:44.929Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2025-12-24T18:14:44.929Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2025-12-24T18:14:44.947Z [DEBUG] LSP server manager initialized successfully
+2025-12-24T18:14:44.947Z [DEBUG] LSP notification handlers registered successfully for all 0 server(s)
+2025-12-24T18:14:44.947Z [DEBUG] Found 0 plugins (0 enabled, 0 disabled)
+2025-12-24T18:14:44.952Z [DEBUG] Loading skills from: managed=/Library/Application Support/ClaudeCode/.claude/skills, user=/Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/skills, project=[/Users/matianjun/Dropbox/code/llm_fun/.claude/skills]
+2025-12-24T18:14:45.096Z [DEBUG] [SLOW OPERATION DETECTED] execSyncWithDefaults_DEPRECATED (139.7ms): ps aux | grep -E "Visual Studio Code|Code Helper|Cursor Helper|Windsurf Helper|IntelliJ IDEA|PyCharm
+2025-12-24T18:14:45.097Z [DEBUG] installed_plugins.json doesn't exist, returning empty V2 object
+2025-12-24T18:14:45.125Z [DEBUG] Creating shell snapshot for zsh (/bin/zsh)
+2025-12-24T18:14:45.125Z [DEBUG] Looking for shell config file: /Users/matianjun/.zshrc
+2025-12-24T18:14:45.125Z [DEBUG] Snapshots directory: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/shell-snapshots
+2025-12-24T18:14:45.125Z [DEBUG] Creating snapshot at: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/shell-snapshots/snapshot-zsh-1766600085125-lkxy6l.sh
+2025-12-24T18:14:45.125Z [DEBUG] Shell binary exists: true
+2025-12-24T18:14:45.125Z [DEBUG] Execution timeout: 10000ms
+2025-12-24T18:14:45.127Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/todos/8085ecd2-e429-4c21-8587-48385c34cc23-agent-8085ecd2-e429-4c21-8587-48385c34cc23.json.tmp.20889.1766600085127
+2025-12-24T18:14:45.134Z [DEBUG] [SLOW OPERATION DETECTED] fs.writeFileSync (7.2ms)
+2025-12-24T18:14:45.134Z [DEBUG] Temp file written successfully, size: 2 bytes
+2025-12-24T18:14:45.134Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/todos/8085ecd2-e429-4c21-8587-48385c34cc23-agent-8085ecd2-e429-4c21-8587-48385c34cc23.json.tmp.20889.1766600085127 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/todos/8085ecd2-e429-4c21-8587-48385c34cc23-agent-8085ecd2-e429-4c21-8587-48385c34cc23.json
+2025-12-24T18:14:45.134Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/todos/8085ecd2-e429-4c21-8587-48385c34cc23-agent-8085ecd2-e429-4c21-8587-48385c34cc23.json written atomically
+2025-12-24T18:14:45.144Z [DEBUG] getPluginSkills: Processing 0 enabled plugins
+2025-12-24T18:14:45.144Z [DEBUG] Total plugin skills loaded: 0
+2025-12-24T18:14:45.144Z [DEBUG] Total plugin commands loaded: 0
+2025-12-24T18:14:45.144Z [DEBUG] Registered 0 hooks from 0 plugins
+2025-12-24T18:14:45.159Z [DEBUG] Loaded 1 unique skills (managed: 0, user: 0, project: 1, legacy commands: 0)
+2025-12-24T18:14:45.159Z [DEBUG] getSkills returning: 1 skill dir commands, 0 plugin skills
+2025-12-24T18:14:45.160Z [DEBUG] Total plugin agents loaded: 0
+2025-12-24T18:14:45.173Z [DEBUG] Git remote URL: git@github.com:albertwh1te/llm_fun.git
+2025-12-24T18:14:45.173Z [DEBUG] Parsed repository: albertwh1te/llm_fun from git@github.com:albertwh1te/llm_fun.git
+2025-12-24T18:14:45.173Z [DEBUG] Parsed repository: albertwh1te/llm_fun from URL: git@github.com:albertwh1te/llm_fun.git
+2025-12-24T18:14:45.174Z [DEBUG] Path /Users/matianjun/Dropbox/code/llm_fun already tracked for repo albertwh1te/llm_fun
+2025-12-24T18:14:45.280Z [DEBUG] Ripgrep first use test: PASSED (mode=builtin, path=/Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/arm64-darwin/rg)
+2025-12-24T18:14:45.923Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600085923
+2025-12-24T18:14:45.923Z [DEBUG] Preserving file permissions: 100600
+2025-12-24T18:14:45.929Z [DEBUG] [SLOW OPERATION DETECTED] fs.writeFileSync (5.6ms)
+2025-12-24T18:14:45.929Z [DEBUG] Temp file written successfully, size: 52444 bytes
+2025-12-24T18:14:45.929Z [DEBUG] Applied original permissions to temp file
+2025-12-24T18:14:45.929Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600085923 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2025-12-24T18:14:45.929Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2025-12-24T18:14:46.353Z [DEBUG] [SLOW OPERATION DETECTED] fs.copyFileSync (21.3ms)
+2025-12-24T18:14:46.353Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600086353
+2025-12-24T18:14:46.354Z [DEBUG] Preserving file permissions: 100600
+2025-12-24T18:14:46.370Z [DEBUG] [SLOW OPERATION DETECTED] fs.writeFileSync (16.9ms)
+2025-12-24T18:14:46.370Z [DEBUG] Temp file written successfully, size: 52444 bytes
+2025-12-24T18:14:46.371Z [DEBUG] Applied original permissions to temp file
+2025-12-24T18:14:46.371Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600086353 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2025-12-24T18:14:46.371Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2025-12-24T18:14:46.394Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600086394
+2025-12-24T18:14:46.394Z [DEBUG] Preserving file permissions: 100600
+2025-12-24T18:14:46.405Z [DEBUG] [SLOW OPERATION DETECTED] fs.writeFileSync (11.0ms)
+2025-12-24T18:14:46.406Z [DEBUG] Temp file written successfully, size: 52444 bytes
+2025-12-24T18:14:46.406Z [DEBUG] Applied original permissions to temp file
+2025-12-24T18:14:46.406Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600086394 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2025-12-24T18:14:46.409Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2025-12-24T18:14:46.555Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600086555
+2025-12-24T18:14:46.555Z [DEBUG] Preserving file permissions: 100600
+2025-12-24T18:14:46.560Z [DEBUG] [SLOW OPERATION DETECTED] fs.writeFileSync (5.6ms)
+2025-12-24T18:14:46.560Z [DEBUG] Temp file written successfully, size: 52444 bytes
+2025-12-24T18:14:46.561Z [DEBUG] Applied original permissions to temp file
+2025-12-24T18:14:46.561Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600086555 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2025-12-24T18:14:46.561Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2025-12-24T18:14:47.097Z [DEBUG] Shell snapshot created successfully (176696 bytes)
+2025-12-24T18:14:50.066Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600090066
+2025-12-24T18:14:50.066Z [DEBUG] Preserving file permissions: 100600
+2025-12-24T18:14:50.077Z [DEBUG] [SLOW OPERATION DETECTED] fs.writeFileSync (8.4ms)
+2025-12-24T18:14:50.077Z [DEBUG] Temp file written successfully, size: 52571 bytes
+2025-12-24T18:14:50.077Z [DEBUG] Applied original permissions to temp file
+2025-12-24T18:14:50.077Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600090066 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2025-12-24T18:14:50.079Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2025-12-24T18:14:50.100Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600090100
+2025-12-24T18:14:50.100Z [DEBUG] Preserving file permissions: 100600
+2025-12-24T18:14:50.105Z [DEBUG] Temp file written successfully, size: 52572 bytes
+2025-12-24T18:14:50.105Z [DEBUG] Applied original permissions to temp file
+2025-12-24T18:14:50.105Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600090100 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2025-12-24T18:14:50.105Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2025-12-24T18:14:50.107Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600090107
+2025-12-24T18:14:50.107Z [DEBUG] Preserving file permissions: 100600
+2025-12-24T18:14:50.112Z [DEBUG] [SLOW OPERATION DETECTED] fs.writeFileSync (5.3ms)
+2025-12-24T18:14:50.112Z [DEBUG] Temp file written successfully, size: 52613 bytes
+2025-12-24T18:14:50.112Z [DEBUG] Applied original permissions to temp file
+2025-12-24T18:14:50.112Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600090107 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2025-12-24T18:14:50.112Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2025-12-24T18:14:50.116Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600090116
+2025-12-24T18:14:50.116Z [DEBUG] Preserving file permissions: 100600
+2025-12-24T18:14:50.121Z [DEBUG] [SLOW OPERATION DETECTED] fs.writeFileSync (5.2ms)
+2025-12-24T18:14:50.121Z [DEBUG] Temp file written successfully, size: 53066 bytes
+2025-12-24T18:14:50.121Z [DEBUG] Applied original permissions to temp file
+2025-12-24T18:14:50.121Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600090116 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2025-12-24T18:14:50.121Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2025-12-24T18:14:50.130Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600090130
+2025-12-24T18:14:50.131Z [DEBUG] Preserving file permissions: 100600
+2025-12-24T18:14:50.136Z [DEBUG] [SLOW OPERATION DETECTED] fs.writeFileSync (5.4ms)
+2025-12-24T18:14:50.136Z [DEBUG] Temp file written successfully, size: 53137 bytes
+2025-12-24T18:14:50.136Z [DEBUG] Applied original permissions to temp file
+2025-12-24T18:14:50.136Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600090130 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2025-12-24T18:14:50.137Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2025-12-24T18:14:51.043Z [ERROR] Error: Error: 1P event logging: 16 events failed to export
+    at yp1.queueFailedEvents (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:240:39698)
+    at yp1.doExport (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:240:38794)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2025-12-24T18:14:51.043Z [ERROR] Error: Error: {"stack":"Error: Failed to export 16 events\n    at yp1.doExport (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:240:38885)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)","message":"Failed to export 16 events","name":"Error"}
+    at rK0.error (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1683:34862)
+    at sm1.error (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:239:33126)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:239:64151
+    at ty8 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:239:64697)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:240:20245
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2025-12-24T18:14:53.610Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600093610
+2025-12-24T18:14:53.610Z [DEBUG] Preserving file permissions: 100600
+2025-12-24T18:14:53.620Z [DEBUG] [SLOW OPERATION DETECTED] fs.writeFileSync (9.8ms)
+2025-12-24T18:14:53.620Z [DEBUG] Temp file written successfully, size: 53178 bytes
+2025-12-24T18:14:53.620Z [DEBUG] Applied original permissions to temp file
+2025-12-24T18:14:53.620Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600093610 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2025-12-24T18:14:53.623Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2025-12-24T18:14:53.688Z [DEBUG] [SLOW OPERATION DETECTED] fs.existsSync (7.4ms)
+2025-12-24T18:14:53.710Z [DEBUG] [SLOW OPERATION DETECTED] fs.readFileSync (11.0ms)
+2025-12-24T18:14:53.774Z [DEBUG] [SLOW OPERATION DETECTED] fs.existsSync (6.0ms)
+2025-12-24T18:14:53.810Z [DEBUG] Initialized versioned plugins system with 0 plugins
+2025-12-24T18:14:53.813Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600093813
+2025-12-24T18:14:53.813Z [DEBUG] Preserving file permissions: 100600
+2025-12-24T18:14:53.819Z [DEBUG] [SLOW OPERATION DETECTED] fs.writeFileSync (6.0ms)
+2025-12-24T18:14:53.819Z [DEBUG] Temp file written successfully, size: 53198 bytes
+2025-12-24T18:14:53.819Z [DEBUG] Applied original permissions to temp file
+2025-12-24T18:14:53.819Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600093813 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2025-12-24T18:14:53.820Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2025-12-24T18:14:53.827Z [DEBUG] Getting matching hook commands for SessionStart with query: startup
+2025-12-24T18:14:53.827Z [DEBUG] Found 0 hook matchers in settings
+2025-12-24T18:14:53.827Z [DEBUG] Matched 0 unique hooks for query "startup" (0 before deduplication)
+2025-12-24T18:14:53.882Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600093882
+2025-12-24T18:14:53.882Z [DEBUG] Preserving file permissions: 100600
+2025-12-24T18:14:53.887Z [DEBUG] [SLOW OPERATION DETECTED] fs.writeFileSync (5.1ms)
+2025-12-24T18:14:53.887Z [DEBUG] Temp file written successfully, size: 53234 bytes
+2025-12-24T18:14:53.888Z [DEBUG] Applied original permissions to temp file
+2025-12-24T18:14:53.888Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600093882 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2025-12-24T18:14:53.888Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2025-12-24T18:14:53.901Z [DEBUG] performStartupChecks called
+2025-12-24T18:14:53.903Z [DEBUG] Starting background plugin installations
+2025-12-24T18:14:53.903Z [DEBUG] performBackgroundPluginInstallations called
+2025-12-24T18:14:53.911Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600093911
+2025-12-24T18:14:53.911Z [DEBUG] Preserving file permissions: 100600
+2025-12-24T18:14:53.916Z [DEBUG] Temp file written successfully, size: 53291 bytes
+2025-12-24T18:14:53.916Z [DEBUG] Applied original permissions to temp file
+2025-12-24T18:14:53.916Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600093911 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2025-12-24T18:14:53.916Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2025-12-24T18:14:53.919Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600093919
+2025-12-24T18:14:53.919Z [DEBUG] Preserving file permissions: 100600
+2025-12-24T18:14:53.924Z [DEBUG] [SLOW OPERATION DETECTED] fs.writeFileSync (5.3ms)
+2025-12-24T18:14:53.924Z [DEBUG] Temp file written successfully, size: 53340 bytes
+2025-12-24T18:14:53.924Z [DEBUG] Applied original permissions to temp file
+2025-12-24T18:14:53.924Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600093919 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2025-12-24T18:14:53.925Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2025-12-24T18:14:53.927Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600093927
+2025-12-24T18:14:53.927Z [DEBUG] Preserving file permissions: 100600
+2025-12-24T18:14:53.932Z [DEBUG] Temp file written successfully, size: 53413 bytes
+2025-12-24T18:14:53.932Z [DEBUG] Applied original permissions to temp file
+2025-12-24T18:14:53.932Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600093927 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2025-12-24T18:14:53.932Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2025-12-24T18:14:53.934Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600093934
+2025-12-24T18:14:53.934Z [DEBUG] Preserving file permissions: 100600
+2025-12-24T18:14:53.940Z [DEBUG] [SLOW OPERATION DETECTED] fs.writeFileSync (5.4ms)
+2025-12-24T18:14:53.940Z [DEBUG] Temp file written successfully, size: 53460 bytes
+2025-12-24T18:14:53.940Z [DEBUG] Applied original permissions to temp file
+2025-12-24T18:14:53.940Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600093934 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2025-12-24T18:14:53.940Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2025-12-24T18:14:53.947Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600093947
+2025-12-24T18:14:53.947Z [DEBUG] Preserving file permissions: 100600
+2025-12-24T18:14:53.952Z [DEBUG] [SLOW OPERATION DETECTED] fs.writeFileSync (5.3ms)
+2025-12-24T18:14:53.952Z [DEBUG] Temp file written successfully, size: 53512 bytes
+2025-12-24T18:14:53.952Z [DEBUG] Applied original permissions to temp file
+2025-12-24T18:14:53.952Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600093947 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2025-12-24T18:14:53.953Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2025-12-24T18:14:53.954Z [DEBUG] Setting installation status: 0 marketplaces, 0 installable plugins, 0 uninstallable plugins
+2025-12-24T18:14:53.955Z [DEBUG] Attempting to auto-install official marketplace
+2025-12-24T18:14:53.960Z [DEBUG] Loaded plugins - Enabled: 0, Disabled: 0, Commands: 0, Agents: 0, Errors: 0
+2025-12-24T18:14:54.144Z [DEBUG] Getting matching hook commands for SubagentStart with query: Explore
+2025-12-24T18:14:54.144Z [DEBUG] Found 0 hook matchers in settings
+2025-12-24T18:14:54.144Z [DEBUG] Matched 0 unique hooks for query "Explore" (0 before deduplication)
+2025-12-24T18:14:54.144Z [DEBUG] Getting matching hook commands for SubagentStart with query: Plan
+2025-12-24T18:14:54.144Z [DEBUG] Found 0 hook matchers in settings
+2025-12-24T18:14:54.144Z [DEBUG] Matched 0 unique hooks for query "Plan" (0 before deduplication)
+2025-12-24T18:14:54.190Z [DEBUG] Skills and commands included in Skill tool: knowledge-connector
+2025-12-24T18:14:54.203Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600094203
+2025-12-24T18:14:54.203Z [DEBUG] Preserving file permissions: 100600
+2025-12-24T18:14:54.209Z [DEBUG] [SLOW OPERATION DETECTED] fs.writeFileSync (5.2ms)
+2025-12-24T18:14:54.209Z [DEBUG] Temp file written successfully, size: 53693 bytes
+2025-12-24T18:14:54.209Z [DEBUG] Applied original permissions to temp file
+2025-12-24T18:14:54.209Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600094203 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2025-12-24T18:14:54.209Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2025-12-24T18:14:54.216Z [DEBUG] AutoUpdaterWrapper: Installation type: unknown
+2025-12-24T18:14:54.236Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600094236
+2025-12-24T18:14:54.236Z [DEBUG] Preserving file permissions: 100600
+2025-12-24T18:14:54.242Z [DEBUG] [SLOW OPERATION DETECTED] fs.writeFileSync (5.9ms)
+2025-12-24T18:14:54.242Z [DEBUG] Temp file written successfully, size: 53739 bytes
+2025-12-24T18:14:54.242Z [DEBUG] Applied original permissions to temp file
+2025-12-24T18:14:54.242Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600094236 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2025-12-24T18:14:54.242Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2025-12-24T18:14:54.476Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600094476
+2025-12-24T18:14:54.476Z [DEBUG] Preserving file permissions: 100600
+2025-12-24T18:14:54.481Z [DEBUG] [SLOW OPERATION DETECTED] fs.writeFileSync (5.1ms)
+2025-12-24T18:14:54.481Z [DEBUG] Temp file written successfully, size: 53739 bytes
+2025-12-24T18:14:54.482Z [DEBUG] Applied original permissions to temp file
+2025-12-24T18:14:54.482Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.20889.1766600094476 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2025-12-24T18:14:54.482Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2025-12-24T18:14:55.505Z [DEBUG] Stream started - received first chunk
+2025-12-24T18:14:55.550Z [DEBUG] Stream started - received first chunk
+2025-12-24T18:14:55.576Z [DEBUG] Stream started - received first chunk
+2025-12-24T18:14:55.886Z [DEBUG] Getting matching hook commands for SessionEnd with query: prompt_input_exit
+2025-12-24T18:14:55.886Z [DEBUG] Found 0 hook matchers in settings
+2025-12-24T18:14:55.886Z [DEBUG] Matched 0 unique hooks for query "prompt_input_exit" (0 before deduplication)
