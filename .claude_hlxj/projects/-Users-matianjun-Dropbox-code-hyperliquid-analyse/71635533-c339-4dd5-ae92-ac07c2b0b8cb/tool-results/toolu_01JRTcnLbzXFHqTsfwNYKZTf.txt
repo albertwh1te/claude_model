@@ -1,0 +1,60 @@
+     1→import typer
+     2→
+     3→import pandas as pd
+     4→from scripts.data_scripts import compare_5_15_kline
+     5→
+     6→
+     7→# Create a new Typer app for this subcommand
+     8→app = typer.Typer()
+     9→
+    10→
+    11→@app.command("kline")
+    12→def compare_backtest_5_15_kline():
+    13→    """
+    14→    Compare backtest results between 5-minute and 15-minute klines.
+    15→    """
+    16→    compare_5_15_kline()
+    17→
+    18→
+    19→@app.command("weight")
+    20→def export_weight_data(file_path: str):
+    21→    """
+    22→    Export weight data for analysis.
+    23→    """
+    24→    df = pd.read_feather(file_path)
+    25→    df.to_csv("tmp_weight_data.csv", index=False)
+    26→
+    27→
+    28→def find_the_anomaly(file_path):
+    29→    print(f"🕵️ 正在分析文件: {file_path} ...")
+    30→    df = pd.read_csv(file_path)
+    31→    df["time"] = pd.to_datetime(df["time"])
+    32→
+    33→    # 计算每一步的资金变化率
+    34→    df["pct_change"] = df["equity"].pct_change()
+    35→    df["diff"] = df["equity"].diff()
+    36→
+    37→    # 找出变化率最大的前 5 个时刻
+    38→    top_jumps = df.sort_values("pct_change", ascending=False).head(5)
+    39→
+    40→    print("\n💥 资金暴涨时刻 Top 5 (The Big Bang Moments):")
+    41→    print("-" * 60)
+    42→    for idx, row in top_jumps.iterrows():
+    43→        print(f"时间: {row['time']}")
+    44→        print(f"瞬间收益率: {row['pct_change']*100:.2f}%")
+    45→        print(f"瞬间赚了: {row['diff']:,.2f}")
+    46→        print(f"当前净值: {row['equity']:,.2f}")
+    47→        print("-" * 60)
+    48→
+    49→    return top_jumps.iloc[0]["time"]
+    50→
+    51→
+    52→@app.command("tmp")
+    53→def tmp():
+    54→    file_path = "ranker_model_backtest_v5_history.csv"
+    55→    print(find_the_anomaly(file_path))
+    56→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

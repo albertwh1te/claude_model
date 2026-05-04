@@ -1,0 +1,36 @@
+     1→"""Async Perp API for Nado Protocol."""
+     2→
+     3→from nado_api.apis.base import AsyncNadoBaseAPI
+     4→from nado_api.types import IndexerPerpPricesData
+     5→
+     6→
+     7→class AsyncPerpAPI(AsyncNadoBaseAPI):
+     8→    """
+     9→    Async API for Perpetual (Perp) operations in Nado Protocol.
+    10→
+    11→    Provides functionality for querying perp market data.
+    12→    """
+    13→
+    14→    async def get_prices(self, product_id: int) -> IndexerPerpPricesData:
+    15→        """
+    16→        Retrieves the latest index and mark price for a specific perp product.
+    17→
+    18→        Args:
+    19→            product_id: The identifier for the perp product.
+    20→
+    21→        Returns:
+    22→            IndexerPerpPricesData: An object containing the latest prices.
+    23→                - product_id: The identifier for the perp product.
+    24→                - index_price_x18: The latest index price, scaled by 1e18.
+    25→                - mark_price_x18: The latest mark price, scaled by 1e18.
+    26→                - update_time: The timestamp of the last price update.
+    27→        """
+    28→        return await self.context.indexer_client.get_perp_prices(product_id)
+    29→
+    30→
+    31→__all__ = ["AsyncPerpAPI"]
+    32→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

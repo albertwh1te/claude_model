@@ -1,0 +1,12 @@
+172:    model_file = "ranker_model_4hour.pkl"
+179:    save_path = "ranker_model_4h_predictions.feather"
+281:    feature_path = f"tmp_feature_4h_{symbol_set_name}.csv"
+308:    feature_file_name = f"tmp_feature_4h_{symbol_list_name}.csv"
+329:    save_path = "ranker_model_4h_predictions.feather"
+330:    pkl_path = "regression_model_4h.pkl"
+342:    prediction_file: str = "ranker_model_4h_predictions.feather",
+343:    output_file: str = "ranker_weight_4h.feather",
+384:    weight_file: str = "ranker_weight_4h.feather",
+461:        feature_file_name = "tmp_feature_4h_full.csv"
+463:        pkl_path = "regression_model_4h.pkl"
+464:        save_path = "ranker_model_4h_predictions.feather"

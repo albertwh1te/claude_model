@@ -1,0 +1,17 @@
+[
+  {
+    "content": "分析 ranker_process.py 和 ranker_feature.py 的 feature 逻辑差异",
+    "status": "in_progress",
+    "activeForm": "分析 feature 逻辑差异"
+  },
+  {
+    "content": "找出需要同步的 feature 更新",
+    "status": "pending",
+    "activeForm": "找出需要同步的更新"
+  },
+  {
+    "content": "修改 ranker_process.py 以同步 feature",
+    "status": "pending",
+    "activeForm": "修改代码同步 feature"
+  }
+]

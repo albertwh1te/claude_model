@@ -1,0 +1,1122 @@
+     1→import os
+     2→from typing import List, Optional
+     3→
+     4→import numpy as np
+     5→import pandas as pd
+     6→from scipy.stats import norm
+     7→from tqdm import tqdm
+     8→
+     9→from logger import main_logger as logger
+    10→from ranker_model.ranker_feature_4h import RankerFeature4H, key_windows, target_columns
+    11→from data.data_model import sqlite_local
+    12→
+    13→# Binance public metrics columns (from metrics CSV)
+    14→BN_PUBLIC_FEATURE_COLUMNS = [
+    15→    "sum_open_interest",
+    16→    "sum_open_interest_value",
+    17→    "count_toptrader_long_short_ratio",
+    18→    "sum_toptrader_long_short_ratio",
+    19→    "count_long_short_ratio",
+    20→    "sum_taker_long_short_vol_ratio",
+    21→]
+    22→
+    23→# ==============================================================================
+    24→# Derived Feature Columns (计算在 Cross-Section Level)
+    25→# ==============================================================================
+    26→# 这些交互特征在横截面级别计算，使用 Z-Score 标准化后的值。
+    27→# 计算流程：
+    28→#   1. Token Level: 保留原始 Ratio, Momentum, Volatility 数据
+    29→#   2. Cross Section Step 1 (Z-Score): 对关键特征做 Gaussian Rank
+    30→#   3. Cross Section Step 2 (交互): 用 Z-Score 后的值计算交互特征
+    31→# Note: OI-related features have been removed (oi_market_cap_ratio, oi_momentum_4h,
+    32→#       price_oi_consistency, squeeze_potential)
+    33→
+    34→BN_DERIVED_FEATURE_COLUMNS = [
+    35→    # ===== 交互特征 (使用 Z-Score 后的值) =====
+    36→    # Smart Money vs Retail: 机构和散户的分歧
+    37→    "smart_retail_divergence",  # TopTrader_LS_Ratio_zscore - Global_LS_Ratio_zscore
+    38→    # Smart Money Reversal: 机构看多/空时的动量信号
+    39→    "smart_money_reversal",  # TopTrader_LS_Ratio_zscore * momentum_12h_zscore
+    40→    # Taker Pressure: 主动买卖压力与波动率的交互
+    41→    "taker_buy_pressure",  # Taker_Vol_Ratio_zscore * volatility_4h_zscore
+    42→]
+    43→
+    44→# ==============================================================================
+    45→# Funding Rate Feature Columns
+    46→# ==============================================================================
+    47→# 资金费率（Funding Rate）是永续合约特有的机制，反映市场多空情绪。
+    48→# - 正费率：多头支付空头利息，多头拥挤
+    49→# - 负费率：空头支付多头利息，空头拥挤
+    50→# 数据来源：Binance Futures API
+    51→# 结算周期：根据币种不同，可能是 1h / 4h / 8h 三种周期
+    52→#   - 8h 结算 (传统): 00:00, 08:00, 16:00 UTC
+    53→#   - 4h 结算: 00:00, 04:00, 08:00, 12:00, 16:00, 20:00 UTC
+    54→#   - 1h 结算: 每小时整点
+    55→# 本实现通过检测费率变化点来自动适应不同的结算周期
+    56→
+    57→FUNDING_RATE_FEATURE_COLUMNS = [
+    58→    # ===== Token Level 基础特征 =====
+    59→    # 原始资金费率（已对齐到 K 线时间）
+    60→    "funding_rate_raw",
+    61→    # 资金费率变化率：当前费率 - 前一期费率
+    62→    "funding_rate_delta",
+    63→    # 资金费率乖离率：当前费率 - 3 日均值，衡量短期情绪过热程度
+    64→    "funding_rate_ma_diff",
+    65→    # 24 小时累计资金费率：多头过去 24h 支付的利息总和，反映持仓成本
+    66→    "funding_accumulated_24h",
+    67→    # ===== Funding Rate 组合交互特征 =====
+    68→    # Note: funding_oi_interaction has been removed (OI-related)
+    69→    # 资金费率 x 波动率交互：高费率且高波动 = 崩盘风险 (预期负IC)
+    70→    # 公式：Z-Score(funding_rate_raw) * Z-Score(volatility_4h)
+    71→    # 逻辑：
+    72→    #   - 正Z(高费率) * 正Z(高波动) = 正数 -> 极度危险（顶部狂热）
+    73→    #   - 负Z(低费率) * 正Z(高波动) = 负数 -> 底部恐慌抛售，可能是买点
+    74→    "inter_fr_vol_4h",
+    75→    # 资金费率 x 成交量交互：高费率且放量 = 动量确信度 (预期正IC)
+    76→    # 公式：Z-Score(funding_rate_raw) * Z-Score(log1p(volume_usd))
+    77→    # 逻辑：
+    78→    #   - 高费率 + 放量 = 趋势确认，动量可能延续
+    79→    #   - 低费率 + 放量 = 可能是趋势反转的早期信号
+    80→    "inter_fr_volume_4h",
+    81→]
+    82→
+    83→
+    84→class RankerFeature4HV2(RankerFeature4H):
+    85→    """
+    86→    4H feature engineering v2.
+    87→
+    88→    - Inherits all features from RankerFeature4H (no feature removal).
+    89→    - Adds Binance public metrics features aligned to kline timestamps.
+    90→    """
+    91→
+    92→    def __init__(
+    93→        self,
+    94→        symbols: List[str] = None,
+    95→        start_time: pd.Timestamp = None,
+    96→        end_time: pd.Timestamp = None,
+    97→        minute_level: int = 15,
+    98→        target: bool = True,
+    99→        bn_public_data_path: Optional[str] = None,
+   100→        bn_public_max_lag_minutes: int = 30,
+   101→        use_bn_public_data: bool = True,
+   102→        use_funding_rate: bool = True,
+   103→        funding_rate_max_lag_hours: int = 12,
+   104→    ):
+   105→        super().__init__(
+   106→            symbols=symbols,
+   107→            start_time=start_time,
+   108→            end_time=end_time,
+   109→            minute_level=minute_level,
+   110→            target=target,
+   111→        )
+   112→        # Where `data/get_bn_public_history_data.py` stores metrics CSVs by default.
+   113→        self.bn_public_data_path = bn_public_data_path or os.getenv(
+   114→            "BINANCE_PUBLIC_DATA_PATH", "/home/mark/data/binance_public_data"
+   115→        )
+   116→        # Max allowed time gap when aligning metrics to kline times.
+   117→        self.bn_public_max_lag = pd.Timedelta(minutes=bn_public_max_lag_minutes)
+   118→        self.use_bn_public_data = use_bn_public_data
+   119→        self.bn_public_feature_columns = list(BN_PUBLIC_FEATURE_COLUMNS)
+   120→        self.bn_derived_feature_columns = list(BN_DERIVED_FEATURE_COLUMNS)
+   121→
+   122→        # Funding Rate 配置
+   123→        # funding_rate_max_lag_hours: Funding Rate 数据的最大允许滞后时间（小时）
+   124→        # 由于 Binance 有 1h/4h/8h 三种结算周期，设置为 12 小时可以：
+   125→        # - 8h 结算：容纳 1.5 个周期（正常情况不会丢弃数据）
+   126→        # - 4h 结算：容纳 3 个周期
+   127→        # - 1h 结算：容纳 12 个周期
+   128→        # 如果某个币种数据缺失超过 12 小时，该时间点的费率将被置为 0
+   129→        self.use_funding_rate = use_funding_rate
+   130→        self.funding_rate_max_lag = pd.Timedelta(hours=funding_rate_max_lag_hours)
+   131→        self.funding_rate_feature_columns = list(FUNDING_RATE_FEATURE_COLUMNS)
+   132→
+   133→    @staticmethod
+   134→    def _empty_bn_public_frame(columns: List[str]) -> pd.DataFrame:
+   135→        """Return an empty metrics frame with required columns."""
+   136→        return pd.DataFrame(columns=["create_time", "symbol"] + columns)
+   137→
+   138→    def _ensure_bn_public_columns(self, df: pd.DataFrame) -> pd.DataFrame:
+   139→        """
+   140→        Ensure all expected metrics columns exist.
+   141→
+   142→        Missing columns are created as NaN so downstream logic can fill them.
+   143→        """
+   144→        for column in self.bn_public_feature_columns:
+   145→            if column not in df.columns:
+   146→                df[column] = np.nan
+   147→        return df
+   148→
+   149→    def _normalize_bn_public_data(self, df: pd.DataFrame, symbol: str) -> pd.DataFrame:
+   150→        """
+   151→        Normalize raw metrics data:
+   152→        - Parse timestamps
+   153→        - Enforce symbol filtering
+   154→        - Ensure required columns and numeric types
+   155→        - Drop duplicates by (create_time, symbol)
+   156→        """
+   157→        if df.empty or "create_time" not in df.columns:
+   158→            logger.debug(
+   159→                f"[4H V2] BN data normalization skipped for {symbol}: "
+   160→                f"empty={df.empty}, has_create_time={'create_time' in df.columns if not df.empty else 'N/A'}"
+   161→            )
+   162→            return self._empty_bn_public_frame(self.bn_public_feature_columns)
+   163→
+   164→        normalized = df.copy()
+   165→        original_len = len(normalized)
+   166→
+   167→        # 解析时间戳
+   168→        normalized["create_time"] = pd.to_datetime(
+   169→            normalized["create_time"], errors="coerce"
+   170→        )
+   171→        invalid_time_count = normalized["create_time"].isna().sum()
+   172→        if invalid_time_count > 0:
+   173→            logger.warning(
+   174→                f"[4H V2] {symbol}: {invalid_time_count}/{original_len} rows have invalid timestamps, "
+   175→                f"sample invalid values: {df.loc[normalized['create_time'].isna(), 'create_time'].head(3).tolist()}"
+   176→            )
+   177→        normalized = normalized[normalized["create_time"].notna()]
+   178→
+   179→        if "symbol" not in normalized.columns:
+   180→            normalized["symbol"] = symbol
+   181→        normalized = normalized[normalized["symbol"] == symbol]
+   182→
+   183→        normalized = self._ensure_bn_public_columns(normalized)
+   184→
+   185→        # 数值类型转换并记录转换失败的情况
+   186→        for column in self.bn_public_feature_columns:
+   187→            original_values = normalized[column].copy()
+   188→            normalized[column] = pd.to_numeric(normalized[column], errors="coerce")
+   189→            coerce_failed = normalized[column].isna() & original_values.notna()
+   190→            if coerce_failed.any():
+   191→                failed_values = original_values[coerce_failed].head(3).tolist()
+   192→                logger.warning(
+   193→                    f"[4H V2] {symbol}: Column '{column}' has {coerce_failed.sum()} non-numeric values, "
+   194→                    f"sample: {failed_values}"
+   195→                )
+   196→
+   197→        keep_columns = ["create_time", "symbol"] + self.bn_public_feature_columns
+   198→        normalized = normalized[keep_columns]
+   199→        normalized.sort_values("create_time", inplace=True)
+   200→
+   201→        # 记录重复数据
+   202→        dup_count = normalized.duplicated(subset=["create_time", "symbol"]).sum()
+   203→        if dup_count > 0:
+   204→            logger.debug(
+   205→                f"[4H V2] {symbol}: Dropped {dup_count} duplicate rows by (create_time, symbol)"
+   206→            )
+   207→        normalized.drop_duplicates(
+   208→            subset=["create_time", "symbol"], keep="last", inplace=True
+   209→        )
+   210→        return normalized
+   211→
+   212→    # ==========================================================================
+   213→    # Funding Rate Data Loading & Feature Calculation
+   214→    # ==========================================================================
+   215→
+   216→    def _load_funding_rate_from_db(
+   217→        self, symbol: str, start_time: pd.Timestamp, end_time: pd.Timestamp
+   218→    ) -> pd.DataFrame:
+   219→        """
+   220→        从数据库加载指定 symbol 的 Funding Rate 历史数据。
+   221→
+   222→        数据来源：BinanceFundingRate 表（data/data_model.py）
+   223→        结算周期：每 8 小时（00:00, 08:00, 16:00 UTC）
+   224→
+   225→        Args:
+   226→            symbol: 交易对名称（如 "BTCUSDT"）
+   227→            start_time: 开始时间（包含）
+   228→            end_time: 结束时间（包含）
+   229→
+   230→        Returns:
+   231→            DataFrame with columns: [funding_time, symbol, funding_rate]
+   232→            按 funding_time 升序排列
+   233→        """
+   234→        if not self.use_funding_rate:
+   235→            return pd.DataFrame(columns=["funding_time", "symbol", "funding_rate"])
+   236→
+   237→        # 构建 SQL 查询
+   238→        # 注意：为了 merge_asof 正确工作，需要获取 start_time 之前的数据
+   239→        # 以便第一个 K 线能找到对应的 funding rate
+   240→        # 扩展查询范围到 start_time 前 3 天
+   241→        query_start = start_time - pd.Timedelta(days=3)
+   242→        start_time_str = query_start.strftime("%Y-%m-%d %H:%M:%S")
+   243→        end_time_str = end_time.strftime("%Y-%m-%d %H:%M:%S")
+   244→
+   245→        sql = f"""
+   246→            SELECT funding_time, symbol, funding_rate
+   247→            FROM binancefundingrate
+   248→            WHERE symbol = '{symbol}'
+   249→              AND funding_time >= '{start_time_str}'
+   250→              AND funding_time <= '{end_time_str}'
+   251→            ORDER BY funding_time ASC
+   252→        """
+   253→
+   254→        try:
+   255→            cursor = sqlite_local.execute_sql(sql)
+   256→            df = pd.DataFrame(
+   257→                cursor.fetchall(), columns=[col[0] for col in cursor.description]
+   258→            )
+   259→        except Exception as e:
+   260→            logger.warning(f"[4H V2] Failed to load funding rate for {symbol}: {e}")
+   261→            return pd.DataFrame(columns=["funding_time", "symbol", "funding_rate"])
+   262→
+   263→        if df.empty:
+   264→            logger.debug(
+   265→                f"[4H V2] {symbol}: No funding rate data found for period "
+   266→                f"{start_time_str} to {end_time_str}"
+   267→            )
+   268→            return pd.DataFrame(columns=["funding_time", "symbol", "funding_rate"])
+   269→
+   270→        # 转换时间格式
+   271→        # 注意：funding_time 可能包含不同格式（带/不带毫秒，带时区）
+   272→        # 使用 format='ISO8601' 处理混合格式，utc=True 统一时区
+   273→        df["funding_time"] = pd.to_datetime(
+   274→            df["funding_time"], format="ISO8601", utc=True
+   275→        )
+   276→        # 移除时区信息，转换为 naive datetime（与 kline 时间一致）
+   277→        df["funding_time"] = df["funding_time"].dt.tz_localize(None)
+   278→        df["funding_rate"] = pd.to_numeric(df["funding_rate"], errors="coerce")
+   279→
+   280→        # 检测数据质量
+   281→        nan_count = df["funding_rate"].isna().sum()
+   282→        if nan_count > 0:
+   283→            logger.warning(
+   284→                f"[4H V2] {symbol}: {nan_count}/{len(df)} funding rates are NaN"
+   285→            )
+   286→
+   287→        logger.debug(
+   288→            f"[4H V2] {symbol}: Loaded {len(df)} funding rate records "
+   289→            f"from {df['funding_time'].min()} to {df['funding_time'].max()}"
+   290→        )
+   291→
+   292→        return df
+   293→
+   294→    def _build_funding_rate_feature_frame(
+   295→        self, symbol: str, time_index: pd.DatetimeIndex
+   296→    ) -> pd.DataFrame:
+   297→        """
+   298→        构建 Funding Rate 特征 DataFrame，对齐到 K 线时间戳。
+   299→
+   300→        对齐原则（Point-in-Time Safe）：
+   301→        - 使用 merge_asof 的 backward 方向
+   302→        - 只使用"当前时刻已经结算"的费率，不使用未来数据
+   303→        - 设置最大滞后时间，避免使用过期数据
+   304→
+   305→        特征计算：
+   306→        1. funding_rate_raw: 对齐后的原始费率
+   307→        2. funding_rate_delta: 费率变化率 = 当前 - 前一期
+   308→        3. funding_rate_ma_diff: 费率乖离率 = 当前 - 3日均值
+   309→        4. funding_accumulated_24h: 24小时累计费率
+   310→
+   311→        Args:
+   312→            symbol: 交易对名称
+   313→            time_index: K 线时间索引
+   314→
+   315→        Returns:
+   316→            包含 Funding Rate 特征的 DataFrame
+   317→        """
+   318→        # 初始化空 DataFrame
+   319→        if time_index.empty or not symbol:
+   320→            logger.debug(
+   321→                f"[4H V2] _build_funding_rate_feature_frame skipped: "
+   322→                f"time_index_empty={time_index.empty}, symbol={symbol}"
+   323→            )
+   324→            return pd.DataFrame(
+   325→                index=time_index,
+   326→                data=0.0,
+   327→                columns=self.funding_rate_feature_columns,
+   328→            )
+   329→
+   330→        start_time = pd.to_datetime(time_index.min())
+   331→        end_time = pd.to_datetime(time_index.max())
+   332→
+   333→        # 加载 Funding Rate 数据
+   334→        funding_df = self._load_funding_rate_from_db(symbol, start_time, end_time)
+   335→
+   336→        if funding_df.empty:
+   337→            logger.debug(f"[4H V2] {symbol}: No funding rate data found, using zeros")
+   338→            return pd.DataFrame(
+   339→                index=time_index,
+   340→                data=0.0,
+   341→                columns=self.funding_rate_feature_columns,
+   342→            )
+   343→
+   344→        # 准备时间 DataFrame 用于 merge_asof
+   345→        time_df = pd.DataFrame({"time": pd.to_datetime(time_index)})
+   346→        time_df.sort_values("time", inplace=True)
+   347→        funding_df = funding_df.sort_values("funding_time")
+   348→
+   349→        # 使用 merge_asof 对齐数据（backward 方向，避免未来数据泄露）
+   350→        # 逻辑：如果 08:00 结算费率，08:15 的 K 线会取到 08:00 的值
+   351→        merged = pd.merge_asof(
+   352→            time_df,
+   353→            funding_df,
+   354→            left_on="time",
+   355→            right_on="funding_time",
+   356→            direction="backward",
+   357→        )
+   358→
+   359→        # 检测过期数据
+   360→        lag = merged["time"] - merged["funding_time"]
+   361→        stale_mask = merged["funding_time"].isna() | (lag > self.funding_rate_max_lag)
+   362→        stale_count = stale_mask.sum()
+   363→
+   364→        if stale_count > 0:
+   365→            stale_times = merged.loc[stale_mask, "time"].head(3).tolist()
+   366→            logger.debug(
+   367→                f"[4H V2] {symbol}: {stale_count}/{len(merged)} rows have stale funding rate "
+   368→                f"(max_lag={self.funding_rate_max_lag}), sample times: {stale_times}"
+   369→            )
+   370→            merged.loc[stale_mask, "funding_rate"] = np.nan
+   371→
+   372→        merged.set_index("time", inplace=True)
+   373→        merged = merged.reindex(time_index)
+   374→
+   375→        # =====================================================================
+   376→        # 计算 Funding Rate 特征
+   377→        # =====================================================================
+   378→
+   379→        # Feature 1: funding_rate_raw
+   380→        # 原始资金费率，填充 NaN 为 0（中性）
+   381→        merged["funding_rate_raw"] = merged["funding_rate"].fillna(0.0)
+   382→
+   383→        # Feature 2: funding_rate_delta (资金费率变化率)
+   384→        # 公式：当前费率 - 前一期费率
+   385→        merged["funding_rate_delta"] = merged["funding_rate_raw"].diff().fillna(0.0)
+   386→
+   387→        # Feature 3: funding_rate_ma_diff (乖离率)
+   388→        # 公式：当前费率 - 3日均值
+   389→        # 逻辑：费率突然飙升，比平时高很多，说明情绪短期过热
+   390→        # 滚动窗口：3天 = 288 个 15m K 线
+   391→        # 注意：无论币种是 1h/4h/8h 结算，这个窗口都基于时间计算
+   392→        # - 8h 结算：3天 ≈ 9 次结算的均值
+   393→        # - 4h 结算：3天 ≈ 18 次结算的均值
+   394→        # - 1h 结算：3天 ≈ 72 次结算的均值
+   395→        rolling_window_3d = 288  # 3 天的 15 分钟 K 线数
+   396→        funding_ma_3d = (
+   397→            merged["funding_rate_raw"]
+   398→            .rolling(window=rolling_window_3d, min_periods=1)
+   399→            .mean()
+   400→        )
+   401→        merged["funding_rate_ma_diff"] = (
+   402→            merged["funding_rate_raw"] - funding_ma_3d
+   403→        ).fillna(0.0)
+   404→
+   405→        # Feature 4: funding_accumulated_24h (持有成本)
+   406→        # 公式：过去 24h 的费率总和
+   407→        # 逻辑：过去 24 小时多头付了多少利息？如果利息高，多头平仓意愿极强
+   408→        # 实现方式：检测费率变化点（而非假设固定周期），在变化点累加费率
+   409→        # 这种方式自动适应 1h/4h/8h 不同结算周期：
+   410→        # - 8h 结算：24h 内累加 3 次
+   411→        # - 4h 结算：24h 内累加 6 次
+   412→        # - 1h 结算：24h 内累加 24 次
+   413→        funding_raw = merged["funding_rate_raw"]
+   414→
+   415→        # 检测费率变化点（与前一个值不同）
+   416→        funding_changed = funding_raw != funding_raw.shift(1)
+   417→        # 在变化点使用实际费率，其他时间为 0
+   418→        funding_at_settlement = funding_raw.where(funding_changed, 0.0)
+   419→        # 24h 累计 = 过去 96 个 15m K 线的费率总和
+   420→        rolling_window_24h = 96  # 24h / 15m = 96
+   421→        merged["funding_accumulated_24h"] = (
+   422→            funding_at_settlement.rolling(window=rolling_window_24h, min_periods=1)
+   423→            .sum()
+   424→            .fillna(0.0)
+   425→        )
+   426→
+   427→        # Feature 5: inter_fr_vol_4h (费率 x 波动率交互特征)
+   428→        # 需要在 cross_section_feature 中计算，这里设置占位符
+   429→        merged["inter_fr_vol_4h"] = 0.0
+   430→
+   431→        # Feature 6: inter_fr_volume_4h (费率 x 成交量交互特征)
+   432→        # 需要在 cross_section_feature 中计算，这里设置占位符
+   433→        merged["inter_fr_volume_4h"] = 0.0
+   434→
+   435→        # 数据验证和清理
+   436→        for col in self.funding_rate_feature_columns:
+   437→            if col in merged.columns:
+   438→                # 替换 Inf 值
+   439→                inf_count = np.isinf(merged[col]).sum()
+   440→                if inf_count > 0:
+   441→                    logger.warning(
+   442→                        f"[4H V2] {symbol}: {col} has {inf_count} Inf values, replacing with 0"
+   443→                    )
+   444→                    merged[col] = merged[col].replace([np.inf, -np.inf], 0.0)
+   445→
+   446→                # Clip 极端值（防止模型受异常影响）
+   447→                if col == "funding_rate_raw":
+   448→                    # 费率通常在 -0.03% 到 0.03%，极端情况可能到 ±0.1%
+   449→                    merged[col] = merged[col].clip(-0.01, 0.01)
+   450→                elif col == "funding_rate_delta":
+   451→                    # 变化率同样限制在合理范围
+   452→                    merged[col] = merged[col].clip(-0.01, 0.01)
+   453→                elif col == "funding_rate_ma_diff":
+   454→                    # 乖离率不应该超过 ±0.005
+   455→                    merged[col] = merged[col].clip(-0.005, 0.005)
+   456→                elif col == "funding_accumulated_24h":
+   457→                    # 24h 累计不应该超过 ±0.03
+   458→                    merged[col] = merged[col].clip(-0.03, 0.03)
+   459→
+   460→        return merged[self.funding_rate_feature_columns]
+   461→
+   462→    def _load_bn_public_data(
+   463→        self, symbol: str, start_time: pd.Timestamp, end_time: pd.Timestamp
+   464→    ) -> pd.DataFrame:
+   465→        """
+   466→        Load Binance public metrics CSVs for a single symbol and date range.
+   467→
+   468→        File naming pattern: {symbol}-metrics-{YYYY-MM-DD}.csv
+   469→        """
+   470→        if not self.use_bn_public_data or not self.bn_public_data_path:
+   471→            return self._empty_bn_public_frame(self.bn_public_feature_columns)
+   472→
+   473→        symbol_dir = os.path.join(self.bn_public_data_path, symbol)
+   474→        if not os.path.isdir(symbol_dir):
+   475→            logger.warning(
+   476→                f"[4H V2] Binance public data folder not found: {symbol_dir}"
+   477→            )
+   478→            return self._empty_bn_public_frame(self.bn_public_feature_columns)
+   479→
+   480→        daily_frames = []
+   481→        for day in pd.date_range(
+   482→            start=start_time.date(), end=end_time.date(), freq="D"
+   483→        ):
+   484→            date_str = day.strftime("%Y-%m-%d")
+   485→            file_name = f"{symbol}-metrics-{date_str}.csv"
+   486→            file_path = os.path.join(symbol_dir, file_name)
+   487→            if not os.path.exists(file_path):
+   488→                continue
+   489→            try:
+   490→                daily_frames.append(pd.read_csv(file_path))
+   491→            except Exception as exc:
+   492→                logger.warning(f"[4H V2] Failed reading {file_path}: {exc}")
+   493→
+   494→        if not daily_frames:
+   495→            return self._empty_bn_public_frame(self.bn_public_feature_columns)
+   496→
+   497→        raw = pd.concat(daily_frames, ignore_index=True)
+   498→        return self._normalize_bn_public_data(raw, symbol)
+   499→
+   500→    def _build_bn_feature_frame(
+   501→        self, symbol: str, time_index: pd.DatetimeIndex
+   502→    ) -> pd.DataFrame:
+   503→        """
+   504→        Align metrics data to kline timestamps (point-in-time safe).
+   505→
+   506→        We use merge_asof with backward direction to ensure no future data leak.
+   507→        When the last metrics timestamp is too far away, we drop it to avoid
+   508→        using stale values.
+   509→        """
+   510→        all_feature_columns = (
+   511→            self.bn_public_feature_columns + self.bn_derived_feature_columns
+   512→        )
+   513→
+   514→        if time_index.empty or not symbol:
+   515→            logger.debug(
+   516→                f"[4H V2] _build_bn_feature_frame skipped: "
+   517→                f"time_index_empty={time_index.empty}, symbol={symbol}"
+   518→            )
+   519→            return pd.DataFrame(index=time_index, data=0, columns=all_feature_columns)
+   520→
+   521→        start_time = pd.to_datetime(time_index.min())
+   522→        end_time = pd.to_datetime(time_index.max())
+   523→        metrics = self._load_bn_public_data(symbol, start_time, end_time)
+   524→        if metrics.empty:
+   525→            logger.debug(
+   526→                f"[4H V2] {symbol}: No BN metrics data found for period "
+   527→                f"{start_time} to {end_time}, using zeros"
+   528→            )
+   529→            return pd.DataFrame(index=time_index, data=0, columns=all_feature_columns)
+   530→
+   531→        time_df = pd.DataFrame({"time": pd.to_datetime(time_index)})
+   532→        time_df.sort_values("time", inplace=True)
+   533→        metrics = metrics.sort_values("create_time")
+   534→
+   535→        merged = pd.merge_asof(
+   536→            time_df,
+   537→            metrics,
+   538→            left_on="time",
+   539→            right_on="create_time",
+   540→            direction="backward",
+   541→        )
+   542→
+   543→        # Filter out stale metrics beyond max lag.
+   544→        lag = merged["time"] - merged["create_time"]
+   545→        stale_mask = merged["create_time"].isna() | (lag > self.bn_public_max_lag)
+   546→        stale_count = stale_mask.sum()
+   547→        if stale_count > 0:
+   548→            # 记录过期数据的详细信息
+   549→            stale_times = merged.loc[stale_mask, "time"].head(3).tolist()
+   550→            stale_lags = lag[stale_mask].head(3).tolist()
+   551→            logger.debug(
+   552→                f"[4H V2] {symbol}: {stale_count}/{len(merged)} rows have stale BN data "
+   553→                f"(max_lag={self.bn_public_max_lag}), sample times: {stale_times}, "
+   554→                f"sample lags: {stale_lags}"
+   555→            )
+   556→        merged.loc[stale_mask, self.bn_public_feature_columns] = np.nan
+   557→
+   558→        merged.set_index("time", inplace=True)
+   559→        merged = merged.reindex(time_index)
+   560→
+   561→        # Fill NaN values appropriately:
+   562→        # - Ratio columns: fill with 1.0 (neutral)
+   563→        # - Count columns: fill with 0
+   564→        ratio_columns = [
+   565→            "sum_toptrader_long_short_ratio",
+   566→            "count_long_short_ratio",
+   567→            "sum_taker_long_short_vol_ratio",
+   568→        ]
+   569→        count_columns = [
+   570→            "count_toptrader_long_short_ratio",
+   571→        ]
+   572→
+   573→        for col in ratio_columns:
+   574→            if col in merged.columns:
+   575→                merged[col] = merged[col].fillna(1.0)
+   576→
+   577→        for col in count_columns:
+   578→            if col in merged.columns:
+   579→                merged[col] = merged[col].fillna(0)
+   580→
+   581→        # Compute derived features
+   582→        merged = self._compute_derived_features(merged, symbol)
+   583→
+   584→        # Final fill for any remaining NaN in base columns
+   585→        merged[self.bn_public_feature_columns] = merged[
+   586→            self.bn_public_feature_columns
+   587→        ].fillna(0)
+   588→
+   589→        return merged[all_feature_columns]
+   590→
+   591→    def _compute_derived_features(
+   592→        self, df: pd.DataFrame, symbol: str = "UNKNOWN"  # noqa: ARG002
+   593→    ) -> pd.DataFrame:
+   594→        """
+   595→        在 Token Level 计算基础派生特征。
+   596→
+   597→        注意：交互特征（smart_money_reversal 等）已移至 cross_section_feature 中计算，
+   598→        使用 Z-Score 标准化后的值。
+   599→
+   600→        此方法仅初始化交互特征的占位符，确保列存在。
+   601→        OI 相关特征已删除。
+   602→
+   603→        Args:
+   604→            df: 包含 BN 公开数据特征的 DataFrame
+   605→            symbol: 币种符号，用于日志记录
+   606→        """
+   607→        # 交互特征的占位符，将在 cross_section_feature 中填充
+   608→        # 这里初始化为 0，确保列存在
+   609→        df["smart_retail_divergence"] = 0.0
+   610→        df["smart_money_reversal"] = 0.0
+   611→        df["taker_buy_pressure"] = 0.0
+   612→
+   613→        return df
+   614→
+   615→    def calculate_token_level_feature(self, df: pd.DataFrame, target: bool = True):
+   616→        """
+   617→        计算 Token Level 特征，包含 Binance 公开数据和 Funding Rate 特征。
+   618→
+   619→        此方法扩展了父类的特征，添加了：
+   620→        1. BN 公开数据特征（Long/Short Ratio 等）
+   621→        2. Funding Rate 特征（资金费率相关）
+   622→
+   623→        交互特征（smart_money_reversal 等）不在此处计算，
+   624→        而是在 cross_section_feature 中使用 Z-Score 标准化后的值计算。
+   625→
+   626→        Args:
+   627→            df: 包含 OHLCV 数据的 DataFrame
+   628→            target: 是否计算目标变量
+   629→
+   630→        Returns:
+   631→            包含所有 token level 特征的 DataFrame
+   632→        """
+   633→        symbol = None
+   634→        if not df.empty and "symbol" in df.columns:
+   635→            symbol = df["symbol"].iloc[0]
+   636→
+   637→        # 确保新增特征、BN 特征和 Funding Rate 特征不会重复添加到 feature names 中
+   638→        all_bn_features = (
+   639→            self.bn_public_feature_columns + self.bn_derived_feature_columns
+   640→        )
+   641→        all_funding_features = self.funding_rate_feature_columns
+   642→        additional_token_features = [
+   643→            "downside_volatility_4h",
+   644→            "momentum_acceleration_4h",
+   645→        ]
+   646→        self.token_level_feature_names.difference_update(additional_token_features)
+   647→        self.token_level_feature_names.difference_update(all_bn_features)
+   648→        self.token_level_feature_names.difference_update(all_funding_features)
+   649→
+   650→        # 调用父类方法计算基础特征
+   651→        base_feature = super().calculate_token_level_feature(df, target=target).copy()
+   652→
+   653→        # 新增下行波动率：只统计负收益率的标准差 (4h = 16 根 15m K 线)
+   654→        if "return" in df.columns:
+   655→            neg_ret = df["return"].where(df["return"] < 0)
+   656→            base_feature["downside_volatility_4h"] = (
+   657→                neg_ret.rolling(window=16, min_periods=1).std().fillna(0.0)
+   658→            )
+   659→        else:
+   660→            base_feature["downside_volatility_4h"] = 0.0
+   661→
+   662→        # 动量加速度：momentum_4h 的一阶差分
+   663→        if "momentum_4h" in base_feature.columns:
+   664→            base_feature["momentum_acceleration_4h"] = (
+   665→                base_feature["momentum_4h"].diff().fillna(0.0)
+   666→            )
+   667→        else:
+   668→            base_feature["momentum_acceleration_4h"] = 0.0
+   669→
+   670→        self.token_level_feature_names.add("downside_volatility_4h")
+   671→        self.token_level_feature_names.add("momentum_acceleration_4h")
+   672→
+   673→        # 构建 BN 特征 DataFrame 并合并
+   674→        bn_feature = self._build_bn_feature_frame(symbol, base_feature.index)
+   675→        base_feature = base_feature.join(bn_feature, how="left")
+   676→
+   677→        # 构建 Funding Rate 特征 DataFrame 并合并
+   678→        funding_feature = self._build_funding_rate_feature_frame(
+   679→            symbol, base_feature.index
+   680→        )
+   681→        base_feature = base_feature.join(funding_feature, how="left")
+   682→
+   683→        # 填充所有 BN 特征列中的 NaN
+   684→        for col in all_bn_features:
+   685→            if col in base_feature.columns:
+   686→                base_feature[col] = base_feature[col].fillna(0)
+   687→
+   688→        # 填充所有 Funding Rate 特征列中的 NaN
+   689→        for col in all_funding_features:
+   690→            if col in base_feature.columns:
+   691→                base_feature[col] = base_feature[col].fillna(0)
+   692→
+   693→        # 注册特征名称，供横截面标准化使用
+   694→        self.token_level_feature_names.update(all_bn_features)
+   695→        self.token_level_feature_names.update(all_funding_features)
+   696→
+   697→        return base_feature
+   698→
+   699→    def cross_section_feature(self, df: pd.DataFrame, target: bool):
+   700→        """
+   701→        计算横截面特征，包含 BN 公开数据的交互特征。
+   702→
+   703→        此方法实现了两步流程：
+   704→        1. Z-Score 标准化: 对 Taker ratio 等关键特征做 Gaussian Rank
+   705→        2. 计算交互特征: 使用 Z-Score 后的值计算交互特征
+   706→
+   707→        Note: OI-related features have been removed.
+   708→
+   709→        Args:
+   710→            df: 包含 token level 特征的 DataFrame，索引为 (time, symbol)
+   711→            target: 是否处理目标变量
+   712→
+   713→        Returns:
+   714→            包含所有横截面特征的 DataFrame
+   715→        """
+   716→        if target:
+   717→            df.dropna(inplace=True)
+   718→            bar = tqdm(df.groupby(level=0))
+   719→        else:
+   720→            bar = df.groupby(level=0)
+   721→
+   722→        dfs = []
+   723→        for time, time_df in bar:
+   724→            if target:
+   725→                bar.set_description(f"{time} , total symbol: {len(time_df)}")
+   726→            try:
+   727→                if len(time_df) < 5:
+   728→                    logger.warning(
+   729→                        f"[4H V2] Skipping time {time} due to extremely low symbol count: {len(time_df)}, "
+   730→                        f"symbols: {list(time_df.index.get_level_values(1))}"
+   731→                    )
+   732→                    continue
+   733→
+   734→                # ==============================================================
+   735→                # Step 1: Z-Score 标准化 (Gaussian Rank)
+   736→                # ==============================================================
+   737→                # 对需要做交互的特征先进行 Z-Score 标准化
+   738→                # 这确保了交互特征的输入都是同分布的
+   739→
+   740→                # 辅助函数：计算 Gaussian Rank (Z-Score)
+   741→                def gaussian_rank(series: pd.Series, col_name: str = "") -> pd.Series:
+   742→                    """将百分位排名转换为标准正态分布的 Z-Score"""
+   743→                    epsilon = 1e-6
+   744→                    pct_rank = series.rank(pct=True)
+   745→                    # 避免 ppf(0) 和 ppf(1) 产生无穷大
+   746→                    pct_rank = pct_rank * (1 - 2 * epsilon) + epsilon
+   747→                    result = pd.Series(norm.ppf(pct_rank), index=series.index)
+   748→
+   749→                    # 检测 Z-Score 中的异常值
+   750→                    inf_count = np.isinf(result).sum()
+   751→                    if inf_count > 0:
+   752→                        logger.warning(
+   753→                            f"[4H V2] Time {time}: gaussian_rank for '{col_name}' produced "
+   754→                            f"{inf_count} Inf values, input stats: min={series.min():.4f}, "
+   755→                            f"max={series.max():.4f}, nan_count={series.isna().sum()}"
+   756→                        )
+   757→                        result = result.replace([np.inf, -np.inf], 0)
+   758→
+   759→                    return result
+   760→
+   761→                # 需要做 Z-Score 的 BN 公开数据特征
+   762→                bn_features_to_zscore = [
+   763→                    "sum_toptrader_long_short_ratio",  # 机构多空比
+   764→                    "count_long_short_ratio",  # 散户多空比
+   765→                    "sum_taker_long_short_vol_ratio",  # Taker 买卖比
+   766→                ]
+   767→
+   768→                # 需要做 Z-Score 的 Funding Rate 特征
+   769→                funding_features_to_zscore = [
+   770→                    "funding_rate_raw",  # 原始资金费率
+   771→                    "funding_rate_ma_diff",  # 资金费率乖离率
+   772→                    "funding_accumulated_24h",  # 24小时累计资金费率
+   773→                ]
+   774→
+   775→                # 存储 Z-Score 后的值，用于交互特征计算
+   776→                zscore_values = {}
+   777→                for col in bn_features_to_zscore:
+   778→                    if col in time_df.columns and not time_df[col].isna().all():
+   779→                        # 检测输入数据的变异性
+   780→                        if time_df[col].std() == 0:
+   781→                            logger.debug(
+   782→                                f"[4H V2] Time {time}: Column '{col}' has zero variance "
+   783→                                f"(all values={time_df[col].iloc[0]}), Z-Score will be 0"
+   784→                            )
+   785→                            zscore_values[col] = pd.Series(0.0, index=time_df.index)
+   786→                        else:
+   787→                            zscore_values[col] = gaussian_rank(time_df[col], col)
+   788→                    else:
+   789→                        if col in time_df.columns:
+   790→                            logger.debug(
+   791→                                f"[4H V2] Time {time}: Column '{col}' is all NaN, using 0"
+   792→                            )
+   793→                        zscore_values[col] = pd.Series(0.0, index=time_df.index)
+   794→
+   795→                # 对 Funding Rate 特征做 Z-Score
+   796→                for col in funding_features_to_zscore:
+   797→                    if col in time_df.columns and not time_df[col].isna().all():
+   798→                        if time_df[col].std() == 0:
+   799→                            logger.debug(
+   800→                                f"[4H V2] Time {time}: Funding feature '{col}' has zero variance, Z-Score will be 0"
+   801→                            )
+   802→                            zscore_values[col] = pd.Series(0.0, index=time_df.index)
+   803→                        else:
+   804→                            zscore_values[col] = gaussian_rank(time_df[col], col)
+   805→                    else:
+   806→                        zscore_values[col] = pd.Series(0.0, index=time_df.index)
+   807→
+   808→                # 对 momentum 和 volatility 也做 Z-Score，用于交互特征
+   809→                momentum_cols = ["momentum_4h", "momentum_12h"]
+   810→                volatility_cols = ["volatility_4h"]
+   811→
+   812→                for col in momentum_cols + volatility_cols:
+   813→                    if col in time_df.columns and not time_df[col].isna().all():
+   814→                        if time_df[col].std() == 0:
+   815→                            logger.debug(
+   816→                                f"[4H V2] Time {time}: Column '{col}' has zero variance, Z-Score will be 0"
+   817→                            )
+   818→                            zscore_values[col] = pd.Series(0.0, index=time_df.index)
+   819→                        else:
+   820→                            zscore_values[col] = gaussian_rank(time_df[col], col)
+   821→                    else:
+   822→                        zscore_values[col] = pd.Series(0.0, index=time_df.index)
+   823→
+   824→                # 对新增特征做 Cross-Section Z-Score
+   825→                extra_features_to_zscore = [
+   826→                    "downside_volatility_4h",
+   827→                    "momentum_acceleration_4h",
+   828→                    "funding_rate_delta",
+   829→                ]
+   830→                for col in extra_features_to_zscore:
+   831→                    if col in time_df.columns and not time_df[col].isna().all():
+   832→                        if time_df[col].std() == 0:
+   833→                            logger.debug(
+   834→                                f"[4H V2] Time {time}: Column '{col}' has zero variance, Z-Score will be 0"
+   835→                            )
+   836→                            time_df[col] = 0.0
+   837→                        else:
+   838→                            time_df[col] = gaussian_rank(time_df[col], col)
+   839→                    else:
+   840→                        time_df[col] = 0.0
+   841→
+   842→                # ==============================================================
+   843→                # Step 2.5: Volume USD 的 Z-Score 处理（特殊处理）
+   844→                # ==============================================================
+   845→                # Volume 是绝对值（BTC 几十亿，小币几百万），必须先取 log1p 再 rank
+   846→                # 这样可以减少巨鲸币种的偏度，使分布更均匀
+   847→                if (
+   848→                    "volume_usd" in time_df.columns
+   849→                    and not time_df["volume_usd"].isna().all()
+   850→                ):
+   851→                    # Step 1: 取 log1p 减少偏度
+   852→                    volume_log = np.log1p(time_df["volume_usd"])
+   853→                    if volume_log.std() == 0:
+   854→                        logger.debug(
+   855→                            f"[4H V2] Time {time}: volume_usd (log1p) has zero variance, Z-Score will be 0"
+   856→                        )
+   857→                        zscore_values["volume_usd"] = pd.Series(
+   858→                            0.0, index=time_df.index
+   859→                        )
+   860→                    else:
+   861→                        # Step 2: 对 log1p(volume) 做 Gaussian Rank
+   862→                        zscore_values["volume_usd"] = gaussian_rank(
+   863→                            volume_log, "volume_usd"
+   864→                        )
+   865→                else:
+   866→                    zscore_values["volume_usd"] = pd.Series(0.0, index=time_df.index)
+   867→
+   868→                # ==============================================================
+   869→                # Step 2: 计算交互特征 (使用 Z-Score 后的值)
+   870→                # ==============================================================
+   871→
+   872→                # Feature 1: Smart-Retail Divergence
+   873→                # 机构多空比 Z-Score - 散户多空比 Z-Score
+   874→                # 正值 = 机构比散户更看多; 负值 = 机构比散户更看空
+   875→                time_df["smart_retail_divergence"] = (
+   876→                    zscore_values["sum_toptrader_long_short_ratio"]
+   877→                    - zscore_values["count_long_short_ratio"]
+   878→                ).fillna(0)
+   879→
+   880→                # Feature 2: Smart Money Reversal
+   881→                # 机构多空比 Z-Score * 12H 动量 Z-Score
+   882→                # 正值 = 机构看多且价格上涨 或 机构看空且价格下跌
+   883→                # 负值 = 机构看多但价格下跌 或 机构看空但价格上涨 (反转信号)
+   884→                time_df["smart_money_reversal"] = (
+   885→                    zscore_values["sum_toptrader_long_short_ratio"]
+   886→                    * zscore_values["momentum_12h"]
+   887→                ).fillna(0)
+   888→
+   889→                # Feature 3: Taker Buy Pressure
+   890→                # Taker 买卖比 Z-Score * 波动率 Z-Score
+   891→                # 高买压 + 高波动 = 强势突破; 低买压 + 高波动 = 恐慌抛售
+   892→                time_df["taker_buy_pressure"] = (
+   893→                    zscore_values["sum_taker_long_short_vol_ratio"]
+   894→                    * zscore_values["volatility_4h"]
+   895→                ).fillna(0)
+   896→
+   897→                # ==============================================================
+   898→                # Funding Rate 组合交互特征（费率 x 波动 / 费率 x 成交量）
+   899→                # ==============================================================
+   900→
+   901→                # Feature 4: inter_fr_vol_4h (费率 x 波动率)
+   902→                # 公式：Z-Score(funding_rate_raw) * Z-Score(volatility_4h)
+   903→                # 逻辑：高费率且高波动 = 崩盘风险 (预期负IC)
+   904→                #   - 正Z(高费率) * 正Z(高波动) = 正数 -> 极度危险（顶部狂热）
+   905→                #   - 负Z(低费率) * 正Z(高波动) = 负数 -> 底部恐慌抛售，可能是买点
+   906→                # 这个乘法逻辑完美捕捉了"顶部狂热"和"底部恐慌"两种状态
+   907→                inter_fr_vol_raw = (
+   908→                    zscore_values["funding_rate_raw"] * zscore_values["volatility_4h"]
+   909→                ).fillna(0)
+   910→
+   911→                # Feature 5: inter_fr_volume_4h (费率 x 成交量)
+   912→                # 公式：Z-Score(funding_rate_raw) * Z-Score(log1p(volume_usd))
+   913→                # 逻辑：高费率且放量 = 动量确信度 (预期正IC)
+   914→                #   - 高费率 + 放量 = 趋势确认，动量可能延续
+   915→                #   - 低费率 + 放量 = 可能是趋势反转的早期信号
+   916→                inter_fr_volume_raw = (
+   917→                    zscore_values["funding_rate_raw"] * zscore_values["volume_usd"]
+   918→                ).fillna(0)
+   919→
+   920→                # ==============================================================
+   921→                # 对 Funding Rate 组合交互特征做最终处理
+   922→                # ==============================================================
+   923→                # 1. 对原始乘积做 rank(pct=True) 归一化到 0~1
+   924→                # 2. 这确保了特征值的可比性和模型训练的稳定性
+   925→                # 3. NaN 值填充为 0.5（rank 的中位数）
+   926→
+   927→                # inter_fr_vol_4h: 归一化到 0~1
+   928→                if inter_fr_vol_raw.std() > 0:
+   929→                    time_df["inter_fr_vol_4h"] = inter_fr_vol_raw.rank(pct=True).fillna(
+   930→                        0.5
+   931→                    )
+   932→                else:
+   933→                    time_df["inter_fr_vol_4h"] = 0.5  # 无变异时使用中位数
+   934→
+   935→                # inter_fr_volume_4h: 归一化到 0~1
+   936→                if inter_fr_volume_raw.std() > 0:
+   937→                    time_df["inter_fr_volume_4h"] = inter_fr_volume_raw.rank(
+   938→                        pct=True
+   939→                    ).fillna(0.5)
+   940→                else:
+   941→                    time_df["inter_fr_volume_4h"] = 0.5  # 无变异时使用中位数
+   942→
+   943→                # 检测交互特征的异常值
+   944→                interaction_features = [
+   945→                    "smart_retail_divergence",
+   946→                    "smart_money_reversal",
+   947→                    "taker_buy_pressure",
+   948→                    "inter_fr_vol_4h",
+   949→                    "inter_fr_volume_4h",
+   950→                ]
+   951→                for feat in interaction_features:
+   952→                    if feat in time_df.columns:
+   953→                        inf_count = np.isinf(time_df[feat]).sum()
+   954→                        extreme_count = (time_df[feat].abs() > 100).sum()
+   955→                        if inf_count > 0 or extreme_count > 0:
+   956→                            logger.warning(
+   957→                                f"[4H V2] Time {time}: Interaction feature '{feat}' has anomalies: "
+   958→                                f"inf_count={inf_count}, extreme_count(>100)={extreme_count}, "
+   959→                                f"min={time_df[feat].min():.4f}, max={time_df[feat].max():.4f}"
+   960→                            )
+   961→                            # 替换 Inf 值
+   962→                            time_df[feat] = time_df[feat].replace([np.inf, -np.inf], 0)
+   963→
+   964→                # ==============================================================
+   965→                # 原有的横截面处理逻辑
+   966→                # ==============================================================
+   967→
+   968→                # Target 处理 (Gaussian Rank)
+   969→                if target:
+   970→                    for column in target_columns:
+   971→                        time_df[f"{column}_number"] = time_df[column]
+   972→
+   973→                        epsilon = 1e-6
+   974→                        pct_rank = time_df[column].rank(pct=True)
+   975→                        pct_rank = pct_rank * (1 - 2 * epsilon) + epsilon
+   976→
+   977→                        time_df[f"{column}_zscore"] = norm.ppf(pct_rank)
+   978→                        time_df[column] = time_df[column].rank(pct=True)
+   979→
+   980→                # Market Cap / Momentum Label 处理
+   981→                if not target and not all(time_df["momentum_4h"].isna()):
+   982→                    time_df["momentum_4h_label"] = time_df["momentum_4h"].rank(pct=True)
+   983→
+   984→                time_df["market_cap_rank_50"] = time_df["market_cap"].rank(pct=True)
+   985→                time_df["market_cap_rank_10"] = time_df["market_cap"].rank(pct=True)
+   986→
+   987→                # Numeric Features 标准化 (Percentile Rank)
+   988→                # 注意：BN 交互特征和 Funding Rate 交互特征不在这里标准化，因为它们已经是 Z-Score 的乘积
+   989→                numeric_features_to_standardize = self.get_numeric_feature_names()
+   990→
+   991→                # 排除不需要标准化的特征
+   992→                volatility_features = [
+   993→                    f.replace("momentum", "volatility") for f in key_windows.keys()
+   994→                ]
+   995→                # 排除波动率特征
+   996→                features_to_exclude = set(volatility_features)
+   997→                # 排除 BN 派生特征（已经是 Z-Score 交互结果）
+   998→                features_to_exclude.update(self.bn_derived_feature_columns)
+   999→                # 排除 BN 原始特征（将被单独处理）
+  1000→                features_to_exclude.update(self.bn_public_feature_columns)
+  1001→                # 排除新增特征（已做 Cross-Section Z-Score）
+  1002→                features_to_exclude.update(
+  1003→                    [
+  1004→                        "downside_volatility_4h",
+  1005→                        "momentum_acceleration_4h",
+  1006→                    ]
+  1007→                )
+  1008→                # 排除 Funding Rate 特征（将被单独处理）
+  1009→                features_to_exclude.update(self.funding_rate_feature_columns)
+  1010→
+  1011→                numeric_features_to_standardize = [
+  1012→                    f
+  1013→                    for f in numeric_features_to_standardize
+  1014→                    if f not in features_to_exclude
+  1015→                ]
+  1016→
+  1017→                time_df[numeric_features_to_standardize] = time_df[
+  1018→                    numeric_features_to_standardize
+  1019→                ].rank(pct=True)
+  1020→
+  1021→                # 对 BN 原始特征做 Percentile Rank 标准化
+  1022→                bn_public_features_in_df = [
+  1023→                    col
+  1024→                    for col in self.bn_public_feature_columns
+  1025→                    if col in time_df.columns
+  1026→                ]
+  1027→                if bn_public_features_in_df:
+  1028→                    time_df[bn_public_features_in_df] = time_df[
+  1029→                        bn_public_features_in_df
+  1030→                    ].rank(pct=True)
+  1031→
+  1032→                # 对 Funding Rate 基础特征做 Percentile Rank 标准化
+  1033→                # 注意：funding_oi_interaction 是交互特征，不需要再标准化
+  1034→                funding_base_features = [
+  1035→                    "funding_rate_raw",
+  1036→                    "funding_rate_ma_diff",
+  1037→                    "funding_accumulated_24h",
+  1038→                ]
+  1039→                funding_features_in_df = [
+  1040→                    col for col in funding_base_features if col in time_df.columns
+  1041→                ]
+  1042→                if funding_features_in_df:
+  1043→                    time_df[funding_features_in_df] = time_df[
+  1044→                        funding_features_in_df
+  1045→                    ].rank(pct=True)
+  1046→
+  1047→                # 均值特征
+  1048→                time_df["momentum_1h_mean"] = time_df["momentum_1h"].mean()
+  1049→                time_df["momentum_4h_mean"] = time_df["momentum_4h"].mean()
+  1050→                time_df["momentum_24h_mean"] = time_df["momentum_24h"].mean()
+  1051→                time_df["momentum_72h_mean"] = time_df["momentum_72h"].mean()
+  1052→
+  1053→                dfs.append(time_df)
+  1054→
+  1055→            except Exception as e:
+  1056→                # 收集详细的错误上下文信息
+  1057→                error_context = {
+  1058→                    "time": str(time),
+  1059→                    "symbol_count": len(time_df) if time_df is not None else 0,
+  1060→                    "symbols": (
+  1061→                        list(time_df.index.get_level_values(1))[:10]
+  1062→                        if time_df is not None
+  1063→                        else []
+  1064→                    ),
+  1065→                }
+  1066→                # 尝试获取导致异常的数据统计
+  1067→                try:
+  1068→                    if time_df is not None:
+  1069→                        error_context["columns_with_nan"] = [
+  1070→                            col for col in time_df.columns if time_df[col].isna().any()
+  1071→                        ][:10]
+  1072→                        error_context["columns_with_inf"] = [
+  1073→                            col
+  1074→                            for col in time_df.select_dtypes(
+  1075→                                include=[np.number]
+  1076→                            ).columns
+  1077→                            if np.isinf(time_df[col]).any()
+  1078→                        ][:10]
+  1079→                except Exception:
+  1080→                    pass
+  1081→
+  1082→                logger.error(
+  1083→                    f"[4H V2] Failed to generate cross section feature at {time}: {e}\n"
+  1084→                    f"Error context: {error_context}",
+  1085→                    exc_info=True,
+  1086→                )
+  1087→
+  1088→        if not dfs:
+  1089→            # 如果所有时间点都被跳过，返回空 DataFrame
+  1090→            logger.warning(
+  1091→                "[4H V2] All time points were skipped in cross_section_feature, "
+  1092→                "returning empty DataFrame"
+  1093→            )
+  1094→            return pd.DataFrame()
+  1095→
+  1096→        df = pd.concat(dfs)
+  1097→
+  1098→        # 时间特征
+  1099→        df["day_of_week"] = df.index.get_level_values(0).dayofweek
+  1100→        df["hour_of_day"] = df.index.get_level_values(0).hour
+  1101→
+  1102→        # BTC/ETH 标记
+  1103→        df["is_btc"] = (df.index.get_level_values(1) == "BTCUSDT").astype(int)
+  1104→        df["is_eth"] = (df.index.get_level_values(1) == "ETHUSDT").astype(int)
+  1105→
+  1106→        df.sort_values("time", inplace=True)
+  1107→        return df
+  1108→
+  1109→
+  1110→__all__ = [
+  1111→    "RankerFeature4HV2",
+  1112→    "BN_PUBLIC_FEATURE_COLUMNS",
+  1113→    "BN_DERIVED_FEATURE_COLUMNS",
+  1114→    "FUNDING_RATE_FEATURE_COLUMNS",
+  1115→    "key_windows",
+  1116→    "target_columns",
+  1117→]
+  1118→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

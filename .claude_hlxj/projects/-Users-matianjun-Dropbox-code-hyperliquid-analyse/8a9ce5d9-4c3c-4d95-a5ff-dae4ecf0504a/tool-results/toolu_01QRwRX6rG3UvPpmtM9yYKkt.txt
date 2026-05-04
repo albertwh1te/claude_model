@@ -1,0 +1,278 @@
+     1→"""
+     2→Executor Process (Process B)
+     3→
+     4→Consumer in the Producer-Consumer architecture.
+     5→Responsible for:
+     6→1. On startup: Pull current target weights from Redis (Pull-on-Start defense)
+     7→2. Subscribe to rebalance signals from Redis
+     8→3. Execute orders via OrderExecutor when signals are received
+     9→
+    10→Communication Protocol:
+    11→- Storage: Redis GET `strategy:target_weights:{account_id}` for JSON payload
+    12→- Signal: Redis SUBSCRIBE `signal:rebalance:{account_id}` for 'update' messages
+    13→"""
+    14→
+    15→import asyncio
+    16→import json
+    17→from typing import Dict, Optional
+    18→from dataclasses import dataclass, asdict
+    19→import pandas as pd
+    20→
+    21→from logger import online_logger as logger
+    22→from online.order_executor import OrderExecutor
+    23→from utils.redis_util import get_redis
+    24→
+    25→
+    26→@dataclass
+    27→class TargetWeightsPayload:
+    28→    """
+    29→    Data contract for communication between Ranker and Executor.
+    30→
+    31→    Attributes:
+    32→        model_token_size: Target position sizes (positive=long, negative=short)
+    33→        current_kline: Current prices for each symbol
+    34→        timestamp: ISO format timestamp of when the signal was generated
+    35→        account_id: Account identifier for multi-account support
+    36→    """
+    37→    model_token_size: Dict[str, float]
+    38→    current_kline: Dict[str, float]
+    39→    timestamp: str
+    40→    account_id: int
+    41→
+    42→    def to_json(self) -> str:
+    43→        """Serialize payload to JSON string."""
+    44→        return json.dumps(asdict(self))
+    45→
+    46→    @classmethod
+    47→    def from_json(cls, json_str: str) -> "TargetWeightsPayload":
+    48→        """Deserialize payload from JSON string."""
+    49→        data = json.loads(json_str)
+    50→        return cls(**data)
+    51→
+    52→
+    53→class ExecutorProcess:
+    54→    """
+    55→    Executor Process (Process B) - The Consumer.
+    56→
+    57→    Handles:
+    58→    - Pull-on-Start: Fetch and execute pending target weights on startup
+    59→    - Subscribe to rebalance signals
+    60→    - Execute orders via OrderExecutor when notified
+    61→
+    62→    This design ensures:
+    63→    1. No missed signals if Executor restarts mid-cycle
+    64→    2. Robust recovery from network issues
+    65→    3. Decoupled execution from calculation logic
+    66→    """
+    67→
+    68→    REDIS_KEY_PREFIX = "strategy:target_weights"
+    69→    REDIS_CHANNEL_PREFIX = "signal:rebalance"
+    70→
+    71→    def __init__(self, account_id: int, exchange_account_name: str = "main"):
+    72→        self.account_id = account_id
+    73→        self.exchange_account_name = exchange_account_name
+    74→        self._last_processed_timestamp: Optional[str] = None
+    75→        self._running = False
+    76→
+    77→        logger.info(f"ExecutorProcess initialized for account_id={self.account_id}")
+    78→
+    79→    @property
+    80→    def redis_key(self) -> str:
+    81→        """Redis key for fetching target weights."""
+    82→        return f"{self.REDIS_KEY_PREFIX}:{self.account_id}"
+    83→
+    84→    @property
+    85→    def redis_channel(self) -> str:
+    86→        """Redis channel for subscribing to rebalance signals."""
+    87→        return f"{self.REDIS_CHANNEL_PREFIX}:{self.account_id}"
+    88→
+    89→    async def _fetch_target_weights(self) -> Optional[TargetWeightsPayload]:
+    90→        """
+    91→        Fetch target weights from Redis (GET operation).
+    92→
+    93→        Returns:
+    94→            Optional[TargetWeightsPayload]: Payload if found, None otherwise
+    95→        """
+    96→        try:
+    97→            redis = get_redis(async_mode=True)
+    98→            data = await redis.get(self.redis_key)
+    99→
+   100→            if data is None:
+   101→                logger.info(f"No target weights found in Redis for key: {self.redis_key}")
+   102→                return None
+   103→
+   104→            payload = TargetWeightsPayload.from_json(data)
+   105→            logger.info(
+   106→                f"Fetched target weights: {len(payload.model_token_size)} positions, "
+   107→                f"timestamp={payload.timestamp}"
+   108→            )
+   109→            return payload
+   110→
+   111→        except json.JSONDecodeError as e:
+   112→            logger.error(f"Failed to decode target weights JSON: {e}")
+   113→            return None
+   114→        except Exception as e:
+   115→            logger.error(f"Failed to fetch target weights from Redis: {e}")
+   116→            return None
+   117→
+   118→    async def _execute_rebalance(self, payload: TargetWeightsPayload) -> bool:
+   119→        """
+   120→        Execute the rebalance based on target weights.
+   121→
+   122→        Args:
+   123→            payload: The target weights payload from Ranker
+   124→
+   125→        Returns:
+   126→            bool: True if execution was successful, False otherwise
+   127→        """
+   128→        # Dedupe: Skip if we've already processed this timestamp
+   129→        if payload.timestamp == self._last_processed_timestamp:
+   130→            logger.info(f"Skipping duplicate signal for timestamp: {payload.timestamp}")
+   131→            return True
+   132→
+   133→        try:
+   134→            logger.info(
+   135→                f"Executing rebalance for account_id={self.account_id}, "
+   136→                f"positions={len(payload.model_token_size)}, "
+   137→                f"timestamp={payload.timestamp}"
+   138→            )
+   139→
+   140→            # Convert current_kline dict to pd.Series
+   141→            current_kline = pd.Series(payload.current_kline)
+   142→
+   143→            # Create executor and align positions
+   144→            executor = OrderExecutor(account_name=self.exchange_account_name)
+   145→            await executor.align_positions(
+   146→                model_token_size=payload.model_token_size,
+   147→                current_kline=current_kline,
+   148→            )
+   149→
+   150→            # Update last processed timestamp
+   151→            self._last_processed_timestamp = payload.timestamp
+   152→
+   153→            logger.info(
+   154→                f"Successfully executed rebalance for timestamp={payload.timestamp}"
+   155→            )
+   156→            return True
+   157→
+   158→        except Exception as e:
+   159→            logger.error(f"Failed to execute rebalance: {e}", exc_info=True)
+   160→            return False
+   161→
+   162→    async def _pull_on_start(self) -> bool:
+   163→        """
+   164→        Pull-on-Start defense: Fetch and execute any pending target weights.
+   165→
+   166→        This ensures that if the Executor restarts after the Ranker has already
+   167→        published target weights, it will still execute them.
+   168→
+   169→        Returns:
+   170→            bool: True if there were pending weights and they were executed,
+   171→                  False if no pending weights or execution failed
+   172→        """
+   173→        logger.info("Executing Pull-on-Start: Checking for pending target weights...")
+   174→
+   175→        payload = await self._fetch_target_weights()
+   176→
+   177→        if payload is None:
+   178→            logger.info("No pending target weights found on startup")
+   179→            return False
+   180→
+   181→        # Execute the pending weights
+   182→        success = await self._execute_rebalance(payload)
+   183→
+   184→        if success:
+   185→            logger.info("Pull-on-Start: Successfully processed pending weights")
+   186→        else:
+   187→            logger.warning("Pull-on-Start: Failed to process pending weights")
+   188→
+   189→        return success
+   190→
+   191→    async def _subscribe_loop(self):
+   192→        """
+   193→        Main subscription loop for receiving rebalance signals.
+   194→
+   195→        Uses Redis Pub/Sub to listen for 'update' messages on the rebalance channel.
+   196→        When a signal is received, fetches the latest target weights and executes.
+   197→        """
+   198→        try:
+   199→            redis = get_redis(async_mode=True)
+   200→            pubsub = redis.pubsub()
+   201→
+   202→            await pubsub.subscribe(self.redis_channel)
+   203→            logger.info(f"Subscribed to channel: {self.redis_channel}")
+   204→
+   205→            async for message in pubsub.listen():
+   206→                if not self._running:
+   207→                    break
+   208→
+   209→                if message["type"] == "message":
+   210→                    signal = message["data"]
+   211→                    logger.info(f"Received signal: {signal} on channel: {self.redis_channel}")
+   212→
+   213→                    if signal == "update":
+   214→                        # Fetch latest target weights (GET)
+   215→                        payload = await self._fetch_target_weights()
+   216→
+   217→                        if payload is not None:
+   218→                            await self._execute_rebalance(payload)
+   219→                        else:
+   220→                            logger.warning("Received 'update' signal but no payload found in Redis")
+   221→
+   222→        except Exception as e:
+   223→            logger.error(f"Subscription loop error: {e}", exc_info=True)
+   224→            raise
+   225→
+   226→    async def start(self):
+   227→        """
+   228→        Start the Executor process.
+   229→
+   230→        1. Execute Pull-on-Start to handle any pending weights
+   231→        2. Enter the subscription loop to listen for new signals
+   232→        """
+   233→        self._running = True
+   234→
+   235→        logger.info(f"Starting ExecutorProcess for account_id={self.account_id}")
+   236→
+   237→        # Step 1: Pull-on-Start defense
+   238→        await self._pull_on_start()
+   239→
+   240→        # Step 2: Enter subscription loop
+   241→        while self._running:
+   242→            try:
+   243→                await self._subscribe_loop()
+   244→            except Exception as e:
+   245→                logger.error(f"Subscription loop failed, retrying in 5s: {e}")
+   246→                await asyncio.sleep(5)
+   247→
+   248→    async def stop(self):
+   249→        """Stop the Executor process gracefully."""
+   250→        logger.info(f"Stopping ExecutorProcess for account_id={self.account_id}")
+   251→        self._running = False
+   252→
+   253→
+   254→async def run_executor(account_id: int, exchange_account_name: str = "main"):
+   255→    """Entry point to run the Executor process."""
+   256→    executor = ExecutorProcess(
+   257→        account_id=account_id,
+   258→        exchange_account_name=exchange_account_name,
+   259→    )
+   260→
+   261→    try:
+   262→        await executor.start()
+   263→    except KeyboardInterrupt:
+   264→        await executor.stop()
+   265→
+   266→
+   267→if __name__ == "__main__":
+   268→    import sys
+   269→
+   270→    account_id = int(sys.argv[1]) if len(sys.argv) > 1 else 1
+   271→    exchange_name = sys.argv[2] if len(sys.argv) > 2 else "main"
+   272→
+   273→    asyncio.run(run_executor(account_id, exchange_name))
+   274→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

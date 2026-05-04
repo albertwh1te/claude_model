@@ -1,0 +1,681 @@
+     1→"""Binance Perpetual Futures trading API helper (async)."""
+     2→
+     3→import hmac
+     4→import json
+     5→import time
+     6→import hashlib
+     7→from decimal import Decimal, ROUND_DOWN, ROUND_UP
+     8→from functools import wraps
+     9→from typing import Any, Dict, Iterable, List, Optional, Literal, Union
+    10→from urllib.parse import urlencode, quote
+    11→
+    12→import aiohttp
+    13→from pydantic import BaseModel, Field, ValidationError, field_validator
+    14→from pydantic import model_validator
+    15→
+    16→from binance_api.Binance_market_util import BinanceMarketUtils, SymbolRules
+    17→from config.config_types import OnlinePosition
+    18→from logger import main_logger as logger
+    19→
+    20→
+    21→def ensure_exchange_info(func):
+    22→    """Decorator to lazily initialize exchange info before method execution."""
+    23→
+    24→    @wraps(func)
+    25→    async def wrapper(self, *args, **kwargs):
+    26→        if getattr(self, "symbol_rules", None) is None:
+    27→            await self.init_info()
+    28→        return await func(self, *args, **kwargs)
+    29→
+    30→    return wrapper
+    31→
+    32→
+    33→class BinanceOrder(BaseModel):
+    34→    """Single order payload validator for Binance perpetual futures."""
+    35→
+    36→    symbol: str
+    37→    side: Literal["BUY", "SELL"]
+    38→    order_type: Literal["MARKET", "LIMIT"]
+    39→    quantity: float = Field(gt=0, description="Order quantity, must be greater than 0")
+    40→    price: Optional[float] = Field(
+    41→        None, gt=0, description="Limit price; required for LIMIT"
+    42→    )
+    43→    time_in_force: Optional[str] = Field(
+    44→        "GTC",
+    45→        # @info GTX (Good Till Crossing) - 也就是 Post Only (只做 Maker)
+    46→        # @info GTD (Good Till Date) - 指定日期前有效
+    47→        # @info FOK (Fill or Kill) - 全部成交或取消
+    48→        # @info IOC (Immediate or Cancel) - 立即成交或取消
+    49→        # @info GTC (Good Till Cancel) - 直到取消前有效
+    50→        pattern=r"^(GTC|IOC|FOK|GTD|GTX)$",
+    51→        description="Time in force for LIMIT orders",
+    52→    )
+    53→    reduce_only: bool = Field(default=False, description="Whether order is reduce-only")
+    54→
+    55→    @field_validator("symbol")
+    56→    @classmethod
+    57→    def clean_symbol(cls, value: str) -> str:
+    58→        return value.strip().upper()
+    59→
+    60→    @model_validator(mode="before")
+    61→    def validate_limit_price_and_tif(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+    62→        order_type = values.get("order_type")
+    63→        price = values.get("price")
+    64→        tif = values.get("time_in_force")
+    65→
+    66→        if order_type == "LIMIT" and price is None:
+    67→            raise ValueError("price is required for LIMIT orders")
+    68→
+    69→        if order_type == "MARKET":
+    70→            # Do not send timeInForce for market orders
+    71→            values["time_in_force"] = None
+    72→
+    73→        return values
+    74→
+    75→    # 返回类型改为 Optional，并增加过滤逻辑
+    76→    def to_payload(
+    77→        self, rules: Optional[SymbolRules] = None
+    78→    ) -> Optional[Dict[str, Any]]:
+    79→        """
+    80→        Convert order to Binance REST payload.
+    81→        Returns None if the order does not meet filter requirements (MinQty, MinNotional).
+    82→        """
+    83→
+    84→        quantity_dec = Decimal(str(self.quantity))
+    85→        price_dec = Decimal(str(self.price)) if self.price is not None else None
+    86→
+    87→        if rules:
+    88→            step_dec = Decimal(str(rules.step_size)) if rules.step_size else None
+    89→            min_qty_dec = Decimal(str(rules.min_qty)) if rules.min_qty else None
+    90→
+    91→            # [Step 1] Quantity Rounding (向下取整到 stepSize)
+    92→            if step_dec:
+    93→                # 必须调用 normalize() 去除 stepSize 字符串中可能存在的无效零
+    94→                # 例子: "1.0000" -> "1" (让 quantize 知道要取整)
+    95→                # 例子: "0.0100" -> "0.01"
+    96→                step_dec = step_dec.normalize()
+    97→
+    98→                quantity_dec = quantity_dec.quantize(step_dec, rounding=ROUND_DOWN)
+    99→
+   100→            # [Step 2] Min Qty Check (过滤逻辑)
+   101→            # 原始逻辑是强制提升到 min_qty，现在改为过滤并报错
+   102→            if min_qty_dec and quantity_dec < min_qty_dec:
+   103→                logger.warning(
+   104→                    f"⛔ Order Rejected ({self.symbol}): Quantity {quantity_dec} < MinQty {min_qty_dec}"
+   105→                )
+   106→                return None
+   107→
+   108→            # [Step 3] Price Rounding
+   109→            if price_dec is not None and rules.tick_size:
+   110→                tick_dec = Decimal(str(rules.tick_size))
+   111→                price_dec = price_dec.quantize(tick_dec, rounding=ROUND_DOWN)
+   112→
+   113→            # [Step 4] Min Notional Check (过滤逻辑)
+   114→            # 只有限价单或者有价格参考时才能准确检查名义价值
+   115→            if rules.min_notional and price_dec is not None:
+   116→                min_notional_dec = Decimal(str(rules.min_notional))
+   117→                notional = price_dec * quantity_dec
+   118→
+   119→                if notional < min_notional_dec:
+   120→                    logger.warning(
+   121→                        f"⛔ Order Rejected ({self.symbol}): Notional {notional} < MinNotional {min_notional_dec}"
+   122→                    )
+   123→                    return None
+   124→
+   125→        # 构造 Payload
+   126→        payload: Dict[str, Any] = {
+   127→            "symbol": self.symbol,
+   128→            "side": self.side,
+   129→            "type": self.order_type,
+   130→            "quantity": self._decimal_to_str(quantity_dec),
+   131→        }
+   132→
+   133→        if price_dec is not None:
+   134→            payload["price"] = self._decimal_to_str(price_dec)
+   135→
+   136→        if self.time_in_force:
+   137→            payload["timeInForce"] = self.time_in_force
+   138→
+   139→        payload["reduceOnly"] = "true" if self.reduce_only else "false"
+   140→
+   141→        logger.info(f"✅ Order Accepted ({self.symbol}): {payload}")
+   142→        return payload
+   143→
+   144→    @staticmethod
+   145→    def _decimal_to_str(value: Decimal) -> str:
+   146→        # 使用 "f" 格式化防止科学计数法 (如 1E-7)
+   147→        s = "{:f}".format(value)
+   148→        # 如果包含小数点，则去除末尾的 0 和可能残留的小数点
+   149→        if "." in s:
+   150→            s = s.rstrip("0").rstrip(".")
+   151→        return s
+   152→
+   153→
+   154→class BinanceBatchOrder(BaseModel):
+   155→    """Batch order payload validator for Binance perpetual futures."""
+   156→
+   157→    symbol: str
+   158→    side: Literal["BUY", "SELL"]
+   159→    type: Literal["LIMIT", "MARKET"]
+   160→    quantity: float = Field(gt=0)
+   161→    price: Optional[float] = Field(None, gt=0)
+   162→    timeInForce: Optional[str] = Field(None, pattern=r"^(GTC|IOC|FOK|GTD|GTX)$")
+   163→    reduce_only: Optional[bool] = Field(None)
+   164→
+   165→    @field_validator("symbol")
+   166→    @classmethod
+   167→    def clean_symbol(cls, value: str) -> str:
+   168→        return value.strip().upper()
+   169→
+   170→    def _fmt_num(self, n: Optional[float]) -> str:
+   171→        """Helper to format numbers without scientific notation and trailing zeros."""
+   172→        if n is None:
+   173→            return ""
+   174→        # 格式化为字符串，去除末尾无效的0
+   175→        return f"{n:.8f}".rstrip("0").rstrip(".")
+   176→
+   177→    def __str__(self) -> str:
+   178→        """Used for print() and logger.info()"""
+   179→        # 1. 视觉符号：买入绿色圆点，卖出红色圆点 (在支持 emoji 的终端很直观)
+   180→        icon = "🟢" if self.side == "BUY" else "🔴"
+   181→
+   182→        # 2. 价格显示逻辑
+   183→        price_str = f" @ {self._fmt_num(self.price)}" if self.price else " @ MKT"
+   184→
+   185→        # 3. 额外标志位 (ReduceOnly, TIF)
+   186→        flags = []
+   187→        if self.reduce_only:
+   188→            flags.append("RO")  # Reduce Only
+   189→        if self.timeInForce:
+   190→            flags.append(self.timeInForce)
+   191→
+   192→        flag_str = f"[{'|'.join(flags)}]" if flags else ""
+   193→
+   194→        # 4. 组合最终字符串
+   195→        # 格式示例: 🟢 BUY BTCUSDT LIMIT | Q:0.5 @ 60000 [RO|GTC]
+   196→        return (
+   197→            f"{icon} {self.side:<4} {self.symbol:<10} {self.type:<6} | "
+   198→            f"Q:{self._fmt_num(self.quantity)}{price_str} {flag_str}"
+   199→        ).strip()
+   200→
+   201→    def __repr__(self) -> str:
+   202→        """Used for lists, and repr()"""
+   203→        # 在 ipdb 的列表中，我们希望它既紧凑又有信息量
+   204→        # 直接复用 __str__ 的格式，但包裹尖括号以示区别
+   205→        return f"<Order: {self.__str__()}>"
+   206→
+   207→
+   208→class BinancePerpAPI(BinanceMarketUtils):
+   209→    """Async helper for Binance USDT-margined perpetual futures REST API.
+   210→
+   211→    Exchange metadata is initialized lazily via the ``ensure_exchange_info``
+   212→    decorator on methods that require it.
+   213→    """
+   214→
+   215→    BASE_URL = "https://fapi.binance.com"
+   216→
+   217→    def __init__(
+   218→        self,
+   219→        api_key: str,
+   220→        api_secret: str,
+   221→        session: Optional[aiohttp.ClientSession] = None,
+   222→    ):
+   223→        self.api_key = api_key
+   224→        self.api_secret = api_secret
+   225→        self._session: Optional[aiohttp.ClientSession] = session
+   226→        self.symbol_rules: Optional[Dict[str, Any]] = None
+   227→
+   228→    async def init_info(self):
+   229→        """Initialize exchange info."""
+   230→        exchange_info = await self.get_exchange_info()
+   231→        self.symbol_rules: Dict[str, SymbolRules] = self.extract_symbol_rules(
+   232→            exchange_info
+   233→        )
+   234→
+   235→    @staticmethod
+   236→    def _encode_params(params: Dict[str, Any]) -> str:
+   237→        """URL-encode params with stable key ordering and safe JSON characters."""
+   238→
+   239→        sorted_items = sorted(params.items(), key=lambda item: item[0])
+   240→        return urlencode(sorted_items, doseq=True, safe='[]{}":,')
+   241→
+   242→    async def __aenter__(self) -> "BinancePerpAPI":
+   243→        await self._ensure_session()
+   244→        return self
+   245→
+   246→    async def __aexit__(self, *_exc_info: Any) -> None:
+   247→        await self.close()
+   248→
+   249→    async def _ensure_session(self) -> aiohttp.ClientSession:
+   250→        if self._session is None or self._session.closed:
+   251→            self._session = aiohttp.ClientSession()
+   252→        return self._session
+   253→
+   254→    async def close(self) -> None:
+   255→        if self._session and not self._session.closed:
+   256→            await self._session.close()
+   257→
+   258→    async def request(
+   259→        self,
+   260→        method: str,
+   261→        url: str,
+   262→        *,
+   263→        timeout: int = 15,
+   264→        headers: Optional[Dict[str, str]] = None,
+   265→        proxy: Optional[str] = None,
+   266→        data: Optional[Dict[str, Any]] = None,
+   267→    ) -> Any:
+   268→        """Execute an HTTP request and raise on non-200 responses."""
+   269→
+   270→        session = await self._ensure_session()
+   271→        timeout_cfg = aiohttp.ClientTimeout(total=timeout)
+   272→
+   273→        async with session.request(
+   274→            method, url, headers=headers, proxy=proxy, timeout=timeout_cfg, data=data
+   275→        ) as resp:
+   276→            text = await resp.text()
+   277→            if resp.status != 200:
+   278→                raise RuntimeError(f"Binance API error {resp.status}: {text}")
+   279→            try:
+   280→                return await resp.json()
+   281→            except Exception:
+   282→                return text
+   283→
+   284→    async def sign_and_request(
+   285→        self, method: str, path: str, data: Optional[Dict[str, Any]] = None
+   286→    ) -> Any:
+   287→        """Sign params with HMAC SHA256 and dispatch the request."""
+   288→
+   289→        # 1. 准备基础参数
+   290→        params: Dict[str, Any] = {"timestamp": int(time.time() * 1000)}
+   291→        if data:
+   292→            params.update(data)
+   293→
+   294→        # 移除 None 值
+   295→        filtered = {k: v for k, v in params.items() if v is not None}
+   296→
+   297→        # 2. 针对 POST 且包含 batchOrders 的特殊处理
+   298→        # batchOrders 需要在 Body 中发送，且必须遵循 URL 编码规则
+   299→        if method.upper() == "POST" and "batchOrders" in filtered:
+   300→            # 按 Key 字母序排序
+   301→            sorted_items = sorted(filtered.items(), key=lambda item: item[0])
+   302→
+   303→            # CRITICAL FIX: 使用 urlencode 生成查询字符串
+   304→            # 这会将 [{"symbol":...}] 中的特殊字符正确编码为 %5B%7B%22symbol%22...
+   305→            query_string = urlencode(sorted_items)
+   306→
+   307→            # 签名
+   308→            signature = hmac.new(
+   309→                self.api_secret.encode("utf-8"),
+   310→                query_string.encode("utf-8"),
+   311→                hashlib.sha256,
+   312→            ).hexdigest()
+   313→
+   314→            # 拼接最终的 Body 字符串
+   315→            final_body = f"{query_string}&signature={signature}"
+   316→
+   317→            header = {
+   318→                "X-MBX-APIKEY": self.api_key,
+   319→                "Content-Type": "application/x-www-form-urlencoded",  # 显式指定 Content-Type
+   320→            }
+   321→            url = f"{self.BASE_URL}{path}"
+   322→
+   323→            # 直接发送处理好的字符串(final_body)，避免 aiohttp 再次对字典进行不一致的编码
+   324→            return await self.request(
+   325→                method, url, timeout=15, headers=header, data=final_body
+   326→            )
+   327→
+   328→        # 3. 常规请求处理 (GET 或 普通 POST)
+   329→        sorted_items = sorted(filtered.items(), key=lambda kv: kv[0])
+   330→
+   331→        # 为了兼容性，常规请求也建议使用 urlencode，但保留你原本对 symbol 的特殊处理逻辑也可以
+   332→        # 这里为了最小化改动，对常规请求保留类似逻辑，但建议统一用 urlencode
+   333→        query_parts = []
+   334→        for key, value in sorted_items:
+   335→            val_str = str(value)
+   336→            # Binance 有时对 Query String 中的 symbol 不需要编码，但 urlencode 是最安全的
+   337→            if key == "symbol":
+   338→                val_str = quote(val_str)
+   339→            query_parts.append(f"{key}={val_str}")
+   340→
+   341→        query = "&".join(query_parts)
+   342→
+   343→        signature = hmac.new(
+   344→            self.api_secret.encode("utf-8"),
+   345→            query.encode("utf-8"),
+   346→            hashlib.sha256,
+   347→        ).hexdigest()
+   348→
+   349→        query_with_sig = f"{query}&signature={signature}"
+   350→        url = f"{self.BASE_URL}{path}?{query_with_sig}"
+   351→        header = {"X-MBX-APIKEY": self.api_key}
+   352→
+   353→        return await self.request(method, url, timeout=15, headers=header)
+   354→
+   355→    async def get_account_balance(
+   356→        self, asset_name: Optional[str]
+   357→    ) -> Union[List[Dict[str, Any]], float]:
+   358→        """Return current account balances."""
+   359→        if not asset_name:
+   360→            return await self.sign_and_request("GET", "/fapi/v3/balance")
+   361→
+   362→        data = await self.sign_and_request("GET", "/fapi/v3/balance")
+   363→        filtered = [item for item in data if item["asset"] == asset_name.upper()]
+   364→        return float(filtered[0]["balance"])
+   365→
+   366→    async def get_account_positions(
+   367→        self, raw: bool = False
+   368→    ) -> Union[List[Dict[str, Any]], List[OnlinePosition]]:
+   369→        """
+   370→        Return current position risk data for all symbols.
+   371→
+   372→        Returns: List of position risk dicts, e.g.,
+   373→            [{'symbol': 'HYPEUSDT', 'positionSide': 'BOTH', 'positionAmt': '1.00', 'entryPrice': '24.222', 'breakEvenPrice': '24.234111', 'markPrice': '24.17864286', 'unRealizedProfit': '-0.04335714', 'liquidationPrice': '21.65061717', 'isolatedMargin': '0', 'notional': '24.17864286', 'marginAsset': 'USDT', 'isolatedWallet': '0', 'initialMargin': '1.20893215', 'maintMargin': '0.24178642', 'positionInitialMargin': '1.20893215', 'openOrderInitialMargin': '0', 'adl': 3, 'bidNotional': '0', 'askNotional': '0', 'updateTime': 1766313377084}]
+   374→
+   375→        If raw is False, returns List of OnlinePosition objects.
+   376→
+   377→        """
+   378→        if raw:
+   379→            return await self.sign_and_request("GET", "/fapi/v3/positionRisk")
+   380→
+   381→        data = await self.sign_and_request("GET", "/fapi/v3/positionRisk")
+   382→        # @info  example data item:
+   383→        # {'symbol': 'HYPEUSDT', 'positionSide': 'BOTH', 'positionAmt': '1.00', 'entryPrice': '24.314', 'breakEvenPrice': '24.326157', 'markPrice': '24.29500000', 'unRealizedProfit': '-0.01900000', 'liquidationPrice': '0', 'isolatedMargin': '0', 'notional': '24.29500000', 'marginAsset': 'USDT', 'isolatedWallet': '0', 'initialMargin': '1.21475001', 'maintMargin': '0.24295000', 'positionInitialMargin': '1.21475001', 'openOrderInitialMargin': '0', 'adl': 2, 'bidNotional': '0', 'askNotional': '0', 'updateTime': 1766465808134}
+   384→        positions: List[OnlinePosition] = [
+   385→            OnlinePosition(
+   386→                symbol=item["symbol"],
+   387→                side=("LONG" if float(item["positionAmt"]) > 0 else "SHORT"),
+   388→                amount=abs(float(item["positionAmt"])),
+   389→                entry_price=float(item["entryPrice"]),
+   390→                exit_price=float(item["markPrice"]),
+   391→            )
+   392→            for item in data
+   393→            if float(item["positionAmt"]) != 0
+   394→        ]
+   395→        return positions
+   396→
+   397→    @ensure_exchange_info
+   398→    async def close_all_positions(self) -> List[Dict[str, Any]]:
+   399→        """Close all open positions by placing market orders in the opposite direction."""
+   400→
+   401→        positions: List[OnlinePosition] = await self.get_account_positions(raw=True)
+   402→        results: List[Dict[str, Any]] = []
+   403→
+   404→        for pos in positions:
+   405→            position_amt = float(pos["positionAmt"])
+   406→            if position_amt == 0:
+   407→                continue  # No position to close
+   408→
+   409→            side = "SELL" if position_amt > 0 else "BUY"
+   410→            quantity = abs(position_amt)
+   411→
+   412→            result = await self.make_market_order(
+   413→                symbol=pos["symbol"],
+   414→                side=side,
+   415→                quantity=quantity,
+   416→                reduce_only=True,
+   417→            )
+   418→            results.append(result)
+   419→
+   420→        return results
+   421→
+   422→    @ensure_exchange_info
+   423→    async def make_limit_order(
+   424→        self,
+   425→        symbol: str,
+   426→        side: Literal["BUY", "SELL"],
+   427→        quantity: float,
+   428→        price: float,
+   429→        time_in_force: str = "GTX",
+   430→        reduce_only: bool = False,
+   431→    ) -> Dict[str, Any]:
+   432→        """Place a limit order (GTX by default post only)."""
+   433→        order = BinanceOrder(
+   434→            symbol=symbol,
+   435→            side=side,
+   436→            order_type="LIMIT",
+   437→            quantity=quantity,
+   438→            price=price,
+   439→            time_in_force=time_in_force or "GTC",
+   440→            reduce_only=reduce_only,
+   441→        )
+   442→        rules = self.symbol_rules.get(order.symbol) if self.symbol_rules else None
+   443→        payload = order.to_payload(rules)
+   444→
+   445→        if payload is None:
+   446→            return {
+   447→                "code": -1,
+   448→                "msg": "Order filtered due to limits (MinQty/MinNotional)",
+   449→            }
+   450→
+   451→        return await self.sign_and_request("POST", "/fapi/v1/order", data=payload)
+   452→
+   453→    @ensure_exchange_info
+   454→    async def make_market_order(
+   455→        self,
+   456→        symbol: str,
+   457→        side: Literal["BUY", "SELL"],
+   458→        quantity: float,
+   459→        reduce_only: bool = False,
+   460→    ) -> Dict[str, Any]:
+   461→        """Place a market order."""
+   462→
+   463→        order = BinanceOrder(
+   464→            symbol=symbol,
+   465→            side=side,
+   466→            order_type="MARKET",
+   467→            quantity=quantity,
+   468→            time_in_force=None,
+   469→            reduce_only=reduce_only,
+   470→        )
+   471→        rules = self.symbol_rules.get(order.symbol) if self.symbol_rules else None
+   472→        payload = order.to_payload(rules)
+   473→
+   474→        if payload is None:
+   475→            return {"code": -1, "msg": "Order filtered due to limits (MinQty)"}
+   476→
+   477→        return await self.sign_and_request("POST", "/fapi/v1/order", data=payload)
+   478→
+   479→    @ensure_exchange_info
+   480→    async def batch_order(
+   481→        self, orders: Iterable[Dict[str, Any] | BinanceBatchOrder]
+   482→    ) -> Dict[int, Any]:
+   483→        """Place a batch of up to five orders."""
+   484→
+   485→        validated: List[BinanceBatchOrder] = []
+   486→        for order in orders:
+   487→            try:
+   488→                validated.append(BinanceBatchOrder.model_validate(order))
+   489→            except ValidationError as exc:
+   490→                raise ValueError(f"Invalid order payload: {exc}")
+   491→
+   492→        # 循环构建 payload，并过滤掉 None
+   493→        serialized = []
+   494→        for o in validated:
+   495→            order_obj = BinanceOrder(
+   496→                symbol=o.symbol,
+   497→                side=o.side,
+   498→                order_type=o.type,
+   499→                quantity=o.quantity,
+   500→                price=o.price,
+   501→                time_in_force=o.timeInForce or ("GTC" if o.type == "LIMIT" else None),
+   502→                reduce_only=o.reduce_only if o.reduce_only is not None else False,
+   503→            )
+   504→
+   505→            rules = self.symbol_rules.get(o.symbol) if self.symbol_rules else None
+   506→            payload = order_obj.to_payload(rules)
+   507→
+   508→            # 只有 payload 有效时才加入列表
+   509→            if payload is not None:
+   510→                serialized.append(payload)
+   511→
+   512→        # [新增] 如果过滤后列表为空，直接返回空列表，避免发送空 batchOrders 报错
+   513→        if not serialized:
+   514→            logger.warning("⚠️ All orders in batch were filtered out due to limits.")
+   515→            return []
+   516→
+   517→        # @info send batch order request 5 orders per request
+   518→        results: Dict[int, Any] = {}
+   519→        for i in range(0, len(serialized), 5):
+   520→            batch = serialized[i : i + 5]
+   521→            payload = {"batchOrders": json.dumps(batch, separators=(",", ":"))}
+   522→            response = await self.sign_and_request(
+   523→                "POST", "/fapi/v1/batchOrders", data=payload
+   524→            )
+   525→            results[i] = response
+   526→
+   527→        return results
+   528→
+   529→    async def cancel_all_orders(self, symbol: str) -> Dict[str, Any]:
+   530→        """Cancel all open orders for the given symbol."""
+   531→
+   532→        payload = {"symbol": symbol.strip().upper()}
+   533→        return await self.sign_and_request(
+   534→            "DELETE", "/fapi/v1/allOpenOrders", data=payload
+   535→        )
+   536→
+   537→    @ensure_exchange_info
+   538→    async def get_all_open_orders(
+   539→        self, symbol: Optional[str] = None
+   540→    ) -> List[Dict[str, Any]]:
+   541→        """Fetch all open orders; optionally filter by symbol."""
+   542→
+   543→        payload: Dict[str, Any] = {}
+   544→        if symbol:
+   545→            payload["symbol"] = symbol.strip().upper()
+   546→        return await self.sign_and_request(
+   547→            "GET", "/fapi/v1/openOrders", data=payload if payload else None
+   548→        )
+   549→
+   550→    @ensure_exchange_info
+   551→    async def change_leverage(self, symbol: str, leverage: int) -> Dict[str, Any]:
+   552→        """Change leverage for a given symbol."""
+   553→        payload = {"symbol": symbol.strip().upper(), "leverage": leverage}
+   554→        return await self.sign_and_request("POST", "/fapi/v1/leverage", data=payload)
+   555→
+   556→    @ensure_exchange_info
+   557→    async def change_position_side(self, dual_side: bool = False) -> Dict[str, Any]:
+   558→        """Enable or disable dual side position mode."""
+   559→        payload = {"dualSidePosition": "true" if dual_side else "false"}
+   560→        return await self.sign_and_request(
+   561→            "POST", "/fapi/v1/positionSide/dual", data=payload
+   562→        )
+   563→
+   564→    async def get_exchange_info(self) -> Dict[str, Any]:
+   565→        """Fetch exchange information."""
+   566→        return await self.request("GET", f"{self.BASE_URL}/fapi/v1/exchangeInfo")
+   567→
+   568→    @ensure_exchange_info
+   569→    async def get_book_ticker(
+   570→        self, symbol: Optional[str] = None
+   571→    ) -> Union[Dict[str, Any], List[Dict[str, Any]]]:
+   572→        """Get best bid/ask ticker for a symbol or all symbols.
+   573→
+   574→        returns:
+   575→            A list of responses from the Binance API for each order executed.
+   576→            e.g.,
+   577→                with symbol:
+   578→                {
+   579→                    "symbol": "BTCUSDT", // 交易对
+   580→                    "bidPrice": "4.00000000", //最优买单价
+   581→                    "bidQty": "431.00000000", //挂单量
+   582→                    "askPrice": "4.00000200", //最优卖单价
+   583→                    "askQty": "9.00000000", //挂单量
+   584→                    "time": 1589437530011   // 撮合引擎时间
+   585→                }
+   586→                without symbol:
+   587→                [
+   588→                    {
+   589→                            "symbol": "BTCUSDT", // 交易对
+   590→                            "bidPrice": "4.00000000", //最优买单价
+   591→                            "bidQty": "431.00000000", //挂单量
+   592→                            "askPrice": "4.00000200", //最优卖单价
+   593→                            "askQty": "9.00000000", //挂单量
+   594→                            "time": 1589437530011   // 撮合引擎时间
+   595→                    }
+   596→                ]
+   597→        """
+   598→        if symbol:
+   599→            url = f"{self.BASE_URL}/fapi/v1/ticker/bookTicker?symbol={quote(symbol)}"
+   600→            return await self.request("GET", url)
+   601→        else:
+   602→            url = f"{self.BASE_URL}/fapi/v1/ticker/bookTicker"
+   603→            return await self.request("GET", url)
+   604→
+   605→    async def get_leverage_bracket(
+   606→        self, symbol: Optional[str] = None
+   607→    ) -> List[Dict[str, Any]]:
+   608→        """
+   609→        Get leverage bracket info.
+   610→        If symbol is None, returns brackets for ALL symbols (recommended for efficiency).
+   611→        """
+   612→        params = {}
+   613→        if symbol:
+   614→            params["symbol"] = symbol.strip().upper()
+   615→
+   616→        # 不传 symbol 获取全市场，权重 5；传 symbol 权重 1。
+   617→        # 为了初始化，建议直接不传。
+   618→        return await self.sign_and_request(
+   619→            "GET", "/fapi/v1/leverageBracket", data=params
+   620→        )
+   621→
+   622→    async def set_all_symbol_to_max_leverage(self) -> Dict[str, Dict[str, Any]]:
+   623→        """Set all symbols to the given max leverage."""
+   624→        book_ticker = await self.get_book_ticker()
+   625→        all_symbols = {item["symbol"]: item for item in book_ticker}
+   626→
+   627→        results: Dict[str, Dict[str, Any]] = {}
+   628→        exchange_info = await self.get_leverage_bracket()
+   629→
+   630→        for item in exchange_info:
+   631→            symbol = item["symbol"]
+   632→
+   633→            # @info skip symbols not in book ticker
+   634→            if all_symbols.get(symbol) is None:
+   635→                continue  # Skip symbols not in book ticker
+   636→
+   637→            brackets = item["brackets"]  # 这是一个列表，包含不同层级
+   638→            max_leverage = 0
+   639→            for b in brackets:
+   640→                # initialLeverage 是 int
+   641→                lev = int(b["initialLeverage"])
+   642→                if lev > max_leverage:
+   643→                    max_leverage = lev
+   644→
+   645→            if max_leverage == 0:
+   646→                continue
+   647→
+   648→            result = await self.change_leverage(symbol=symbol, leverage=max_leverage)
+   649→            results[symbol] = result
+   650→            logger.info(
+   651→                f"Set max leverage, {max_leverage}, for symbol: {symbol}",
+   652→            )
+   653→
+   654→        logger.info("Finished setting max leverage for all symbols.")
+   655→        return results
+   656→
+   657→    async def set_all_symbol_leverage(self, leverage: int) -> Dict[str, Dict[str, Any]]:
+   658→        """Set all symbols to the given max leverage."""
+   659→        book_ticker = await self.get_book_ticker()
+   660→        all_symbols = {item["symbol"]: item for item in book_ticker}
+   661→
+   662→        results: Dict[str, Dict[str, Any]] = {}
+   663→        exchange_info = await self.get_leverage_bracket()
+   664→
+   665→        for item in exchange_info:
+   666→            symbol = item["symbol"]
+   667→
+   668→            # @info skip symbols not in book ticker
+   669→            if all_symbols.get(symbol) is None:
+   670→                continue  # Skip symbols not in book ticker
+   671→
+   672→            result = await self.change_leverage(symbol=symbol, leverage=leverage)
+   673→            results[symbol] = result
+   674→            logger.info(
+   675→                f"Set leverage, {leverage}, for symbol: {symbol}",
+   676→            )
+   677→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

@@ -1,0 +1,643 @@
+     1→from pathlib import Path
+     2→from datetime import datetime
+     3→from typing import List, Optional
+     4→import typer
+     5→import asyncio
+     6→import json
+     7→import pandas as pd
+     8→import joblib
+     9→
+    10→from backtest.position_manager import filter_weights
+    11→from bot.hourly_kline import HourlyKline
+    12→from lighter_api.lighter_api import DEFAULT_STARTING_EQUITY, LighterAPI
+    13→from lighter_api.models.account_position import AccountPosition
+    14→from logger import main_logger as logger
+    15→from config.config import (
+    16→    ONLINE_MODEL_PATH,
+    17→    TEMP_FEATURE,
+    18→    ONLINE_FEATURES,
+    19→    LighterConfig,
+    20→)
+    21→from data.kline_data_tools import resample_recent_15_min_kline
+    22→from online.online_trading_v3 import OnlineTradingV3
+    23→from online.online_traing_v2 import OnlineTradingV2
+    24→from online.ranker_process import RankerProcess, run_ranker
+    25→from online.executor_process import ExecutorProcess, run_executor
+    26→from ranker_model.ranker_train_v2 import get_feature_names
+    27→from ranker_model.ranker_online import sync_recent_kline
+    28→from utils.db_util import (
+    29→    get_all_binance_symbols,
+    30→    get_all_training_symbols,
+    31→    get_binance_lighter_both_symbols,
+    32→    get_binance_paradex_both_symbols,
+    33→)
+    34→from utils.redis_util import get_redis
+    35→from bot.daily_kline import DailyKline
+    36→from utils.visualization_util import get_equity_data
+    37→from config.config import visualization_db_config
+    38→
+    39→
+    40→# Create a new Typer app for this subcommand
+    41→app = typer.Typer()
+    42→
+    43→
+    44→async def fix_account_position(weights: dict):
+    45→    api = LighterAPI(
+    46→        api_private_key=LighterConfig.API_PRIVATE_KEY,
+    47→        account_index=LighterConfig.ACCOUNT_INDEX,
+    48→        api_key_index=LighterConfig.API_KEY_INDEX,
+    49→    )
+    50→    current_position = await api.get_all_position()
+    51→    # current_total_equity = await api.get_account_total_equity(
+    52→    #     all_positions=current_position
+    53→    # )
+    54→
+    55→    current_total_equity = DEFAULT_STARTING_EQUITY
+    56→
+    57→    current_position = await api.get_all_position()
+    58→    await api.order_by_weights_and_total_value(
+    59→        weights=weights,
+    60→        total_value=current_total_equity,
+    61→        current_positions=current_position,
+    62→        min_order_amount=DEFAULT_STARTING_EQUITY * 0.002,
+    63→    )
+    64→
+    65→    logger.info(f"Finished first ordering, wait for 60 seconds...")
+    66→    # await asyncio.sleep(60)
+    67→
+    68→    # current_position_2 = await api.get_all_position()
+    69→    # await api.order_by_weights_and_total_value(
+    70→    #     weights=weights,
+    71→    #     total_value=current_total_equity,
+    72→    #     current_positions=current_position,
+    73→    # )
+    74→
+    75→    # logger.info(f"Finished second ordering, wait for 60 seconds...")
+    76→    # await asyncio.sleep(60)
+    77→
+    78→    # current_position = await api.get_all_position()
+    79→    # await api.order_by_weights_and_total_value(
+    80→    #     weights=weights,
+    81→    #     total_value=current_total_equity,
+    82→    #     current_positions=current_position,
+    83→    # )
+    84→    # logger.info(f"Finished second ordering, wait for 60 seconds...")
+    85→
+    86→
+    87→def compare_position_diff(target_df, actual_df, diff_threshold=1.0):
+    88→    """
+    89→    比较两个仓位 DataFrame 的差异。
+    90→
+    91→    Args:
+    92→        target_df: 目标仓位 (ranker_position)
+    93→        actual_df: 实际仓位 (lighter_account_position)
+    94→        diff_threshold: 忽略小于此金额的差异 (默认为 1 USDT)
+    95→
+    96→    Returns:
+    97→        summary_df: 包含所有差异的详细报表
+    98→        missing_tokens: Lighter 账户缺少但 Ranker 有的币种
+    99→        extra_tokens: Lighter 账户持有但 Ranker 没有的币种
+   100→    """
+   101→
+   102→    # 1. 预处理：构造带符号的价值 (Long为正, Short为负) 以便准确计算敞口
+   103→    def get_signed_value(row):
+   104→        # 确保处理大小写敏感问题
+   105→        side = row["side"].lower()
+   106→        val = row["position_value"]
+   107→        return val if side == "long" else -val
+   108→
+   109→    # 复制数据以防修改原始 DF
+   110→    t_df = target_df.copy()
+   111→    a_df = actual_df.copy()
+   112→
+   113→    t_df["signed_target"] = t_df.apply(get_signed_value, axis=1)
+   114→    a_df["signed_actual"] = a_df.apply(get_signed_value, axis=1)
+   115→
+   116→    # 2. 合并数据 (Outer Join 以保留双方特有的 Token)
+   117→    # 假设 symbol 列是主键 (如 "BTCUSDT")
+   118→    merged = pd.merge(
+   119→        t_df[["symbol", "signed_target"]],
+   120→        a_df[["symbol", "signed_actual"]],
+   121→        on="symbol",
+   122→        how="outer",
+   123→    ).fillna(0)
+   124→
+   125→    # 3. 计算差异 (实际 - 目标)
+   126→    # Diff > 0 表示实际仓位比目标更"多" (或者空单更少)
+   127→    # Diff < 0 表示实际仓位比目标更"少" (或者空单更多)
+   128→    merged["diff_value"] = merged["signed_actual"] - merged["signed_target"]
+   129→    merged["abs_diff"] = merged["diff_value"].abs()
+   130→
+   131→    # 4. 增加状态标记以便阅读
+   132→    def get_status(row):
+   133→        if row["signed_target"] != 0 and row["signed_actual"] == 0:
+   134→            return "Missing in Account"  # Ranker有，账户没
+   135→        elif row["signed_target"] == 0 and row["signed_actual"] != 0:
+   136→            return "Extra in Account"  # Ranker没，账户有
+   137→        elif row["abs_diff"] > diff_threshold:
+   138→            return "Value Mismatch"  # 都有，但金额对不上
+   139→        else:
+   140→            return "Matched"  # 基本一致
+   141→
+   142→    merged["status"] = merged.apply(get_status, axis=1)
+   143→
+   144→    # 5. 整理输出格式
+   145→    # 按差异绝对值降序排列，只保留有差异的行
+   146→    result_df = merged[merged["status"] != "Matched"].sort_values(
+   147→        "abs_diff", ascending=False
+   148→    )
+   149→
+   150→    # 提取特定的列表
+   151→    missing_tokens = result_df[result_df["status"] == "Missing in Account"][
+   152→        "symbol"
+   153→    ].tolist()
+   154→    extra_tokens = result_df[result_df["status"] == "Extra in Account"][
+   155→        "symbol"
+   156→    ].tolist()
+   157→
+   158→    print(f"--- 差异概览 ---")
+   159→    print(f"缺少 Token ({len(missing_tokens)}个): {missing_tokens}")
+   160→    print(f"多余 Token ({len(extra_tokens)}个): {extra_tokens}")
+   161→    print(f"\n--- 详细差异表 (Top 10) ---")
+   162→    # 格式化一下显示，保留2位小数
+   163→    pd.set_option("display.max_rows", 20)
+   164→    pd.set_option("display.float_format", "{:.2f}".format)
+   165→    print(
+   166→        result_df[
+   167→            ["symbol", "signed_target", "signed_actual", "diff_value", "status"]
+   168→        ].head(10)
+   169→    )
+   170→    print(f"Diff token 总数: {len(result_df)}")
+   171→
+   172→    return result_df, missing_tokens, extra_tokens
+   173→
+   174→
+   175→def audit_rebalance_logic(ranker_df, account_df, total_equity):
+   176→    """
+   177→    模拟 order_by_weights_and_total_value 的逻辑来审计仓位差异。
+   178→
+   179→    Args:
+   180→        ranker_df: 包含 ['symbol', 'weigths', 'side']
+   181→        account_df: 包含 ['symbol', 'position_value', 'side']
+   182→        total_equity: 用于计算目标价值的总权益 (对应交易函数里的 total_value)
+   183→    """
+   184→
+   185→    # -------------------------------------------------
+   186→    # 1. 模拟交易代码的权重归一化 (Step 1 of your function)
+   187→    # -------------------------------------------------
+   188→    ranker = ranker_df.copy()
+   189→
+   190→    # 确保 weight 也是带符号的，或者根据 side 处理
+   191→    # 假设你的 ranker_df['weigths'] 可能是正数，通过 side='short' 变负
+   192→    def get_signed_weight(row):
+   193→        w = abs(row["weigths"])
+   194→        return w if row["side"] == "long" else -w
+   195→
+   196→    ranker["raw_signed_weight"] = ranker.apply(get_signed_weight, axis=1)
+   197→
+   198→    # 计算权重绝对值之和
+   199→    weights_sum = ranker["raw_signed_weight"].abs().sum()
+   200→
+   201→    # 执行归一化 (关键步骤!)
+   202→    if weights_sum == 0:
+   203→        ranker["normalized_weight"] = 0
+   204→    else:
+   205→        ranker["normalized_weight"] = ranker["raw_signed_weight"] / weights_sum
+   206→
+   207→    # 计算目标价值 (Target Value)
+   208→    ranker["target_value"] = ranker["normalized_weight"] * total_equity
+   209→
+   210→    # -------------------------------------------------
+   211→    # 2. 准备账户数据
+   212→    # -------------------------------------------------
+   213→    account = account_df.copy()
+   214→
+   215→    def get_signed_position(row):
+   216→        val = abs(row["position_value"])
+   217→        return val if row["side"] == "long" else -val
+   218→
+   219→    account["actual_value"] = account.apply(get_signed_position, axis=1)
+   220→
+   221→    # -------------------------------------------------
+   222→    # 3. 合并与比较
+   223→    # -------------------------------------------------
+   224→    merged = pd.merge(
+   225→        ranker[["symbol", "target_value"]],
+   226→        account[["symbol", "actual_value"]],
+   227→        on="symbol",
+   228→        how="outer",
+   229→    ).fillna(0)
+   230→
+   231→    # 计算执行层面的 Diff (Target - Actual)
+   232→    # 正数 = 需要买入 (Long More / Close Short)
+   233→    # 负数 = 需要卖出 (Short More / Close Long)
+   234→    merged["trade_diff"] = merged["target_value"] - merged["actual_value"]
+   235→
+   236→    # 增加一列：模拟交易代码的操作类型
+   237→    def classify_action(row):
+   238→        t = row["target_value"]
+   239→        a = row["actual_value"]
+   240→        diff = row["trade_diff"]
+   241→
+   242→        if abs(diff) < 1.0:  # 忽略微小金额
+   243→            return "No Action"
+   244→
+   245→        # 异号 (翻转)
+   246→        if (t > 0 and a < 0) or (t < 0 and a > 0):
+   247→            return "FLIP (Close & Open)"
+   248→
+   249→        # 目标为0 (平仓)
+   250→        if t == 0 and a != 0:
+   251→            return "Close Position"
+   252→
+   253→        # 同号但大小不同
+   254→        if abs(diff) > 0:
+   255→            if t > 0:  # 多头端
+   256→                return "Add Long" if t > a else "Reduce Long"
+   257→            else:  # 空头端
+   258→                return "Add Short" if t < a else "Reduce Short"
+   259→
+   260→        return "Stable"
+   261→
+   262→    merged["action_type"] = merged.apply(classify_action, axis=1)
+   263→
+   264→    # 排序：按交易金额大小排序
+   265→    merged["abs_trade_size"] = merged["trade_diff"].abs()
+   266→    result = merged.sort_values("abs_trade_size", ascending=False)
+   267→
+   268→    return result
+   269→
+   270→
+   271→async def compare_online_position_vs_ranker_position(ranker_account_id: int = 22):
+   272→    api = LighterAPI(
+   273→        api_private_key=LighterConfig.API_PRIVATE_KEY,
+   274→        account_index=LighterConfig.ACCOUNT_INDEX,
+   275→        api_key_index=LighterConfig.API_KEY_INDEX,
+   276→    )
+   277→    lighter_account_position: List[AccountPosition] = await api.get_all_position()
+   278→
+   279→    online_ranker_api = OnlineTradingV2(
+   280→        symbols=["BTCUSDT"], account_id=ranker_account_id
+   281→    )
+   282→
+   283→    ranker_position = pd.DataFrame(
+   284→        [
+   285→            {"symbol": k, "weigths": v, "side": "long" if v > 0 else "short"}
+   286→            for k, v in online_ranker_api.position_manager.to_trading_weights().items()
+   287→        ]
+   288→    )
+   289→    ranker_position["position_value"] = (
+   290→        ranker_position["weigths"].abs() * DEFAULT_STARTING_EQUITY
+   291→    )
+   292→    ranker_position.sort_values("position_value", ascending=False, inplace=True)
+   293→
+   294→    lighter_account_position = pd.DataFrame(
+   295→        [
+   296→            {
+   297→                "symbol": i.symbol + "USDT",
+   298→                "position_value": float(i.position_value),
+   299→                "side": "long" if i.sign > 0 else "short",
+   300→            }
+   301→            for i in lighter_account_position
+   302→        ]
+   303→    )
+   304→    lighter_account_position.sort_values(
+   305→        "position_value", ascending=False, inplace=True
+   306→    )
+   307→    result_df, missing_tokens, extra_tokens = compare_position_diff(
+   308→        actual_df=lighter_account_position, target_df=ranker_position
+   309→    )
+   310→
+   311→    audit_result = audit_rebalance_logic(
+   312→        account_df=lighter_account_position,
+   313→        ranker_df=ranker_position,
+   314→        total_equity=DEFAULT_STARTING_EQUITY,
+   315→    )
+   316→
+   317→    print(audit_result.head(10))
+   318→
+   319→    total_diff = audit_result.trade_diff.abs().sum()
+   320→    print(
+   321→        f"Total trade diff value: {total_diff} USDT ,ratio {total_diff/DEFAULT_STARTING_EQUITY}"
+   322→    )
+   323→
+   324→
+   325→# /****************
+   326→#  * API COMMANDS *
+   327→#  ****************/
+   328→
+   329→
+   330→@app.command("local_kline")
+   331→def sync_kline_data(days: int = 30):
+   332→    # symbol_list = get_all_training_symbols()
+   333→    symbol_list = get_all_binance_symbols()
+   334→    for i in range(5):
+   335→        logger.info(
+   336→            f"Start syncing {len(symbol_list)} symbols kline data...,{i} round, days: {days}"
+   337→        )
+   338→        sync_recent_kline(hours=24 * days, symbols=symbol_list)
+   339→
+   340→
+   341→@app.command("kline")
+   342→def sync_kline_data(days: int = 30):
+   343→    # @info  find the new symbols only in lighter but not in paradex
+   344→    # old_symbol_list = get_binance_paradex_both_symbols()
+   345→    # new_symbol_list = get_binance_lighter_both_symbols()
+   346→    # symbol_list = [i for i in new_symbol_list if i not in old_symbol_list]
+   347→    symbol_list = get_binance_lighter_both_symbols()
+   348→    sync_recent_kline(hours=24 * days, symbols=symbol_list)
+   349→
+   350→
+   351→@app.command("feature")
+   352→def check_feature_info(file_path: str = TEMP_FEATURE):
+   353→    feature = pd.read_csv(file_path)
+   354→    feature_names = get_feature_names(df=feature)
+   355→    logger.info(f"Feature names: {feature_names}")
+   356→    logger.info(f"Feature names number: {len(feature_names)}")
+   357→
+   358→
+   359→@app.command("daily")
+   360→def run_daily_kline_service():
+   361→    daily_kline_service = DailyKline()
+   362→    daily_kline_service.run_forever()
+   363→
+   364→
+   365→@app.command("hourly")
+   366→def sync_kline_hourly():
+   367→    symbol_list = get_all_binance_symbols()
+   368→    daily_kline_service = HourlyKline(symbols=symbol_list)
+   369→    daily_kline_service.run_forever()
+   370→
+   371→
+   372→@app.command("predict")
+   373→def predict_one_round(account_id: int = 5):
+   374→    recent_hours = 2
+   375→    sync_recent_kline(hours=recent_hours)
+   376→    print(f"one time predict, paper trading account {account_id}")
+   377→    resample_recent_15_min_kline(hours=2)
+   378→    # @todo implement the one round prediction logic
+   379→
+   380→
+   381→@app.command("run")
+   382→def run_online_service():
+   383→    """
+   384→    Run the online service.
+   385→    """
+   386→    # @todo implement the online service run logic
+   387→    pass
+   388→
+   389→
+   390→@app.command("equity")
+   391→def calculate_total_equity(account_id: int):
+   392→    """
+   393→    Calculate the total equity for the given paper trading account.
+   394→    """
+   395→    print(calculate_total_equity(account_id=account_id))
+   396→
+   397→
+   398→@app.command("order")
+   399→def make_online_order(trading_account: int, paper_trading_account: int):
+   400→    """
+   401→    Make online orders for the given account.
+   402→    """
+   403→    # @todo implement the online order logic
+   404→    pass
+   405→
+   406→
+   407→@app.command("check_model")
+   408→def check_online_model():
+   409→    model = joblib.load(ONLINE_MODEL_PATH)
+   410→    model_online_features = model.feature_name()
+   411→    assert set(model_online_features) == set(ONLINE_FEATURES)
+   412→    logger.info(f"online feature names: {model_online_features}")
+   413→    logger.info(f"online feature length: {len(model_online_features)}")
+   414→    model_file_path = Path(ONLINE_MODEL_PATH)
+   415→
+   416→    stats = model_file_path.stat()
+   417→    # 3. Extract the modification time (st_mtime)
+   418→    timestamp = stats.st_mtime
+   419→
+   420→    # 4. Convert timestamp to a human-readable string
+   421→    date_time = datetime.fromtimestamp(timestamp)
+   422→    print(f"model updated time: {date_time.strftime('%Y-%m-%d %H:%M:%S')}")
+   423→
+   424→
+   425→@app.command("trading")
+   426→def test_online_data():
+   427→    paper_trading_account_id = 23
+   428→    symbols = get_all_binance_symbols()
+   429→    # symbols = symbols[:10]
+   430→    data = OnlineTradingV3(symbols=symbols, account_id=paper_trading_account_id)
+   431→    asyncio.run(data.start_websocket())
+   432→
+   433→
+   434→@app.command("check_positions")
+   435→def check_ranker_position(total_value: float = 10_000):
+   436→    paper_trading_account_id = 22
+   437→    symbols = get_binance_lighter_both_symbols()
+   438→    data = OnlineTradingV2(symbols=symbols, account_id=paper_trading_account_id)
+   439→
+   440→    df = pd.DataFrame(
+   441→        [
+   442→            {"symbol": k, "weigths": v}
+   443→            for k, v in data.position_manager.to_trading_weights().items()
+   444→        ]
+   445→    )
+   446→    df["value"] = df["weigths"].abs() * total_value
+   447→    print(df.sort_values(by="value", ascending=False).head(20))
+   448→    print(f"total position number: {len(df)}")
+   449→
+   450→
+   451→@app.command("fix_positions")
+   452→def fix_ranker_position():
+   453→    paper_trading_account_id = 22
+   454→    symbols = get_binance_lighter_both_symbols()
+   455→    data = OnlineTradingV2(symbols=symbols, account_id=paper_trading_account_id)
+   456→
+   457→    df = pd.DataFrame(
+   458→        [
+   459→            {"symbol": k, "weigths": v}
+   460→            for k, v in data.position_manager.to_trading_weights().items()
+   461→        ]
+   462→    )
+   463→    TOTAL_VALUE = 1_000
+   464→    df["value"] = df["weigths"].abs() * TOTAL_VALUE
+   465→    print(df.sort_values(by="value", ascending=False).head(10))
+   466→
+   467→    logger.info(f"Start fixing account positions...")
+   468→
+   469→    weights = data.position_manager.to_trading_weights()
+   470→    keys = list(weights.keys())
+   471→
+   472→    keep_item = 40
+   473→
+   474→    weights_2 = {k: v for k, v in weights.items() if k in keys[:keep_item]}
+   475→
+   476→    # weights = filter_weights(weights=weights, threshold=0.01)
+   477→
+   478→    # asyncio.run(fix_account_position(weights=weights_2))
+   479→    asyncio.run(fix_account_position(weights=weights))
+   480→    logger.info(f"Finished fixing account positions.")
+   481→
+   482→
+   483→@app.command("compare")
+   484→def compare_position(ranker_account_id: int = 22):
+   485→    asyncio.run(compare_online_position_vs_ranker_position(ranker_account_id))
+   486→
+   487→
+   488→@app.command("export")
+   489→def export_account_equity_history(account_id: int = 22):
+   490→    equity_data = get_equity_data(account_id=account_id, **visualization_db_config)
+   491→    equity_data.to_csv(f"account_{account_id}_equity_history.csv", index=False)
+   492→    import ipdb
+   493→
+   494→    ipdb.set_trace()
+   495→
+   496→
+   497→# /*************************************
+   498→#  * RANKER-EXECUTOR DISTRIBUTED ARCH  *
+   499→#  *************************************/
+   500→
+   501→
+   502→@app.command("ranker")
+   503→def start_ranker_process(
+   504→    account_id: int = typer.Argument(..., help="Account ID for the ranker process"),
+   505→):
+   506→    """
+   507→    Start the Ranker process (Process A) for distributed trading.
+   508→
+   509→    The Ranker process handles:
+   510→    - WebSocket connection to Binance for real-time kline data
+   511→    - Feature calculation and model prediction
+   512→    - Portfolio optimization to generate target weights
+   513→    - Publishing target weights to Redis for Executor to consume
+   514→
+   515→    Example:
+   516→        python main.py online ranker 1
+   517→    """
+   518→    logger.info(f"Starting Ranker process for account_id={account_id}")
+   519→    logger.info("Redis communication protocol:")
+   520→    logger.info(f"  - Storage Key: strategy:target_weights:{account_id}")
+   521→    logger.info(f"  - Signal Channel: signal:rebalance:{account_id}")
+   522→    asyncio.run(run_ranker(account_id=account_id))
+   523→
+   524→
+   525→@app.command("executor")
+   526→def start_executor_process(
+   527→    account_id: int = typer.Argument(..., help="Account ID for the executor process"),
+   528→    exchange_account: str = typer.Option(
+   529→        "main", "--exchange", "-e", help="Exchange account name (e.g., main, sub)"
+   530→    ),
+   531→):
+   532→    """
+   533→    Start the Executor process (Process B) for distributed trading.
+   534→
+   535→    The Executor process handles:
+   536→    - Pull-on-Start: Fetch and execute pending target weights on startup
+   537→    - Subscribe to rebalance signals from Redis
+   538→    - Execute orders via OrderExecutor when notified
+   539→
+   540→    Example:
+   541→        python main.py online executor 1
+   542→        python main.py online executor 1 --exchange sub_account
+   543→    """
+   544→    logger.info(f"Starting Executor process for account_id={account_id}")
+   545→    logger.info(f"Exchange account: {exchange_account}")
+   546→    logger.info("Redis communication protocol:")
+   547→    logger.info(f"  - Storage Key: strategy:target_weights:{account_id}")
+   548→    logger.info(f"  - Signal Channel: signal:rebalance:{account_id}")
+   549→    logger.info("Pull-on-Start enabled: Will fetch pending weights on startup")
+   550→    asyncio.run(
+   551→        run_executor(account_id=account_id, exchange_account_name=exchange_account)
+   552→    )
+   553→
+   554→
+   555→@app.command("distributed")
+   556→def start_distributed_trading(
+   557→    account_id: int = typer.Argument(..., help="Account ID"),
+   558→    mode: str = typer.Option(
+   559→        "both", "--mode", "-m", help="Mode: ranker, executor, or both"
+   560→    ),
+   561→    exchange_account: str = typer.Option(
+   562→        "main", "--exchange", "-e", help="Exchange account name"
+   563→    ),
+   564→):
+   565→    """
+   566→    Start distributed trading system (Ranker-Executor architecture).
+   567→
+   568→    Modes:
+   569→    - ranker: Start only the Ranker process (calculation)
+   570→    - executor: Start only the Executor process (execution)
+   571→    - both: Start both processes (for local testing only)
+   572→
+   573→    For production, run ranker and executor as separate processes:
+   574→        Terminal 1: python main.py online ranker 1
+   575→        Terminal 2: python main.py online executor 1
+   576→
+   577→    Example:
+   578→        python main.py online distributed 1 --mode ranker
+   579→        python main.py online distributed 1 --mode executor --exchange main
+   580→    """
+   581→    if mode == "ranker":
+   582→        logger.info(f"Starting Ranker only for account_id={account_id}")
+   583→        asyncio.run(run_ranker(account_id=account_id))
+   584→    elif mode == "executor":
+   585→        logger.info(f"Starting Executor only for account_id={account_id}")
+   586→        asyncio.run(
+   587→            run_executor(account_id=account_id, exchange_account_name=exchange_account)
+   588→        )
+   589→    elif mode == "both":
+   590→        logger.warning("Running both processes in single terminal (testing only)")
+   591→        logger.warning("For production, use separate terminals for ranker and executor")
+   592→
+   593→        async def run_both():
+   594→            ranker_task = asyncio.create_task(run_ranker(account_id=account_id))
+   595→            executor_task = asyncio.create_task(
+   596→                run_executor(
+   597→                    account_id=account_id, exchange_account_name=exchange_account
+   598→                )
+   599→            )
+   600→            await asyncio.gather(ranker_task, executor_task)
+   601→
+   602→        asyncio.run(run_both())
+   603→    else:
+   604→        raise typer.BadParameter(
+   605→            f"Invalid mode: {mode}. Use 'ranker', 'executor', or 'both'"
+   606→        )
+   607→
+   608→
+   609→@app.command("sync_symbols")
+   610→def sync_symbols_to_redis():
+   611→    """
+   612→    Fetch all trading symbols from Binance and save to Redis.
+   613→
+   614→    This command:
+   615→    1. Fetches all USDT perpetual futures symbols from Binance
+   616→    2. Saves them to Redis key 'daily_kline:all_token_list' as JSON array
+   617→
+   618→    Example:
+   619→        python main.py online sync_symbols
+   620→    """
+   621→    logger.info("Fetching symbols from Binance...")
+   622→    try:
+   623→        symbols = get_all_binance_symbols()
+   624→        logger.info(f"Fetched {len(symbols)} symbols from Binance")
+   625→
+   626→        # Save to Redis
+   627→        redis = get_redis(async_mode=False)
+   628→        redis.set(
+   629→            "daily_kline:all_token_list",
+   630→            # json.dumps(symbols),
+   631→        )
+   632→        logger.info(
+   633→            f"Successfully saved {len(symbols)} symbols to Redis key 'daily_kline:all_token_list'"
+   634→        )
+   635→        logger.info(f"Sample symbols: {symbols[:10]}")
+   636→    except Exception as e:
+   637→        logger.error(f"Failed to sync symbols to Redis: {e}", exc_info=True)
+   638→        raise typer.Exit(code=1)
+   639→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

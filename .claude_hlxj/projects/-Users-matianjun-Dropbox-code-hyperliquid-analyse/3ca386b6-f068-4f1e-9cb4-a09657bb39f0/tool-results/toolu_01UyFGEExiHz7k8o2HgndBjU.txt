@@ -1,0 +1,28 @@
+The file /Users/matianjun/Dropbox/code/hyperliquid_analyse/task_plan.md has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→# Task Plan: Implement Binance Funding Rate Sync
+     2→
+     3→## Goal
+     4→实现获取 Binance funding rate 历史数据的功能，存储到数据库，并通过 CLI 命令进行同步。
+     5→
+     6→## Phases
+     7→- [ ] Phase 1: 研究 Binance Funding Rate API 文档
+     8→- [ ] Phase 2: 实现 BinanceFundingRate 数据模型
+     9→- [ ] Phase 3: 实现获取 funding rate 的 API 函数
+    10→- [ ] Phase 4: 实现 CLI 命令 sync-funding-rate
+    11→- [ ] Phase 5: 编写测试
+    12→- [ ] Phase 6: 更新文档
+    13→
+    14→## Key Questions
+    15→1. Binance funding rate API 的具体格式是什么？
+    16→2. 如何获取所有 Binance symbols？
+    17→3. 数据库表结构应该如何设计？
+    18→
+    19→## Decisions Made
+    20→- (待定)
+    21→
+    22→## Errors Encountered
+    23→- (无)
+    24→
+    25→## Status
+    26→**Currently in Phase 1** - 研究 Binance Funding Rate API 文档
+    27→

@@ -1,0 +1,1711 @@
+     1→"""
+     2→Pydantic v2 type definitions for Nado Async API.
+     3→
+     4→This module provides standalone type definitions using pydantic v2,
+     5→independent of nado_protocol's pydantic v1 types.
+     6→"""
+     7→
+     8→from enum import Enum
+     9→from typing import Any, Dict, List, Optional, Union
+    10→from pydantic import BaseModel, Field, ConfigDict
+    11→from eth_account.signers.local import LocalAccount
+    12→import time
+    13→import secrets
+    14→
+    15→# Check pydantic version
+    16→try:
+    17→    from pydantic import VERSION as PYDANTIC_VERSION
+    18→
+    19→    PYDANTIC_V2 = PYDANTIC_VERSION.startswith("2.")
+    20→except ImportError:
+    21→    PYDANTIC_V2 = False
+    22→
+    23→if PYDANTIC_V2:
+    24→    from pydantic import field_validator
+    25→else:
+    26→    from pydantic import validator as field_validator
+    27→
+    28→
+    29→# ==================== Enums ====================
+    30→
+    31→
+    32→class StrEnum(str, Enum):
+    33→    """String enum base class."""
+    34→
+    35→    pass
+    36→
+    37→
+    38→class OrderType(StrEnum):
+    39→    """Order type enumeration."""
+    40→
+    41→    DEFAULT = "default"
+    42→    IOC = "ioc"
+    43→    FOK = "fok"
+    44→    POST_ONLY = "post_only"
+    45→
+    46→
+    47→class ResponseStatus(StrEnum):
+    48→    """Response status enumeration."""
+    49→
+    50→    SUCCESS = "success"
+    51→    FAILURE = "failure"
+    52→
+    53→
+    54→class MarketType(StrEnum):
+    55→    """Market type enumeration."""
+    56→
+    57→    SPOT = "spot"
+    58→    PERP = "perp"
+    59→
+    60→
+    61→class NadoNetwork(StrEnum):
+    62→    """Nado network enumeration."""
+    63→
+    64→    HARDHAT = "hardhat"
+    65→    TESTING = "testing"
+    66→    TESTNET = "testnet"
+    67→    MAINNET = "mainnet"
+    68→
+    69→
+    70→class NadoExecuteType(StrEnum):
+    71→    """Nado execute type enumeration."""
+    72→
+    73→    PLACE_ORDER = "place_order"
+    74→    PLACE_ORDERS = "place_orders"
+    75→    CANCEL_ORDERS = "cancel_orders"
+    76→    CANCEL_PRODUCT_ORDERS = "cancel_product_orders"
+    77→    CANCEL_AND_PLACE = "cancel_and_place"
+    78→    WITHDRAW_COLLATERAL = "withdraw_collateral"
+    79→    LIQUIDATE_SUBACCOUNT = "liquidate_subaccount"
+    80→    MINT_NLP = "mint_nlp"
+    81→    BURN_NLP = "burn_nlp"
+    82→    LINK_SIGNER = "link_signer"
+    83→    TRANSFER_QUOTE = "transfer_quote"
+    84→
+    85→
+    86→class NadoTxType(StrEnum):
+    87→    """Nado transaction type enumeration (extends NadoExecuteType)."""
+    88→
+    89→    PLACE_ORDER = "place_order"
+    90→    PLACE_ORDERS = "place_orders"
+    91→    CANCEL_ORDERS = "cancel_orders"
+    92→    CANCEL_PRODUCT_ORDERS = "cancel_product_orders"
+    93→    CANCEL_AND_PLACE = "cancel_and_place"
+    94→    WITHDRAW_COLLATERAL = "withdraw_collateral"
+    95→    LIQUIDATE_SUBACCOUNT = "liquidate_subaccount"
+    96→    MINT_NLP = "mint_nlp"
+    97→    BURN_NLP = "burn_nlp"
+    98→    LINK_SIGNER = "link_signer"
+    99→    TRANSFER_QUOTE = "transfer_quote"
+   100→    AUTHENTICATE_STREAM = "authenticate"
+   101→    LIST_TRIGGER_ORDERS = "list_trigger_orders"
+   102→
+   103→
+   104→class OrderAppendixTriggerType(Enum):
+   105→    """Order appendix trigger type."""
+   106→
+   107→    NO_TRIGGER = 0
+   108→    PRICE = 1
+   109→    TWAP = 2
+   110→    TWAP_CUSTOM_AMOUNTS = 3
+   111→
+   112→
+   113→class NadoBackendURL(StrEnum):
+   114→    """Backend URL enumeration."""
+   115→
+   116→    DEVNET_GATEWAY = "http://localhost:8000/v1"
+   117→    DEVNET_INDEXER = "http://localhost:8001/v1"
+   118→    DEVNET_TRIGGER = "http://localhost:8003"
+   119→    TESTNET_GATEWAY = "https://gateway.test.nado.xyz/v1"
+   120→    TESTNET_INDEXER = "https://archive.test.nado.xyz/v1"
+   121→    TESTNET_TRIGGER = "https://trigger.test.nado.xyz/v1"
+   122→
+   123→    MAINNET_GATEWAY = "https://gateway.prod.nado.xyz/v1"
+   124→    MAINNET_INDEXER = "https://archive.prod.nado.xyz/v1"
+   125→    MAINNET_TRIGGER = "https://trigger.prod.nado.xyz/v1"
+   126→
+   127→
+   128→# ==================== Exceptions ====================
+   129→
+   130→
+   131→class BadStatusCodeException(Exception):
+   132→    """Raised when HTTP status code is not 200."""
+   133→
+   134→    pass
+   135→
+   136→
+   137→class ExecuteFailedException(Exception):
+   138→    """Raised when execution fails."""
+   139→
+   140→    pass
+   141→
+   142→
+   143→class QueryFailedException(Exception):
+   144→    """Raised when query fails."""
+   145→
+   146→    pass
+   147→
+   148→
+   149→class MissingSignerException(Exception):
+   150→    """Raised when signer is required but not provided."""
+   151→
+   152→    pass
+   153→
+   154→
+   155→class MissingTriggerClient(Exception):
+   156→    """Raised when trigger client is required but not configured."""
+   157→
+   158→    pass
+   159→
+   160→
+   161→# ==================== Base Model ====================
+   162→
+   163→
+   164→def _serialize_bytes_to_hex(obj: Any) -> Any:
+   165→    """Recursively convert bytes to hex strings for JSON serialization."""
+   166→    if isinstance(obj, bytes):
+   167→        return "0x" + obj.hex()
+   168→    elif isinstance(obj, dict):
+   169→        return {k: _serialize_bytes_to_hex(v) for k, v in obj.items()}
+   170→    elif isinstance(obj, list):
+   171→        return [_serialize_bytes_to_hex(v) for v in obj]
+   172→    return obj
+   173→
+   174→
+   175→if PYDANTIC_V2:
+   176→
+   177→    class NadoBaseModel(BaseModel):
+   178→        """Base model for Nado API with pydantic v2 config."""
+   179→
+   180→        model_config = ConfigDict(
+   181→            populate_by_name=True,
+   182→            use_enum_values=True,
+   183→            extra="allow",
+   184→            arbitrary_types_allowed=True,
+   185→        )
+   186→
+   187→        def model_dump(self, mode: str = "python", **kwargs) -> Dict[str, Any]:
+   188→            """Override model_dump to handle bytes serialization for JSON mode."""
+   189→            result = super().model_dump(mode="python", **kwargs)
+   190→            if mode == "json":
+   191→                return _serialize_bytes_to_hex(result)
+   192→            return result
+   193→
+   194→else:
+   195→
+   196→    class NadoBaseModel(BaseModel):
+   197→        """Base model for Nado API with pydantic v1 config."""
+   198→
+   199→        class Config:
+   200→            allow_population_by_field_name = True
+   201→            use_enum_values = True
+   202→            extra = "allow"
+   203→            arbitrary_types_allowed = True
+   204→
+   205→        # Add v2-like methods for compatibility
+   206→        def model_dump(self, mode=None, exclude_none=True, **kwargs):
+   207→            """v2-compatible dump method."""
+   208→            return self.dict(exclude_none=exclude_none, **kwargs)
+   209→
+   210→        @classmethod
+   211→        def model_validate(cls, obj):
+   212→            """v2-compatible validate method."""
+   213→            if isinstance(obj, cls):
+   214→                return obj
+   215→            return cls.parse_obj(obj)
+   216→
+   217→
+   218→# ==================== Subaccount Types ====================
+   219→
+   220→
+   221→class SubaccountParams(NadoBaseModel):
+   222→    """Parameters for identifying a subaccount."""
+   223→
+   224→    subaccount_owner: Optional[str] = None
+   225→    subaccount_name: str = "default"
+   226→
+   227→
+   228→# Type alias for subaccount
+   229→Subaccount = Union[str, bytes, SubaccountParams]
+   230→Signer = Union[str, LocalAccount]
+   231→
+   232→
+   233→# ==================== Utility Functions ====================
+   234→
+   235→
+   236→def hex_to_bytes32(hex_str: str) -> bytes:
+   237→    """Convert hex string to bytes32."""
+   238→    if hex_str.startswith("0x"):
+   239→        hex_str = hex_str[2:]
+   240→    return bytes.fromhex(hex_str.zfill(64))
+   241→
+   242→
+   243→def bytes32_to_hex(b: bytes) -> str:
+   244→    """Convert bytes32 to hex string."""
+   245→    return "0x" + b.hex()
+   246→
+   247→
+   248→def subaccount_to_bytes32(subaccount: Subaccount) -> bytes:
+   249→    """Convert subaccount to bytes32."""
+   250→    if isinstance(subaccount, bytes):
+   251→        return subaccount
+   252→    if isinstance(subaccount, str):
+   253→        return hex_to_bytes32(subaccount)
+   254→    if isinstance(subaccount, SubaccountParams):
+   255→        owner = subaccount.subaccount_owner or ""
+   256→        name = subaccount.subaccount_name or "default"
+   257→        # Encode: owner address (20 bytes) + name (12 bytes)
+   258→        owner_bytes = bytes.fromhex(owner[2:] if owner.startswith("0x") else owner)
+   259→        name_bytes = name.encode("utf-8")[:12].ljust(12, b"\x00")
+   260→        return owner_bytes + name_bytes
+   261→    raise ValueError(f"Cannot convert {type(subaccount)} to bytes32")
+   262→
+   263→
+   264→def subaccount_to_hex(subaccount: Subaccount) -> str:
+   265→    """Convert subaccount to hex string."""
+   266→    return bytes32_to_hex(subaccount_to_bytes32(subaccount))
+   267→
+   268→
+   269→def gen_order_nonce(recv_time_ms: Optional[int] = None) -> int:
+   270→    """Generate order nonce."""
+   271→    if recv_time_ms is None:
+   272→        recv_time_ms = int(time.time() * 1000)
+   273→    random_bits = secrets.randbits(32)
+   274→    return (recv_time_ms << 20) | (random_bits & 0xFFFFF)
+   275→
+   276→
+   277→def get_expiration_timestamp(seconds_from_now: int) -> int:
+   278→    """Get expiration timestamp."""
+   279→    return int(time.time()) + seconds_from_now
+   280→
+   281→
+   282→def gen_order_verifying_contract(product_id: int) -> str:
+   283→    """
+   284→    Generates the order verifying contract address based on the product ID.
+   285→
+   286→    Args:
+   287→        product_id (int): The product ID for which to generate the verifying contract address.
+   288→
+   289→    Returns:
+   290→        str: The generated order verifying contract address in hexadecimal format.
+   291→    """
+   292→    be_bytes = product_id.to_bytes(20, byteorder="big", signed=False)
+   293→    return "0x" + be_bytes.hex()
+   294→
+   295→
+   296→# ==================== Math Utilities ====================
+   297→
+   298→
+   299→def to_x18(value: float) -> int:
+   300→    """Convert float to x18 integer."""
+   301→    return int(value * 10**18)
+   302→
+   303→
+   304→def from_x18(value: int) -> float:
+   305→    """Convert x18 integer to float."""
+   306→    return value / 10**18
+   307→
+   308→
+   309→def to_pow_10(value: float, decimals: int) -> int:
+   310→    """Convert value to power of 10."""
+   311→    return int(value * 10**decimals)
+   312→
+   313→
+   314→def from_pow_10(value: int, decimals: int) -> float:
+   315→    """Convert from power of 10."""
+   316→    return value / 10**decimals
+   317→
+   318→
+   319→def mul_x18(a: int, b: int) -> int:
+   320→    """Multiply two x18 values."""
+   321→    return (a * b) // 10**18
+   322→
+   323→
+   324→def round_x18(value: int, increment: int) -> int:
+   325→    """Round x18 value to increment."""
+   326→    if increment == 0:
+   327→        return value
+   328→    return (value // increment) * increment
+   329→
+   330→
+   331→# ==================== Order Utilities ====================
+   332→
+   333→
+   334→ORDER_APPENDIX_VERSION = 1
+   335→
+   336→
+   337→def build_appendix(
+   338→    order_type: OrderType = OrderType.DEFAULT,
+   339→    reduce_only: bool = False,
+   340→    isolated: bool = False,
+   341→    isolated_margin: int = 0,
+   342→    trigger_type: OrderAppendixTriggerType = OrderAppendixTriggerType.NO_TRIGGER,
+   343→    twap_times: int = 0,
+   344→    twap_slippage_frac: float = 0,
+   345→) -> int:
+   346→    """Build order appendix integer."""
+   347→    order_type_map = {
+   348→        OrderType.DEFAULT: 0,
+   349→        OrderType.IOC: 1,
+   350→        OrderType.FOK: 2,
+   351→        OrderType.POST_ONLY: 3,
+   352→    }
+   353→
+   354→    appendix = ORDER_APPENDIX_VERSION
+   355→    appendix |= (1 if isolated else 0) << 8
+   356→    appendix |= order_type_map.get(order_type, 0) << 9
+   357→    appendix |= (1 if reduce_only else 0) << 11
+   358→    appendix |= trigger_type.value << 12
+   359→
+   360→    if trigger_type in (
+   361→        OrderAppendixTriggerType.TWAP,
+   362→        OrderAppendixTriggerType.TWAP_CUSTOM_AMOUNTS,
+   363→    ):
+   364→        twap_slippage_encoded = int(twap_slippage_frac * 1000) & 0x3FF
+   365→        value = (twap_times & 0x1FF) | (twap_slippage_encoded << 9)
+   366→        appendix |= value << 64
+   367→    elif isolated and isolated_margin > 0:
+   368→        appendix |= (isolated_margin & ((1 << 64) - 1)) << 64
+   369→
+   370→    return appendix
+   371→
+   372→
+   373→# ==================== Client Options ====================
+   374→
+   375→
+   376→class EngineClientOpts(NadoBaseModel):
+   377→    """Engine client configuration options."""
+   378→
+   379→    url: str
+   380→    signer: Optional[LocalAccount] = None
+   381→    linked_signer: Optional[LocalAccount] = None
+   382→    chain_id: Optional[int] = None
+   383→    endpoint_addr: Optional[str] = None
+   384→
+   385→
+   386→class IndexerClientOpts(NadoBaseModel):
+   387→    """Indexer client configuration options."""
+   388→
+   389→    url: str
+   390→
+   391→
+   392→class TriggerClientOpts(NadoBaseModel):
+   393→    """Trigger client configuration options."""
+   394→
+   395→    url: str
+   396→    signer: Optional[LocalAccount] = None
+   397→    linked_signer: Optional[LocalAccount] = None
+   398→    chain_id: Optional[int] = None
+   399→    endpoint_addr: Optional[str] = None
+   400→
+   401→
+   402→# ==================== Execute Request/Response Types ====================
+   403→
+   404→
+   405→def _serialize_sender(v):
+   406→    """Serialize sender to bytes32 if needed."""
+   407→    if isinstance(v, (str, bytes)):
+   408→        return v
+   409→    if isinstance(v, SubaccountParams):
+   410→        return subaccount_to_bytes32(v)
+   411→    return v
+   412→
+   413→
+   414→class BaseParams(NadoBaseModel):
+   415→    """Base parameters for execute requests."""
+   416→
+   417→    sender: Union[str, bytes, SubaccountParams]
+   418→    nonce: Optional[int] = None
+   419→
+   420→    @classmethod
+   421→    def serialize_sender(cls, v):
+   422→        """Serialize sender validator."""
+   423→        return _serialize_sender(v)
+   424→
+   425→
+   426→class MarketOrderParams(BaseParams):
+   427→    """Market order parameters."""
+   428→
+   429→    amount: int
+   430→
+   431→
+   432→class OrderParams(MarketOrderParams):
+   433→    """Order parameters."""
+   434→
+   435→    priceX18: int
+   436→    expiration: int
+   437→    appendix: int = 0
+   438→
+   439→
+   440→class PlaceOrderParams(NadoBaseModel):
+   441→    """Place order request parameters."""
+   442→
+   443→    product_id: int
+   444→    order: OrderParams
+   445→    signature: Optional[str] = None
+   446→    spot_leverage: Optional[bool] = None
+   447→    id: Optional[int] = None
+   448→
+   449→
+   450→class PlaceMarketOrderParams(NadoBaseModel):
+   451→    """Place market order request parameters."""
+   452→
+   453→    product_id: int
+   454→    market_order: MarketOrderParams
+   455→    slippage: Optional[float] = None
+   456→    spot_leverage: Optional[bool] = None
+   457→    reduce_only: Optional[bool] = None
+   458→    signature: Optional[str] = None
+   459→
+   460→
+   461→class CancelOrdersParams(BaseParams):
+   462→    """Cancel orders parameters."""
+   463→
+   464→    productIds: List[int] = Field(default_factory=list)
+   465→    digests: List[bytes] = Field(default_factory=list)
+   466→    signature: Optional[str] = None
+   467→
+   468→
+   469→class CancelProductOrdersParams(BaseParams):
+   470→    """Cancel product orders parameters."""
+   471→
+   472→    productIds: List[int]
+   473→    signature: Optional[str] = None
+   474→
+   475→
+   476→class CancelAndPlaceParams(NadoBaseModel):
+   477→    """Cancel and place parameters."""
+   478→
+   479→    cancel_orders: CancelOrdersParams
+   480→    place_order: PlaceOrderParams
+   481→
+   482→
+   483→class WithdrawCollateralParams(BaseParams):
+   484→    """Withdraw collateral parameters."""
+   485→
+   486→    productId: int
+   487→    amount: int
+   488→    signature: Optional[str] = None
+   489→
+   490→
+   491→class MintNlpParams(BaseParams):
+   492→    """Mint NLP parameters."""
+   493→
+   494→    quoteAmount: int
+   495→    signature: Optional[str] = None
+   496→
+   497→
+   498→class BurnNlpParams(BaseParams):
+   499→    """Burn NLP parameters."""
+   500→
+   501→    productId: Optional[int] = None
+   502→    nlpAmount: int
+   503→    signature: Optional[str] = None
+   504→
+   505→
+   506→class LinkSignerParams(BaseParams):
+   507→    """Link signer parameters."""
+   508→
+   509→    signer: Union[str, bytes]
+   510→    signature: Optional[str] = None
+   511→
+   512→
+   513→class LiquidateSubaccountParams(BaseParams):
+   514→    """Liquidate subaccount parameters."""
+   515→
+   516→    liquidatee: Union[str, bytes]
+   517→    productId: int
+   518→    isEncodedSpread: bool = False
+   519→    amount: int
+   520→    signature: Optional[str] = None
+   521→
+   522→
+   523→class DepositCollateralParams(NadoBaseModel):
+   524→    """
+   525→    Class representing parameters for depositing collateral in the Nado protocol.
+   526→
+   527→    Attributes:
+   528→        subaccount_name (str): The name of the subaccount.
+   529→        product_id (int): The ID of the spot product to deposit collateral for.
+   530→        amount (int): The amount of collateral to be deposited.
+   531→        referral_code (Optional[str]): Use this to indicate you were referred by existing member.
+   532→    """
+   533→
+   534→    subaccount_name: str
+   535→    product_id: int
+   536→    amount: int
+   537→    referral_code: Optional[str] = None
+   538→
+   539→
+   540→class ExecuteData(NadoBaseModel):
+   541→    """Execute response data."""
+   542→
+   543→    digest: Optional[str] = None
+   544→    cancelled_orders: Optional[List[Any]] = None
+   545→
+   546→
+   547→class ErrorData(NadoBaseModel):
+   548→    """Error data."""
+   549→
+   550→    message: Optional[str] = None
+   551→    code: Optional[str] = None
+   552→
+   553→
+   554→class ExecuteResponse(NadoBaseModel):
+   555→    """Execute response."""
+   556→
+   557→    status: str
+   558→    signature: Optional[str] = None
+   559→    data: Optional[ExecuteData] = None
+   560→    error: Optional[ErrorData] = None
+   561→    req: Optional[Dict] = None
+   562→
+   563→
+   564→# ==================== Query Request/Response Types ====================
+   565→
+   566→
+   567→class QueryRequest(NadoBaseModel):
+   568→    """Base query request."""
+   569→
+   570→    type: str
+   571→
+   572→
+   573→class QueryStatusParams(QueryRequest):
+   574→    """Query status parameters."""
+   575→
+   576→    type: str = "status"
+   577→
+   578→
+   579→class QueryContractsParams(QueryRequest):
+   580→    """Query contracts parameters."""
+   581→
+   582→    type: str = "contracts"
+   583→
+   584→
+   585→class QueryNoncesParams(QueryRequest):
+   586→    """Query nonces parameters."""
+   587→
+   588→    type: str = "nonces"
+   589→    address: str
+   590→
+   591→
+   592→class QuerySubaccountInfoParams(QueryRequest):
+   593→    """Query subaccount info parameters."""
+   594→
+   595→    type: str = "subaccount_info"
+   596→    subaccount: str
+   597→    txns: Optional[str] = None
+   598→    pre_state: Optional[str] = None
+   599→
+   600→
+   601→class QuerySubaccountInfoTx(NadoBaseModel):
+   602→    """Subaccount info transaction."""
+   603→
+   604→    type: str
+   605→    params: Dict[str, Any]
+   606→
+   607→
+   608→class QueryMarketPriceParams(QueryRequest):
+   609→    """Query market price parameters."""
+   610→
+   611→    type: str = "market_price"
+   612→    product_id: int
+   613→
+   614→
+   615→class QueryMarketLiquidityParams(QueryRequest):
+   616→    """Query market liquidity parameters."""
+   617→
+   618→    type: str = "market_liquidity"
+   619→    product_id: int
+   620→    depth: int
+   621→
+   622→
+   623→class QuerySubaccountOpenOrdersParams(QueryRequest):
+   624→    """Query subaccount open orders parameters."""
+   625→
+   626→    type: str = "subaccount_orders"
+   627→    product_id: int
+   628→    sender: str
+   629→
+   630→
+   631→class QuerySubaccountMultiProductOpenOrdersParams(QueryRequest):
+   632→    """Query subaccount multi-product open orders parameters."""
+   633→
+   634→    type: str = "subaccount_multi_product_orders"
+   635→    product_ids: List[int]
+   636→    sender: str
+   637→
+   638→
+   639→class QueryAllProductsParams(QueryRequest):
+   640→    """Query all products parameters."""
+   641→
+   642→    type: str = "all_products"
+   643→
+   644→
+   645→class QuerySymbolsParams(QueryRequest):
+   646→    """Query symbols parameters."""
+   647→
+   648→    type: str = "symbols"
+   649→    product_type: Optional[str] = None
+   650→    product_ids: Optional[List[int]] = None
+   651→
+   652→
+   653→class QueryMaxOrderSizeParams(QueryRequest):
+   654→    """Query max order size parameters."""
+   655→
+   656→    type: str = "max_order_size"
+   657→    sender: str
+   658→    product_id: int
+   659→    price_x18: str
+   660→    direction: str
+   661→    spot_leverage: Optional[bool] = None
+   662→
+   663→
+   664→class QueryMaxWithdrawableParams(QueryRequest):
+   665→    """Query max withdrawable parameters."""
+   666→
+   667→    type: str = "max_withdrawable"
+   668→    product_id: int
+   669→    sender: str
+   670→    spot_leverage: Optional[bool] = None
+   671→
+   672→
+   673→class QueryMaxLpMintableParams(QueryRequest):
+   674→    """Query max LP mintable parameters."""
+   675→
+   676→    type: str = "max_lp_mintable"
+   677→    product_id: int
+   678→    sender: str
+   679→    spot_leverage: Optional[bool] = None
+   680→
+   681→
+   682→class QueryFeeRatesParams(QueryRequest):
+   683→    """Query fee rates parameters."""
+   684→
+   685→    type: str = "fee_rates"
+   686→    sender: str
+   687→
+   688→
+   689→class QueryHealthGroupsParams(QueryRequest):
+   690→    """Query health groups parameters."""
+   691→
+   692→    type: str = "health_groups"
+   693→
+   694→
+   695→class QueryLinkedSignerParams(QueryRequest):
+   696→    """Query linked signer parameters."""
+   697→
+   698→    type: str = "linked_signer"
+   699→    subaccount: str
+   700→
+   701→
+   702→class QueryOrderParams(QueryRequest):
+   703→    """Query order parameters."""
+   704→
+   705→    type: str = "order"
+   706→    product_id: int
+   707→    digest: str
+   708→
+   709→
+   710→class QueryIsolatedPositionsParams(QueryRequest):
+   711→    """Query isolated positions parameters."""
+   712→
+   713→    type: str = "isolated_positions"
+   714→    subaccount: str
+   715→
+   716→
+   717→# ==================== Query Response Data Types ====================
+   718→
+   719→
+   720→class StatusData(NadoBaseModel):
+   721→    """Status data."""
+   722→
+   723→    epoch: Optional[str] = None
+   724→    last_event_timestamp: Optional[str] = None
+   725→
+   726→
+   727→class ContractsData(NadoBaseModel):
+   728→    """Contracts data."""
+   729→
+   730→    endpoint_addr: str
+   731→    chain_id: str
+   732→
+   733→
+   734→class NoncesData(NadoBaseModel):
+   735→    """Nonces data."""
+   736→
+   737→    tx_nonce: str
+   738→    order_nonce: str
+   739→
+   740→
+   741→class MarketPriceData(NadoBaseModel):
+   742→    """Market price data."""
+   743→
+   744→    bid: Optional[str] = None
+   745→    ask: Optional[str] = None
+   746→    mid: Optional[str] = None
+   747→
+   748→
+   749→class MarketLiquidity(NadoBaseModel):
+   750→    """Market liquidity level."""
+   751→
+   752→    price: int
+   753→    size: int
+   754→
+   755→
+   756→class MarketLiquidityData(NadoBaseModel):
+   757→    """Market liquidity data."""
+   758→
+   759→    bids: List[List[int]] = Field(default_factory=list)
+   760→    asks: List[List[int]] = Field(default_factory=list)
+   761→
+   762→
+   763→class SubaccountHealth(NadoBaseModel):
+   764→    """Subaccount health."""
+   765→
+   766→    assets: Optional[str] = None
+   767→    liabilities: Optional[str] = None
+   768→    health: Optional[str] = None
+   769→
+   770→
+   771→class SpotBalance(NadoBaseModel):
+   772→    """Spot balance."""
+   773→
+   774→    amount: Optional[str] = None
+   775→
+   776→
+   777→class PerpBalance(NadoBaseModel):
+   778→    """Perp balance."""
+   779→
+   780→    amount: Optional[str] = None
+   781→
+   782→
+   783→class ProductBalance(NadoBaseModel):
+   784→    """Product balance."""
+   785→
+   786→    product_id: int
+   787→    balance: Union[SpotBalance, PerpBalance, Dict]
+   788→
+   789→
+   790→class BookInfo(NadoBaseModel):
+   791→    """Book info."""
+   792→
+   793→    price_increment_x18: int = 0
+   794→    size_increment: int = 0
+   795→
+   796→
+   797→class Product(NadoBaseModel):
+   798→    """Product info."""
+   799→
+   800→    product_id: int
+   801→    oracle_price_x18: int = 0
+   802→    book_info: BookInfo = Field(default_factory=BookInfo)
+   803→
+   804→
+   805→class SubaccountInfoData(NadoBaseModel):
+   806→    """Subaccount info data."""
+   807→
+   808→    health: Optional[SubaccountHealth] = None
+   809→    spot_balances: List[ProductBalance] = Field(default_factory=list)
+   810→    perp_balances: List[ProductBalance] = Field(default_factory=list)
+   811→    spot_products: List[Product] = Field(default_factory=list)
+   812→    perp_products: List[Product] = Field(default_factory=list)
+   813→
+   814→
+   815→class SubaccountPosition(NadoBaseModel):
+   816→    """Subaccount position."""
+   817→
+   818→    balance: ProductBalance
+   819→    product: Product
+   820→
+   821→
+   822→class OpenOrder(NadoBaseModel):
+   823→    """Open order."""
+   824→
+   825→    digest: Optional[str] = None
+   826→    product_id: Optional[int] = None
+   827→    price_x18: Optional[str] = None
+   828→    amount: Optional[str] = None
+   829→    unfilled_amount: Optional[str] = None
+   830→
+   831→
+   832→class SubaccountOpenOrdersData(NadoBaseModel):
+   833→    """Subaccount open orders data."""
+   834→
+   835→    orders: List[OpenOrder] = Field(default_factory=list)
+   836→
+   837→
+   838→class SubaccountMultiProductsOpenOrdersData(NadoBaseModel):
+   839→    """Subaccount multi-products open orders data."""
+   840→
+   841→    orders: Dict[int, List[OpenOrder]] = Field(default_factory=dict)
+   842→
+   843→
+   844→class MaxOrderSizeData(NadoBaseModel):
+   845→    """Max order size data."""
+   846→
+   847→    max_order_size: Optional[str] = None
+   848→
+   849→
+   850→class MaxWithdrawableData(NadoBaseModel):
+   851→    """Max withdrawable data."""
+   852→
+   853→    max_withdrawable: Optional[str] = None
+   854→
+   855→
+   856→class MaxLpMintableData(NadoBaseModel):
+   857→    """Max LP mintable data."""
+   858→
+   859→    max_base_amount: Optional[str] = None
+   860→
+   861→
+   862→class FeeRatesData(NadoBaseModel):
+   863→    """Fee rates data."""
+   864→
+   865→    taker_fee_rate: Optional[str] = None
+   866→    maker_fee_rate: Optional[str] = None
+   867→
+   868→
+   869→class HealthGroupsData(NadoBaseModel):
+   870→    """Health groups data."""
+   871→
+   872→    groups: List[Dict] = Field(default_factory=list)
+   873→
+   874→
+   875→class LinkedSignerData(NadoBaseModel):
+   876→    """Linked signer data."""
+   877→
+   878→    signer: Optional[str] = None
+   879→
+   880→
+   881→class OrderData(NadoBaseModel):
+   882→    """Order data."""
+   883→
+   884→    digest: Optional[str] = None
+   885→    product_id: Optional[int] = None
+   886→
+   887→
+   888→class AllProductsData(NadoBaseModel):
+   889→    """All products data."""
+   890→
+   891→    products: List[Product] = Field(default_factory=list)
+   892→
+   893→
+   894→class SymbolsData(NadoBaseModel):
+   895→    """Symbols data."""
+   896→
+   897→    symbols: List[Dict] = Field(default_factory=list)
+   898→
+   899→
+   900→class IsolatedPositionsData(NadoBaseModel):
+   901→    """Isolated positions data."""
+   902→
+   903→    positions: List[Dict] = Field(default_factory=list)
+   904→
+   905→
+   906→class Orderbook(NadoBaseModel):
+   907→    """Orderbook data."""
+   908→
+   909→    bids: List[List[str]] = Field(default_factory=list)
+   910→    asks: List[List[str]] = Field(default_factory=list)
+   911→
+   912→
+   913→class QueryResponse(NadoBaseModel):
+   914→    """Query response."""
+   915→
+   916→    status: str
+   917→    data: Optional[Any] = None
+   918→    error: Optional[str] = None
+   919→    error_code: Optional[str] = None
+   920→    request_type: Optional[str] = None
+   921→
+   922→
+   923→# Type aliases for query data
+   924→ProductSymbolsData = List[Dict]
+   925→AssetsData = List[Dict]
+   926→MarketPairsData = List[Dict]
+   927→SpotsAprData = List[Dict]
+   928→
+   929→
+   930→# ==================== Indexer Types ====================
+   931→
+   932→
+   933→class IndexerRequest(NadoBaseModel):
+   934→    """Indexer request."""
+   935→
+   936→    type: str
+   937→
+   938→
+   939→class IndexerResponse(NadoBaseModel):
+   940→    """Indexer response."""
+   941→
+   942→    data: Any
+   943→
+   944→
+   945→class IndexerSubaccountHistoricalOrdersParams(IndexerRequest):
+   946→    """Indexer subaccount historical orders parameters."""
+   947→
+   948→    type: str = "subaccount_orders"
+   949→    subaccount: str
+   950→    product_ids: Optional[List[int]] = None
+   951→    idx: Optional[int] = None
+   952→    max_time: Optional[int] = None
+   953→    limit: Optional[int] = None
+   954→
+   955→
+   956→class IndexerHistoricalOrdersByDigestParams(IndexerRequest):
+   957→    """Indexer historical orders by digest parameters."""
+   958→
+   959→    type: str = "orders"
+   960→    digests: List[str]
+   961→
+   962→
+   963→class HistoricalOrder(NadoBaseModel):
+   964→    """Historical order."""
+   965→
+   966→    digest: Optional[str] = None
+   967→    product_id: Optional[int] = None
+   968→    price_x18: Optional[str] = None
+   969→    amount: Optional[str] = None
+   970→    status: Optional[str] = None
+   971→
+   972→
+   973→class IndexerHistoricalOrdersData(NadoBaseModel):
+   974→    """Indexer historical orders data."""
+   975→
+   976→    orders: List[HistoricalOrder] = Field(default_factory=list)
+   977→
+   978→
+   979→class IndexerCandlesticksParams(IndexerRequest):
+   980→    """Indexer candlesticks parameters."""
+   981→
+   982→    type: str = "candlesticks"
+   983→    product_id: int
+   984→    granularity: int
+   985→    max_time: Optional[int] = None
+   986→    limit: Optional[int] = None
+   987→
+   988→
+   989→class Candlestick(NadoBaseModel):
+   990→    """Candlestick data."""
+   991→
+   992→    open_x18: Optional[str] = None
+   993→    high_x18: Optional[str] = None
+   994→    low_x18: Optional[str] = None
+   995→    close_x18: Optional[str] = None
+   996→    volume: Optional[str] = None
+   997→
+   998→
+   999→class IndexerCandlesticksData(NadoBaseModel):
+  1000→    """Indexer candlesticks data."""
+  1001→
+  1002→    candlesticks: List[Candlestick] = Field(default_factory=list)
+  1003→
+  1004→
+  1005→class IndexerFundingRateParams(IndexerRequest):
+  1006→    """Indexer funding rate parameters."""
+  1007→
+  1008→    type: str = "funding_rate"
+  1009→    product_id: int
+  1010→
+  1011→
+  1012→class IndexerFundingRateData(NadoBaseModel):
+  1013→    """Indexer funding rate data."""
+  1014→
+  1015→    product_id: int
+  1016→    funding_rate_x18: Optional[str] = None
+  1017→    update_time: Optional[str] = None
+  1018→
+  1019→
+  1020→class IndexerFundingRatesParams(IndexerRequest):
+  1021→    """Indexer funding rates parameters."""
+  1022→
+  1023→    type: str = "funding_rates"
+  1024→    product_ids: List[int]
+  1025→
+  1026→
+  1027→IndexerFundingRatesData = Dict[int, IndexerFundingRateData]
+  1028→
+  1029→
+  1030→class IndexerPerpPricesParams(IndexerRequest):
+  1031→    """Indexer perp prices parameters."""
+  1032→
+  1033→    type: str = "perp_prices"
+  1034→    product_id: int
+  1035→
+  1036→
+  1037→class IndexerPerpPricesData(NadoBaseModel):
+  1038→    """Indexer perp prices data."""
+  1039→
+  1040→    product_id: int
+  1041→    index_price_x18: Optional[str] = None
+  1042→    mark_price_x18: Optional[str] = None
+  1043→    update_time: Optional[str] = None
+  1044→
+  1045→
+  1046→class IndexerOraclePricesParams(IndexerRequest):
+  1047→    """Indexer oracle prices parameters."""
+  1048→
+  1049→    type: str = "oracle_prices"
+  1050→    product_ids: List[int]
+  1051→
+  1052→
+  1053→IndexerOraclePricesData = Dict[int, str]
+  1054→
+  1055→
+  1056→class IndexerProductSnapshotsParams(IndexerRequest):
+  1057→    """Indexer product snapshots parameters."""
+  1058→
+  1059→    type: str = "product_snapshots"
+  1060→    product_id: int
+  1061→    idx: Optional[int] = None
+  1062→    max_time: Optional[int] = None
+  1063→    limit: Optional[int] = None
+  1064→
+  1065→
+  1066→class IndexerProductSnapshotsData(NadoBaseModel):
+  1067→    """Indexer product snapshots data."""
+  1068→
+  1069→    snapshots: List[Dict] = Field(default_factory=list)
+  1070→
+  1071→
+  1072→class IndexerMarketSnapshotsParams(IndexerRequest):
+  1073→    """Indexer market snapshots parameters."""
+  1074→
+  1075→    type: str = "market_snapshots"
+  1076→    interval: int
+  1077→    max_time: Optional[int] = None
+  1078→    limit: Optional[int] = None
+  1079→
+  1080→
+  1081→class IndexerMarketSnapshotsData(NadoBaseModel):
+  1082→    """Indexer market snapshots data."""
+  1083→
+  1084→    snapshots: List[Dict] = Field(default_factory=list)
+  1085→
+  1086→
+  1087→class IndexerEventsParams(IndexerRequest):
+  1088→    """Indexer events parameters."""
+  1089→
+  1090→    type: str = "events"
+  1091→    subaccount: Optional[str] = None
+  1092→    product_ids: Optional[List[int]] = None
+  1093→    limit: Optional[int] = None
+  1094→
+  1095→
+  1096→class IndexerEventsData(NadoBaseModel):
+  1097→    """Indexer events data."""
+  1098→
+  1099→    events: List[Dict] = Field(default_factory=list)
+  1100→
+  1101→
+  1102→class IndexerMatchesParams(IndexerRequest):
+  1103→    """Indexer matches parameters."""
+  1104→
+  1105→    type: str = "matches"
+  1106→    subaccount: Optional[str] = None
+  1107→    product_ids: Optional[List[int]] = None
+  1108→    limit: Optional[int] = None
+  1109→
+  1110→
+  1111→class IndexerMatchesData(NadoBaseModel):
+  1112→    """Indexer matches data."""
+  1113→
+  1114→    matches: List[Dict] = Field(default_factory=list)
+  1115→
+  1116→
+  1117→class IndexerLiquidationFeedParams(IndexerRequest):
+  1118→    """Indexer liquidation feed parameters."""
+  1119→
+  1120→    type: str = "liquidation_feed"
+  1121→
+  1122→
+  1123→IndexerLiquidationFeedData = List[Dict]
+  1124→
+  1125→
+  1126→class IndexerLinkedSignerRateLimitParams(IndexerRequest):
+  1127→    """Indexer linked signer rate limit parameters."""
+  1128→
+  1129→    type: str = "linked_signer_rate_limit"
+  1130→    subaccount: str
+  1131→
+  1132→
+  1133→class IndexerLinkedSignerRateLimitData(NadoBaseModel):
+  1134→    """Indexer linked signer rate limit data."""
+  1135→
+  1136→    signer: Optional[str] = None
+  1137→    remaining_txs: Optional[int] = None
+  1138→    wait_time: Optional[int] = None
+  1139→
+  1140→
+  1141→class IndexerSubaccountsParams(IndexerRequest):
+  1142→    """Indexer subaccounts parameters."""
+  1143→
+  1144→    type: str = "subaccounts"
+  1145→    address: Optional[str] = None
+  1146→    start: Optional[int] = None
+  1147→    limit: Optional[int] = None
+  1148→
+  1149→
+  1150→class IndexerSubaccountsData(NadoBaseModel):
+  1151→    """Indexer subaccounts data."""
+  1152→
+  1153→    subaccounts: List[Dict] = Field(default_factory=list)
+  1154→
+  1155→
+  1156→class IndexerQuotePriceParams(IndexerRequest):
+  1157→    """Indexer quote price parameters."""
+  1158→
+  1159→    type: str = "quote_price"
+  1160→
+  1161→
+  1162→class IndexerQuotePriceData(NadoBaseModel):
+  1163→    """Indexer quote price data."""
+  1164→
+  1165→    price: Optional[str] = None
+  1166→
+  1167→
+  1168→class IndexerInterestAndFundingParams(IndexerRequest):
+  1169→    """Indexer interest and funding parameters."""
+  1170→
+  1171→    type: str = "interest_funding"
+  1172→    subaccount: str
+  1173→    product_ids: List[int]
+  1174→    limit: int
+  1175→    max_idx: Optional[int] = None
+  1176→
+  1177→
+  1178→class IndexerInterestAndFundingData(NadoBaseModel):
+  1179→    """Indexer interest and funding data."""
+  1180→
+  1181→    payments: List[Dict] = Field(default_factory=list)
+  1182→
+  1183→
+  1184→class IndexerAccountSnapshotsParams(IndexerRequest):
+  1185→    """Indexer account snapshots parameters."""
+  1186→
+  1187→    type: str = "account_snapshots"
+  1188→    subaccounts: List[str]
+  1189→    timestamps: List[int]
+  1190→
+  1191→
+  1192→IndexerAccountSnapshotsData = Dict[str, Dict[int, Dict]]
+  1193→IndexerTickersData = Dict[str, Dict]
+  1194→IndexerPerpContractsData = Dict[str, Dict]
+  1195→IndexerHistoricalTradesData = List[Dict]
+  1196→
+  1197→
+  1198→# ==================== Trigger Types ====================
+  1199→
+  1200→
+  1201→class OraclePriceAbove(NadoBaseModel):
+  1202→    """Oracle price above trigger."""
+  1203→
+  1204→    oracle_price_above: str
+  1205→
+  1206→
+  1207→class OraclePriceBelow(NadoBaseModel):
+  1208→    """Oracle price below trigger."""
+  1209→
+  1210→    oracle_price_below: str
+  1211→
+  1212→
+  1213→class LastPriceAbove(NadoBaseModel):
+  1214→    """Last price above trigger."""
+  1215→
+  1216→    last_price_above: str
+  1217→
+  1218→
+  1219→class LastPriceBelow(NadoBaseModel):
+  1220→    """Last price below trigger."""
+  1221→
+  1222→    last_price_below: str
+  1223→
+  1224→
+  1225→class MidPriceAbove(NadoBaseModel):
+  1226→    """Mid price above trigger."""
+  1227→
+  1228→    mid_price_above: str
+  1229→
+  1230→
+  1231→class MidPriceBelow(NadoBaseModel):
+  1232→    """Mid price below trigger."""
+  1233→
+  1234→    mid_price_below: str
+  1235→
+  1236→
+  1237→PriceRequirement = Union[
+  1238→    OraclePriceAbove,
+  1239→    OraclePriceBelow,
+  1240→    LastPriceAbove,
+  1241→    LastPriceBelow,
+  1242→    MidPriceAbove,
+  1243→    MidPriceBelow,
+  1244→]
+  1245→
+  1246→
+  1247→class Dependency(NadoBaseModel):
+  1248→    """Order dependency."""
+  1249→
+  1250→    digest: str
+  1251→    on_partial_fill: bool = False
+  1252→
+  1253→
+  1254→class PriceTriggerData(NadoBaseModel):
+  1255→    """Price trigger data."""
+  1256→
+  1257→    price_requirement: Union[PriceRequirement, Dict]
+  1258→    dependency: Optional[Dependency] = None
+  1259→
+  1260→
+  1261→class PriceTrigger(NadoBaseModel):
+  1262→    """Price trigger."""
+  1263→
+  1264→    price_trigger: PriceTriggerData
+  1265→
+  1266→
+  1267→class TimeTriggerData(NadoBaseModel):
+  1268→    """Time-based trigger for TWAP orders."""
+  1269→
+  1270→    interval: int  # interval in seconds between executions
+  1271→    amounts: Optional[List[str]] = None  # optional custom amounts per execution
+  1272→
+  1273→
+  1274→class TimeTrigger(NadoBaseModel):
+  1275→    """Time trigger for TWAP orders."""
+  1276→
+  1277→    time_trigger: TimeTriggerData
+  1278→
+  1279→
+  1280→TriggerCriteria = Union[PriceTrigger, TimeTrigger]
+  1281→
+  1282→
+  1283→class TwapTrigger(NadoBaseModel):
+  1284→    """TWAP trigger."""
+  1285→
+  1286→    twap_trigger: Dict
+  1287→
+  1288→
+  1289→class TriggerOrderParams(OrderParams):
+  1290→    """Trigger order parameters."""
+  1291→
+  1292→    pass
+  1293→
+  1294→
+  1295→class PlaceTriggerOrderParams(NadoBaseModel):
+  1296→    """Place trigger order parameters."""
+  1297→
+  1298→    product_id: int
+  1299→    order: OrderParams
+  1300→    trigger: Union[PriceTrigger, TimeTrigger, TwapTrigger, Dict]
+  1301→    signature: Optional[str] = None
+  1302→    digest: Optional[str] = None
+  1303→    spot_leverage: Optional[bool] = None
+  1304→    id: Optional[int] = None
+  1305→
+  1306→
+  1307→class PlaceTriggerOrdersParams(NadoBaseModel):
+  1308→    """Place multiple trigger orders parameters."""
+  1309→
+  1310→    orders: List[PlaceTriggerOrderParams]
+  1311→    stop_on_failure: Optional[bool] = None
+  1312→
+  1313→
+  1314→class CancelTriggerOrdersParams(BaseParams):
+  1315→    """Cancel trigger orders parameters."""
+  1316→
+  1317→    productIds: List[int] = Field(default_factory=list)
+  1318→    digests: List[bytes] = Field(default_factory=list)
+  1319→    signature: Optional[str] = None
+  1320→
+  1321→
+  1322→class CancelProductTriggerOrdersParams(BaseParams):
+  1323→    """Cancel product trigger orders parameters."""
+  1324→
+  1325→    productIds: List[int]
+  1326→    signature: Optional[str] = None
+  1327→
+  1328→
+  1329→class ListTriggerOrdersTx(BaseParams):
+  1330→    """List trigger orders transaction."""
+  1331→
+  1332→    recvTime: int
+  1333→
+  1334→
+  1335→class ListTriggerOrdersParams(NadoBaseModel):
+  1336→    """List trigger orders parameters."""
+  1337→
+  1338→    tx: ListTriggerOrdersTx
+  1339→    product_ids: Optional[List[int]] = None
+  1340→    signature: Optional[str] = None
+  1341→
+  1342→
+  1343→class ListTriggerOrdersRequest(ListTriggerOrdersParams):
+  1344→    """List trigger orders request."""
+  1345→
+  1346→    pass
+  1347→
+  1348→
+  1349→class ListTwapExecutionsParams(NadoBaseModel):
+  1350→    """List TWAP executions parameters."""
+  1351→
+  1352→    digest: str
+  1353→
+  1354→
+  1355→class ListTwapExecutionsRequest(ListTwapExecutionsParams):
+  1356→    """List TWAP executions request."""
+  1357→
+  1358→    pass
+  1359→
+  1360→
+  1361→class TriggerOrder(NadoBaseModel):
+  1362→    """Trigger order."""
+  1363→
+  1364→    digest: Optional[str] = None
+  1365→    product_id: Optional[int] = None
+  1366→    status: Optional[str] = None
+  1367→
+  1368→
+  1369→class TriggerQueryResponse(NadoBaseModel):
+  1370→    """Trigger query response."""
+  1371→
+  1372→    status: str
+  1373→    data: Optional[Any] = None
+  1374→    error: Optional[str] = None
+  1375→
+  1376→
+  1377→# Trigger Execute Types
+  1378→TriggerExecuteParams = Union[
+  1379→    PlaceTriggerOrderParams,
+  1380→    PlaceTriggerOrdersParams,
+  1381→    CancelTriggerOrdersParams,
+  1382→    CancelProductTriggerOrdersParams,
+  1383→]
+  1384→
+  1385→
+  1386→class PlaceTriggerOrderRequest(NadoBaseModel):
+  1387→    """Place trigger order request."""
+  1388→
+  1389→    place_order: PlaceTriggerOrderParams
+  1390→
+  1391→
+  1392→class PlaceTriggerOrdersRequest(NadoBaseModel):
+  1393→    """Place multiple trigger orders request."""
+  1394→
+  1395→    place_orders: PlaceTriggerOrdersParams
+  1396→
+  1397→
+  1398→CancelTriggerOrdersRequest = Dict[str, Any]
+  1399→CancelProductTriggerOrdersRequest = Dict[str, Any]
+  1400→
+  1401→TriggerExecuteRequest = Union[
+  1402→    PlaceTriggerOrderRequest,
+  1403→    PlaceTriggerOrdersRequest,
+  1404→    Dict[str, Any],
+  1405→]
+  1406→
+  1407→
+  1408→def to_trigger_execute_request(params: TriggerExecuteParams) -> TriggerExecuteRequest:
+  1409→    """
+  1410→    Maps TriggerExecuteParams to its corresponding TriggerExecuteRequest object.
+  1411→
+  1412→    Args:
+  1413→        params (TriggerExecuteParams): The parameters to be executed.
+  1414→
+  1415→    Returns:
+  1416→        TriggerExecuteRequest: The corresponding TriggerExecuteRequest object.
+  1417→    """
+  1418→    if isinstance(params, PlaceTriggerOrderParams):
+  1419→        return PlaceTriggerOrderRequest(place_order=params)
+  1420→    elif isinstance(params, PlaceTriggerOrdersParams):
+  1421→        return PlaceTriggerOrdersRequest(place_orders=params)
+  1422→    elif isinstance(params, CancelTriggerOrdersParams):
+  1423→        return {"cancel_orders": params.model_dump(mode="json", exclude_none=True)}
+  1424→    elif isinstance(params, CancelProductTriggerOrdersParams):
+  1425→        return {
+  1426→            "cancel_product_orders": params.model_dump(mode="json", exclude_none=True)
+  1427→        }
+  1428→    return {
+  1429→        "unknown": (
+  1430→            params.model_dump(mode="json", exclude_none=True)
+  1431→            if hasattr(params, "model_dump")
+  1432→            else {}
+  1433→        )
+  1434→    }
+  1435→
+  1436→
+  1437→def create_twap_order(
+  1438→    product_id: int,
+  1439→    sender: str,
+  1440→    price_x18: str,
+  1441→    total_amount_x18: str,
+  1442→    expiration: int,
+  1443→    nonce: int,
+  1444→    times: int,
+  1445→    slippage_frac: float,
+  1446→    interval_seconds: int,
+  1447→    custom_amounts_x18: Optional[List[str]] = None,
+  1448→    reduce_only: bool = False,
+  1449→    spot_leverage: Optional[bool] = None,
+  1450→    id: Optional[int] = None,
+  1451→) -> PlaceTriggerOrderParams:
+  1452→    """
+  1453→    Create a TWAP (Time-Weighted Average Price) order.
+  1454→
+  1455→    Args:
+  1456→        product_id (int): The product ID for the order.
+  1457→        sender (str): The sender address (32 bytes hex).
+  1458→        price_x18 (str): The limit price multiplied by 1e18.
+  1459→        total_amount_x18 (str): The total amount to trade multiplied by 1e18.
+  1460→        expiration (int): Order expiration timestamp.
+  1461→        nonce (int): Order nonce.
+  1462→        times (int): Number of TWAP executions (1-500).
+  1463→        slippage_frac (float): Slippage tolerance as a fraction.
+  1464→        interval_seconds (int): Time interval between executions in seconds.
+  1465→        custom_amounts_x18 (Optional[List[str]]): Custom amounts for each execution.
+  1466→        reduce_only (bool): Whether this is a reduce-only order.
+  1467→        spot_leverage (Optional[bool]): Whether to use spot leverage.
+  1468→        id (Optional[int]): Optional order ID.
+  1469→
+  1470→    Returns:
+  1471→        PlaceTriggerOrderParams: Parameters for placing the TWAP order.
+  1472→    """
+  1473→    if times < 1 or times > 500:
+  1474→        raise ValueError(f"TWAP times must be between 1 and 500, got {times}")
+  1475→
+  1476→    if slippage_frac < 0 or slippage_frac > 1:
+  1477→        raise ValueError(
+  1478→            f"Slippage fraction must be between 0 and 1, got {slippage_frac}"
+  1479→        )
+  1480→
+  1481→    if interval_seconds <= 0:
+  1482→        raise ValueError(f"Interval must be positive, got {interval_seconds}")
+  1483→
+  1484→    # Determine trigger type
+  1485→    trigger_type = (
+  1486→        OrderAppendixTriggerType.TWAP_CUSTOM_AMOUNTS
+  1487→        if custom_amounts_x18 is not None
+  1488→        else OrderAppendixTriggerType.TWAP
+  1489→    )
+  1490→
+  1491→    # Build appendix - TWAP orders must use IOC execution type
+  1492→    appendix = build_appendix(
+  1493→        order_type=OrderType.IOC,
+  1494→        reduce_only=reduce_only,
+  1495→        trigger_type=trigger_type,
+  1496→        twap_times=times,
+  1497→        twap_slippage_frac=slippage_frac,
+  1498→    )
+  1499→
+  1500→    # Create the base order
+  1501→    order_params = OrderParams(
+  1502→        sender=sender,
+  1503→        priceX18=int(price_x18),
+  1504→        amount=int(total_amount_x18),
+  1505→        expiration=expiration,
+  1506→        nonce=nonce,
+  1507→        appendix=appendix,
+  1508→    )
+  1509→
+  1510→    # Create trigger criteria
+  1511→    trigger = TimeTrigger(
+  1512→        time_trigger=TimeTriggerData(
+  1513→            interval=interval_seconds,
+  1514→            amounts=custom_amounts_x18,
+  1515→        )
+  1516→    )
+  1517→
+  1518→    return PlaceTriggerOrderParams(
+  1519→        product_id=product_id,
+  1520→        order=order_params,
+  1521→        trigger=trigger,
+  1522→        signature=None,
+  1523→        digest=None,
+  1524→        spot_leverage=spot_leverage,
+  1525→        id=id,
+  1526→    )
+  1527→
+  1528→
+  1529→# ==================== Helper Functions ====================
+  1530→
+  1531→
+  1532→def ensure_data_type(data: Any, expected_type: type) -> Any:
+  1533→    """Ensure data is of expected type, parsing if needed."""
+  1534→    if data is None:
+  1535→        if expected_type == list:
+  1536→            return []
+  1537→        if expected_type == dict:
+  1538→            return {}
+  1539→        return expected_type()
+  1540→
+  1541→    if isinstance(data, expected_type):
+  1542→        return data
+  1543→
+  1544→    if isinstance(data, dict) and hasattr(expected_type, "model_validate"):
+  1545→        return expected_type.model_validate(data)
+  1546→
+  1547→    return data
+  1548→
+  1549→
+  1550→def is_instance_of_union(obj: Any, union_type: Any) -> bool:
+  1551→    """Check if object is instance of a union type."""
+  1552→    # Handle Dict[str, Any] special case - just check if it's a dict
+  1553→    if union_type is Dict[str, Any]:
+  1554→        return isinstance(obj, dict)
+  1555→    # For Union types, get_args returns the types in the union
+  1556→    try:
+  1557→        from typing import get_args, get_origin
+  1558→
+  1559→        origin = get_origin(union_type)
+  1560→        if origin is Union:
+  1561→            args = get_args(union_type)
+  1562→            return any(
+  1563→                isinstance(obj, arg) for arg in args if not hasattr(arg, "__origin__")
+  1564→            )
+  1565→    except Exception:
+  1566→        pass
+  1567→    try:
+  1568→        return isinstance(obj, union_type)
+  1569→    except TypeError:
+  1570→        return False
+  1571→
+  1572→
+  1573→# ==================== Execute Request Mapping ====================
+  1574→
+  1575→
+  1576→ExecuteParams = Union[
+  1577→    PlaceOrderParams,
+  1578→    CancelOrdersParams,
+  1579→    CancelProductOrdersParams,
+  1580→    CancelAndPlaceParams,
+  1581→    WithdrawCollateralParams,
+  1582→    MintNlpParams,
+  1583→    BurnNlpParams,
+  1584→    LinkSignerParams,
+  1585→    LiquidateSubaccountParams,
+  1586→]
+  1587→
+  1588→ExecuteRequest = Dict[str, Any]
+  1589→IndexerParams = Union[
+  1590→    IndexerSubaccountHistoricalOrdersParams,
+  1591→    IndexerCandlesticksParams,
+  1592→    IndexerFundingRateParams,
+  1593→    IndexerProductSnapshotsParams,
+  1594→    IndexerMarketSnapshotsParams,
+  1595→]
+  1596→
+  1597→
+  1598→def to_execute_request(params: ExecuteParams) -> ExecuteRequest:
+  1599→    """Convert execute params to request dict."""
+  1600→    if isinstance(params, PlaceOrderParams):
+  1601→        return {"place_order": params.model_dump(mode="json", exclude_none=True)}
+  1602→    elif isinstance(params, CancelOrdersParams):
+  1603→        return {"cancel_orders": params.model_dump(mode="json", exclude_none=True)}
+  1604→    elif isinstance(params, CancelProductOrdersParams):
+  1605→        return {
+  1606→            "cancel_product_orders": params.model_dump(mode="json", exclude_none=True)
+  1607→        }
+  1608→    elif isinstance(params, CancelAndPlaceParams):
+  1609→        return {"cancel_and_place": params.model_dump(mode="json", exclude_none=True)}
+  1610→    elif isinstance(params, WithdrawCollateralParams):
+  1611→        return {
+  1612→            "withdraw_collateral": params.model_dump(mode="json", exclude_none=True)
+  1613→        }
+  1614→    elif isinstance(params, MintNlpParams):
+  1615→        return {"mint_nlp": params.model_dump(mode="json", exclude_none=True)}
+  1616→    elif isinstance(params, BurnNlpParams):
+  1617→        return {"burn_nlp": params.model_dump(mode="json", exclude_none=True)}
+  1618→    elif isinstance(params, LinkSignerParams):
+  1619→        return {"link_signer": params.model_dump(mode="json", exclude_none=True)}
+  1620→    elif isinstance(params, LiquidateSubaccountParams):
+  1621→        return {
+  1622→            "liquidate_subaccount": params.model_dump(mode="json", exclude_none=True)
+  1623→        }
+  1624→    return (
+  1625→        params.model_dump(mode="json", exclude_none=True)
+  1626→        if hasattr(params, "model_dump")
+  1627→        else {}
+  1628→    )
+  1629→
+  1630→
+  1631→def to_indexer_request(params: IndexerParams) -> IndexerRequest:
+  1632→    """Convert indexer params to request."""
+  1633→    return params
+  1634→
+  1635→
+  1636→# ==================== Contracts Context (Simplified) ====================
+  1637→
+  1638→
+  1639→class NadoContractsContext(NadoBaseModel):
+  1640→    """Nado contracts context."""
+  1641→
+  1642→    network: Optional[NadoNetwork] = None
+  1643→    endpoint_addr: Optional[str] = None
+  1644→    querier_addr: Optional[str] = None
+  1645→    perp_engine_addr: Optional[str] = None
+  1646→    spot_engine_addr: Optional[str] = None
+  1647→    clearinghouse_addr: Optional[str] = None
+  1648→    airdrop_addr: Optional[str] = None
+  1649→    staking_addr: Optional[str] = None
+  1650→    foundation_rewards_airdrop_addr: Optional[str] = None
+  1651→
+  1652→
+  1653→class DeploymentInfo(NadoBaseModel):
+  1654→    """Deployment info."""
+  1655→
+  1656→    node_url: str
+  1657→    endpoint_addr: str
+  1658→    querier_addr: str
+  1659→    perp_engine_addr: str
+  1660→    spot_engine_addr: str
+  1661→    clearinghouse_addr: str
+  1662→    airdrop_addr: Optional[str] = None
+  1663→    staking_addr: Optional[str] = None
+  1664→    foundation_rewards_airdrop_addr: Optional[str] = None
+  1665→
+  1666→
+  1667→# Deployment configurations
+  1668→DEPLOYMENTS: Dict[NadoNetwork, DeploymentInfo] = {
+  1669→    NadoNetwork.MAINNET: DeploymentInfo(
+  1670→        node_url="https://rpc.inkonchain.com",
+  1671→        endpoint_addr="0xD91Ab41558877A0F0d0cEE283a1753b1a6279C1C",
+  1672→        querier_addr="0x4ed7c70F96B99c776995fB64377f0d4aB3B0e1C1",
+  1673→        perp_engine_addr="0x0000000000000000000000000000000000000000",
+  1674→        spot_engine_addr="0x0000000000000000000000000000000000000000",
+  1675→        clearinghouse_addr="0x0000000000000000000000000000000000000000",
+  1676→    ),
+  1677→    NadoNetwork.TESTNET: DeploymentInfo(
+  1678→        node_url="https://rpc.sepolia.inkonchain.com",
+  1679→        endpoint_addr="0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6",
+  1680→        querier_addr="0x4ed7c70F96B99c776995fB64377f0d4aB3B0e1C1",
+  1681→        perp_engine_addr="0x0000000000000000000000000000000000000000",
+  1682→        spot_engine_addr="0x0000000000000000000000000000000000000000",
+  1683→        clearinghouse_addr="0x0000000000000000000000000000000000000000",
+  1684→    ),
+  1685→}
+  1686→
+  1687→
+  1688→def load_deployment(network: NadoNetwork) -> DeploymentInfo:
+  1689→    """Load deployment info for a network."""
+  1690→    if network in DEPLOYMENTS:
+  1691→        return DEPLOYMENTS[network]
+  1692→    raise ValueError(f"No deployment found for network: {network}")
+  1693→
+  1694→
+  1695→# ==================== Contracts Stub ====================
+  1696→
+  1697→
+  1698→class NadoContracts:
+  1699→    """Stub for NadoContracts - provides on-chain contract interactions."""
+  1700→
+  1701→    def __init__(self, rpc_url: str, context: NadoContractsContext):
+  1702→        """Initialize NadoContracts with RPC URL and context."""
+  1703→        self.rpc_url = rpc_url
+  1704→        self.context = context
+  1705→        # In a real implementation, this would set up web3 connections
+  1706→        # and contract instances. For portability, this is a stub.
+  1707→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

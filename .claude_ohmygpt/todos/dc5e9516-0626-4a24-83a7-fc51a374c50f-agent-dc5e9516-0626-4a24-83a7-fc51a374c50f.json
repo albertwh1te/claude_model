@@ -1,0 +1,22 @@
+[
+  {
+    "content": "Explore codebase structure and recent changes",
+    "status": "in_progress",
+    "activeForm": "Exploring codebase structure and recent changes"
+  },
+  {
+    "content": "Update CLAUDE.md with current state",
+    "status": "pending",
+    "activeForm": "Updating CLAUDE.md with current state"
+  },
+  {
+    "content": "Update gemini.md with current state",
+    "status": "pending",
+    "activeForm": "Updating gemini.md with current state"
+  },
+  {
+    "content": "Generate project review in Chinese at docs folder",
+    "status": "pending",
+    "activeForm": "Generating project review in Chinese"
+  }
+]

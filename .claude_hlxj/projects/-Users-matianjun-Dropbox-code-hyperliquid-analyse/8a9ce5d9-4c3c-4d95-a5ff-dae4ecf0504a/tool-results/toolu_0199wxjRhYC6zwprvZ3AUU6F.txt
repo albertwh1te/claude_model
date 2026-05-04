@@ -1,0 +1,206 @@
+     1→from typing import List, Optional
+     2→import pandas as pd
+     3→from datetime import datetime
+     4→import lightgbm as lgb
+     5→from config.config import TEMP_FEATURE
+     6→from config.ranker_parameters import (
+     7→    RANKER_FEATURE_NAMES,
+     8→    RANKER_REGRESSION_PARAMETERS,
+     9→)
+    10→from logger import main_logger as logger
+    11→import joblib
+    12→
+    13→from utils.ml_util import get_local_feature_data
+    14→
+    15→
+    16→class RegressionModelTrain:
+    17→
+    18→    def __init__(
+    19→        self,
+    20→        feature_file_name: Optional[str] = None,
+    21→        target_column: str = "target_1hour_zscore",
+    22→        hyper_parameters: dict = None,
+    23→    ):
+    24→        self.hyper_parameters = hyper_parameters
+    25→        self.target_column = target_column
+    26→        self.feature_name = RANKER_FEATURE_NAMES
+    27→        # @info 1. 读取特征数据
+    28→        if not feature_file_name:
+    29→            self.feature_data = get_local_feature_data()
+    30→        else:
+    31→            df = pd.read_csv(feature_file_name)
+    32→            df["time"] = pd.to_datetime(df["time"])
+    33→            self.feature_data = df
+    34→            logger.info(
+    35→                f"load feature from {feature_file_name} full feature start time: {df['time'].min()} end time: {df['time'].max()} "
+    36→            )
+    37→
+    38→    def train(self, symbol_list: Optional[List[str]] = None):
+    39→
+    40→        # --- 2. 稳健的时间序列数据划分 (Train / Validation / Test) ---
+    41→        logger.info("Splitting data into train, validation, and test sets...")
+    42→        full_df = self.feature_data.sort_values("time")
+    43→
+    44→        if symbol_list:
+    45→            full_df = full_df[full_df["symbol"].isin(symbol_list)]
+    46→            logger.info(
+    47→                f"Training on {len(symbol_list)} symbols, full_df size: {len(full_df)}"
+    48→            )
+    49→
+    50→        # 测试集为最后90天
+    51→        test_start_time = full_df["time"].max() - pd.Timedelta(days=90)
+    52→        # 验证集为测试集之前的60天
+    53→        val_start_time = test_start_time - pd.Timedelta(days=60)
+    54→
+    55→        # 验证集，用于 early stopping
+    56→        val_df = full_df[
+    57→            (full_df["time"] >= val_start_time) & (full_df["time"] < test_start_time)
+    58→        ]
+    59→        # 测试集，用于最终评估
+    60→        test_df = full_df[full_df["time"] >= test_start_time]
+    61→        # 最终训练集 = 所有在验证集之前的数据
+    62→        train_df = full_df[full_df["time"] < val_start_time]
+    63→
+    64→        # 为了训练最强的模型，我们将训练集和验证集合并
+    65→        # 但依然用独立的验证集进行早停
+    66→        full_train_df = pd.concat([train_df, val_df])
+    67→
+    68→        logger.info(
+    69→            f"Full training set size (for final model): {len(full_train_df)}, start time :{full_train_df['time'].min()}, end time: {full_train_df['time'].max()}"
+    70→        )
+    71→        logger.info(
+    72→            f"Training set size (for early stopping): {len(train_df)}, start time :{train_df['time'].min()}, end time: {train_df['time'].max()}"
+    73→        )
+    74→        logger.info(
+    75→            f"Validation set size (for early stopping): {len(val_df)}, start time :{val_df['time'].min()}, end time: {val_df['time'].max()}"
+    76→        )
+    77→        logger.info(
+    78→            f"Test set size (for final evaluation): {len(test_df)}, start time :{test_df['time'].min()}, end time: {test_df['time'].max()}"
+    79→        )
+    80→
+    81→        logger.info("Start training")
+    82→
+    83→        training_start_time = datetime.now()
+    84→
+    85→        X_train = train_df[self.feature_name]
+    86→        y_train = train_df[self.target_column].astype(float)
+    87→
+    88→        X_val = val_df[self.feature_name]
+    89→        y_val = val_df[self.target_column].astype(float)
+    90→
+    91→        train_data = lgb.Dataset(X_train, label=y_train)
+    92→        val_data = lgb.Dataset(X_val, label=y_val, reference=train_data)
+    93→
+    94→        # optuna_num_boost_round = 182
+    95→        # @info 加一个更多次数看看的效果
+    96→        # optuna_num_boost_round = 500
+    97→        # optuna_num_boost_round = 300
+    98→        optuna_num_boost_round = 1000
+    99→
+   100→        num_boost_round = optuna_num_boost_round
+   101→
+   102→        logger.info(
+   103→            f"Starting model training with number of boost {num_boost_round}, hyper parameters: {self.hyper_parameters}, total feature name :{len(RANKER_FEATURE_NAMES)}"
+   104→        )
+   105→        model = lgb.train(
+   106→            self.hyper_parameters,
+   107→            train_data,
+   108→            num_boost_round=num_boost_round,
+   109→            valid_sets=[
+   110→                train_data,
+   111→                val_data,
+   112→            ],  # 传入训练集和验证集，方便观察是否存在过拟合
+   113→            valid_names=["train", "valid"],  # 给它们起个名字
+   114→            callbacks=[
+   115→                lgb.log_evaluation(period=10),  # <--- 每 10 轮打印一次
+   116→                # @info 早停，200轮没有提升就停止,保证和tune的一致
+   117→                lgb.early_stopping(stopping_rounds=200, verbose=True),
+   118→            ],
+   119→        )
+   120→
+   121→        pkl_path = "regression_model_1h.pkl"
+   122→        joblib.dump(model, pkl_path)
+   123→        logger.info(f"Final model saved to {pkl_path}")
+   124→
+   125→        training_duration = datetime.now() - training_start_time
+   126→        logger.info(f"Model training completed in {training_duration}")
+   127→        logger.info(f"Best iteration found: {model.best_iteration}")  # 这一步至关重要
+   128→
+   129→        X_test = test_df[self.feature_name]
+   130→
+   131→        logger.info(f"Start generate prediction on test set of size {len(test_df)}")
+   132→
+   133→        # LightGBM multiclass 的 predict 默认返回 (n_sample , num_class) 的概率矩阵
+   134→        preds = model.predict(X_test, num_iteration=model.best_iteration)
+   135→        test_df["predicted_probability"] = preds
+   136→        logger.info(
+   137→            f"predicted_probability info :{test_df['predicted_probability'].describe()}"
+   138→        )
+   139→        save_path = "ranker_model_1h_predictions.feather"
+   140→        test_df.to_feather(save_path)
+   141→        logger.info(f"Predictions saved to {save_path}")
+   142→
+   143→    def generate_prediction(self, model: lgb.Booster, test_df: pd.DataFrame):
+   144→
+   145→        X_test = test_df[self.feature_name]
+   146→
+   147→        logger.info(f"Start generate prediction on test set of size {len(test_df)}")
+   148→
+   149→        # LightGBM multiclass 的 predict 默认返回 (n_sample , num_class) 的概率矩阵
+   150→        prob_mat = model.predict(X_test, num_iteration=model.best_iteration)
+   151→
+   152→        test_df["prob"] = prob_mat.tolist()
+   153→
+   154→        return test_df
+   155→
+   156→    def train_online(self, best_iteration: float):
+   157→        """train the regression model for online use
+   158→
+   159→        ### 阶段三：全量重训与上线 (Production Retraining)
+   160→
+   161→        目标：利用所有可用数据训练最终模型，供实盘使用。
+   162→
+   163→        数据范围：全量数据 (Train + Valid + Test)。
+   164→
+   165→        此时没有“未来数据”可供验证，因此不能使用 Early Stopping。
+   166→
+   167→        核心动作：
+   168→
+   169→        加载 Best Parameters。
+   170→
+   171→        固定轮数训练：
+   172→
+   173→        设置 num_boost_round = Final Best Iteration (来自阶段二)。
+   174→
+   175→        """
+   176→        # @info  protective parsing best_iteration
+   177→        best_iteration = int(best_iteration)
+   178→
+   179→        logger.info(f"Start online training with best_iteration: {best_iteration}")
+   180→
+   181→        df = self.feature_data
+   182→        df.sort_values("time", inplace=True)
+   183→
+   184→        training_start_time = datetime.now()
+   185→
+   186→        X_train = df[self.feature_name]
+   187→        y_train = df[self.target_column]
+   188→
+   189→        train_data = lgb.Dataset(X_train, label=y_train.astype(float))
+   190→
+   191→        model = lgb.train(
+   192→            self.hyper_parameters, train_data, num_boost_round=best_iteration
+   193→        )
+   194→
+   195→        date = datetime.now().strftime("%Y%m%d_%H%M")
+   196→        pkl_path = f"regression_model_online_{date}.pkl"
+   197→        joblib.dump(model, pkl_path)
+   198→        training_end_time = datetime.now()
+   199→        training_duration = training_end_time - training_start_time
+   200→        logger.info(f"Model training completed in {training_duration}")
+   201→        logger.info(f"Online model saved to {pkl_path}")
+   202→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

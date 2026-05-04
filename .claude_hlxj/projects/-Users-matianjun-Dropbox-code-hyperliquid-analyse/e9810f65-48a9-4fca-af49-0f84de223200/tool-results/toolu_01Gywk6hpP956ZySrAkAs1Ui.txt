@@ -1,0 +1,14 @@
+The file /Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   336→
+   337→    logger.info(f"[4H] Finished training final model, saved to {pkl_path}")
+   338→
+   339→
+   340→@app.command("generate_weights_4h")
+   341→def generate_weights_4h(
+   342→    prediction_file: str = "ranker_model_4h_predictions.feather",
+   343→    output_file: str = "ranker_weight_4h.feather",
+   344→):
+   345→    """
+   346→    4H版本：根据模型预测结果生成投资组合权重
+   347→
+   348→    Args:

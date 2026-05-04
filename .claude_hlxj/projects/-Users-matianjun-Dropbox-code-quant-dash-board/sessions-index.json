@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "sessionId": "21563642-d657-4f53-bdbe-c5cde3c0adf4",
+      "fullPath": "/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/21563642-d657-4f53-bdbe-c5cde3c0adf4.jsonl",
+      "fileMtime": 1768208423415,
+      "firstPrompt": "ls",
+      "messageCount": 1,
+      "created": "2026-01-12T09:00:23.390Z",
+      "modified": "2026-01-12T09:00:23.390Z",
+      "gitBranch": "master",
+      "projectPath": "/Users/matianjun/Dropbox/code/quant_dash_board",
+      "isSidechain": false
+    },
+    {
+      "sessionId": "3e817f25-e17f-420c-ab2e-c5c38e59aef1",
+      "fullPath": "/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/3e817f25-e17f-420c-ab2e-c5c38e59aef1.jsonl",
+      "fileMtime": 1768210580113,
+      "firstPrompt": "我修改了一下redis 的key 和数据结构，新的redis key的格式 是online_position_manager_state:4h:28 ， 28 就是账户28 数据结构就是 @backend/online_position_4h.py ，里面的load_state_from_redis就是从redis string load 数据成position info的办法。 请你修改一下后端…",
+      "messageCount": 18,
+      "created": "2026-01-12T09:25:03.795Z",
+      "modified": "2026-01-12T09:36:20.094Z",
+      "gitBranch": "master",
+      "projectPath": "/Users/matianjun/Dropbox/code/quant_dash_board",
+      "isSidechain": false
+    },
+    {
+      "sessionId": "c1a902ac-5d95-4dbb-9cdb-ec545e898b36",
+      "fullPath": "/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/c1a902ac-5d95-4dbb-9cdb-ec545e898b36.jsonl",
+      "fileMtime": 1768406808558,
+      "firstPrompt": "我发现onlineposition 的最新价格不正确，我有点怀疑是因为有很多的online position（对于同一个symbol），然后没有选择更新了最新价格的那个batch的数据，但是我也不确定，请你debug 一下看看有啥问题。",
+      "messageCount": 22,
+      "created": "2026-01-14T15:53:27.383Z",
+      "modified": "2026-01-14T16:06:48.517Z",
+      "gitBranch": "master",
+      "projectPath": "/Users/matianjun/Dropbox/code/quant_dash_board",
+      "isSidechain": false
+    },
+    {
+      "sessionId": "e1f4307e-4253-41df-aac2-7f5345fd04e9",
+      "fullPath": "/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/e1f4307e-4253-41df-aac2-7f5345fd04e9.jsonl",
+      "fileMtime": 1768208731948,
+      "firstPrompt": "No prompt",
+      "messageCount": 6,
+      "created": "2026-01-12T09:03:12.584Z",
+      "modified": "2026-01-12T09:05:31.924Z",
+      "gitBranch": "master",
+      "projectPath": "/Users/matianjun/Dropbox/code/quant_dash_board",
+      "isSidechain": false
+    }
+  ],
+  "originalPath": "/Users/matianjun/Dropbox/code/quant_dash_board"
+}

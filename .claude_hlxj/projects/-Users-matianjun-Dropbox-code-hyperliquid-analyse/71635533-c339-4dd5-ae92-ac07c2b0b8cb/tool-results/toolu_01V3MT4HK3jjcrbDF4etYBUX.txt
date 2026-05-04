@@ -1,0 +1,605 @@
+     1→"""Async Market API for Nado Protocol."""
+     2→
+     3→from typing import Optional, List
+     4→
+     5→from nado_api.apis.base import AsyncNadoBaseAPI
+     6→from nado_api.types import (
+     7→    # Execute types
+     8→    BurnNlpParams,
+     9→    CancelAndPlaceParams,
+    10→    CancelOrdersParams,
+    11→    CancelProductOrdersParams,
+    12→    ExecuteResponse,
+    13→    MintNlpParams,
+    14→    PlaceMarketOrderParams,
+    15→    PlaceOrderParams,
+    16→    PlaceTriggerOrderParams,
+    17→    CancelTriggerOrdersParams,
+    18→    CancelProductTriggerOrdersParams,
+    19→    Subaccount,
+    20→    OrderType,
+    21→    # Query types
+    22→    AllProductsData,
+    23→    MarketLiquidityData,
+    24→    MarketPriceData,
+    25→    MaxLpMintableData,
+    26→    MaxOrderSizeData,
+    27→    ProductSymbolsData,
+    28→    SubaccountOpenOrdersData,
+    29→    SubaccountMultiProductsOpenOrdersData,
+    30→    QueryMaxOrderSizeParams,
+    31→    IsolatedPositionsData,
+    32→    IndexerCandlesticksData,
+    33→    IndexerCandlesticksParams,
+    34→    IndexerFundingRateData,
+    35→    IndexerFundingRatesData,
+    36→    IndexerHistoricalOrdersData,
+    37→    IndexerSubaccountHistoricalOrdersParams,
+    38→    IndexerProductSnapshotsData,
+    39→    IndexerProductSnapshotsParams,
+    40→    IndexerMarketSnapshotsParams,
+    41→    IndexerMarketSnapshotsData,
+    42→    ListTriggerOrdersParams,
+    43→    TriggerQueryResponse,
+    44→    MissingTriggerClient,
+    45→)
+    46→
+    47→
+    48→class AsyncMarketAPI(AsyncNadoBaseAPI):
+    49→    """
+    50→    Async API for market operations in Nado Protocol.
+    51→
+    52→    Provides functionality for placing/canceling orders, querying market data,
+    53→    and managing positions.
+    54→    """
+    55→
+    56→    # ==================== Execute Operations ====================
+    57→
+    58→    async def mint_nlp(self, params: MintNlpParams) -> ExecuteResponse:
+    59→        """
+    60→        Mint NLP tokens through the engine.
+    61→
+    62→        Args:
+    63→            params: Parameters required to mint NLP tokens.
+    64→
+    65→        Returns:
+    66→            ExecuteResponse: The response from the engine execution.
+    67→        """
+    68→        return await self.context.engine_client.mint_nlp(params)
+    69→
+    70→    async def burn_nlp(self, params: BurnNlpParams) -> ExecuteResponse:
+    71→        """
+    72→        Burn NLP tokens through the engine.
+    73→
+    74→        Args:
+    75→            params: Parameters required to burn NLP tokens.
+    76→
+    77→        Returns:
+    78→            ExecuteResponse: The response from the engine execution.
+    79→        """
+    80→        return await self.context.engine_client.burn_nlp(params)
+    81→
+    82→    async def place_order(self, params: PlaceOrderParams) -> ExecuteResponse:
+    83→        """
+    84→        Places a limit order through the engine.
+    85→
+    86→        Args:
+    87→            params: Parameters required to place an order.
+    88→
+    89→        Returns:
+    90→            ExecuteResponse: The response from the engine execution.
+    91→        """
+    92→        return await self.context.engine_client.place_order(params)
+    93→
+    94→    async def place_market_order(
+    95→        self, params: PlaceMarketOrderParams
+    96→    ) -> ExecuteResponse:
+    97→        """
+    98→        Places a market order (taker order) through the engine.
+    99→
+   100→        This places an FOK order using top of book price with slippage.
+   101→
+   102→        Args:
+   103→            params: Parameters required to place a market order.
+   104→
+   105→        Returns:
+   106→            ExecuteResponse: The response from the engine execution.
+   107→        """
+   108→        return await self.context.engine_client.place_market_order(params)
+   109→
+   110→    async def cancel_orders(self, params: CancelOrdersParams) -> ExecuteResponse:
+   111→        """
+   112→        Cancels orders through the engine.
+   113→
+   114→        Args:
+   115→            params: Parameters required to cancel orders.
+   116→
+   117→        Returns:
+   118→            ExecuteResponse: The response from the engine execution.
+   119→        """
+   120→        return await self.context.engine_client.cancel_orders(params)
+   121→
+   122→    async def cancel_product_orders(
+   123→        self, params: CancelProductOrdersParams
+   124→    ) -> ExecuteResponse:
+   125→        """
+   126→        Cancels all orders for provided products through the engine.
+   127→
+   128→        Args:
+   129→            params: Parameters required to cancel product orders.
+   130→
+   131→        Returns:
+   132→            ExecuteResponse: The response from the engine execution.
+   133→        """
+   134→        return await self.context.engine_client.cancel_product_orders(params)
+   135→
+   136→    async def cancel_and_place(self, params: CancelAndPlaceParams) -> ExecuteResponse:
+   137→        """
+   138→        Cancels orders and places a new one atomically.
+   139→
+   140→        Args:
+   141→            params: Parameters for cancel and place operation.
+   142→
+   143→        Returns:
+   144→            ExecuteResponse: The response from the engine execution.
+   145→        """
+   146→        return await self.context.engine_client.cancel_and_place(params)
+   147→
+   148→    async def close_position(
+   149→        self, subaccount: Subaccount, product_id: int
+   150→    ) -> ExecuteResponse:
+   151→        """
+   152→        Places an order to close a position for the provided product.
+   153→
+   154→        Args:
+   155→            subaccount: The subaccount to close position for.
+   156→            product_id: The ID of the product to close position for.
+   157→
+   158→        Returns:
+   159→            ExecuteResponse: The response from the engine execution.
+   160→        """
+   161→        return await self.context.engine_client.close_position(subaccount, product_id)
+   162→
+   163→    async def place_trigger_order(
+   164→        self, params: PlaceTriggerOrderParams
+   165→    ) -> ExecuteResponse:
+   166→        """
+   167→        Places a trigger order (TWAP or price-based).
+   168→
+   169→        Args:
+   170→            params: Parameters for the trigger order.
+   171→
+   172→        Returns:
+   173→            ExecuteResponse: The response from the execution.
+   174→
+   175→        Raises:
+   176→            MissingTriggerClient: If trigger client is not configured.
+   177→        """
+   178→        if self.context.trigger_client is None:
+   179→            raise MissingTriggerClient()
+   180→        return await self.context.trigger_client.place_trigger_order(params)
+   181→
+   182→    async def cancel_trigger_orders(
+   183→        self, params: CancelTriggerOrdersParams
+   184→    ) -> ExecuteResponse:
+   185→        """
+   186→        Cancels trigger orders.
+   187→
+   188→        Args:
+   189→            params: Parameters for canceling trigger orders.
+   190→
+   191→        Returns:
+   192→            ExecuteResponse: The response from the execution.
+   193→
+   194→        Raises:
+   195→            MissingTriggerClient: If trigger client is not configured.
+   196→        """
+   197→        if self.context.trigger_client is None:
+   198→            raise MissingTriggerClient()
+   199→        return await self.context.trigger_client.cancel_trigger_orders(params)
+   200→
+   201→    async def cancel_trigger_product_orders(
+   202→        self, params: CancelProductTriggerOrdersParams
+   203→    ) -> ExecuteResponse:
+   204→        """
+   205→        Cancels all trigger orders for specified products.
+   206→
+   207→        Args:
+   208→            params: Parameters for canceling product trigger orders.
+   209→
+   210→        Returns:
+   211→            ExecuteResponse: The response from the execution.
+   212→
+   213→        Raises:
+   214→            MissingTriggerClient: If trigger client is not configured.
+   215→        """
+   216→        if self.context.trigger_client is None:
+   217→            raise MissingTriggerClient()
+   218→        return await self.context.trigger_client.cancel_product_trigger_orders(params)
+   219→
+   220→    async def place_twap_order(
+   221→        self,
+   222→        product_id: int,
+   223→        price_x18: str,
+   224→        total_amount_x18: str,
+   225→        times: int,
+   226→        slippage_frac: float,
+   227→        interval_seconds: int,
+   228→        sender: Optional[str] = None,
+   229→        subaccount_owner: Optional[str] = None,
+   230→        subaccount_name: str = "default",
+   231→        expiration: Optional[int] = None,
+   232→        nonce: Optional[int] = None,
+   233→        custom_amounts_x18: Optional[List[str]] = None,
+   234→        reduce_only: bool = False,
+   235→        spot_leverage: Optional[bool] = None,
+   236→        id: Optional[int] = None,
+   237→    ) -> ExecuteResponse:
+   238→        """
+   239→        Place a TWAP (Time-Weighted Average Price) order.
+   240→
+   241→        Args:
+   242→            product_id: The product ID for the order.
+   243→            price_x18: The limit price multiplied by 1e18.
+   244→            total_amount_x18: The total amount to trade (signed, negative for sell).
+   245→            times: Number of TWAP executions (1-500).
+   246→            slippage_frac: Slippage tolerance as a fraction (e.g., 0.01 for 1%).
+   247→            interval_seconds: Time interval between executions in seconds.
+   248→            sender: The sender address. If provided, takes precedence.
+   249→            subaccount_owner: The subaccount owner address.
+   250→            subaccount_name: The subaccount name. Defaults to "default".
+   251→            expiration: Order expiration timestamp.
+   252→            nonce: Order nonce.
+   253→            custom_amounts_x18: Custom amounts for each execution.
+   254→            reduce_only: Whether this is a reduce-only order.
+   255→            spot_leverage: Whether to use spot leverage.
+   256→            id: Optional order ID.
+   257→
+   258→        Returns:
+   259→            ExecuteResponse: The response from placing the TWAP order.
+   260→
+   261→        Raises:
+   262→            MissingTriggerClient: If trigger client is not configured.
+   263→        """
+   264→        if self.context.trigger_client is None:
+   265→            raise MissingTriggerClient()
+   266→        return await self.context.trigger_client.place_twap_order(
+   267→            product_id=product_id,
+   268→            price_x18=price_x18,
+   269→            total_amount_x18=total_amount_x18,
+   270→            times=times,
+   271→            slippage_frac=slippage_frac,
+   272→            interval_seconds=interval_seconds,
+   273→            sender=sender,
+   274→            subaccount_owner=subaccount_owner,
+   275→            subaccount_name=subaccount_name,
+   276→            expiration=expiration,
+   277→            nonce=nonce,
+   278→            custom_amounts_x18=custom_amounts_x18,
+   279→            reduce_only=reduce_only,
+   280→            spot_leverage=spot_leverage,
+   281→            id=id,
+   282→        )
+   283→
+   284→    async def place_price_trigger_order(
+   285→        self,
+   286→        product_id: int,
+   287→        price_x18: str,
+   288→        amount_x18: str,
+   289→        trigger_price_x18: str,
+   290→        trigger_type: str,
+   291→        sender: Optional[str] = None,
+   292→        subaccount_owner: Optional[str] = None,
+   293→        subaccount_name: str = "default",
+   294→        expiration: Optional[int] = None,
+   295→        nonce: Optional[int] = None,
+   296→        reduce_only: bool = False,
+   297→        order_type: OrderType = OrderType.DEFAULT,
+   298→        spot_leverage: Optional[bool] = None,
+   299→        id: Optional[int] = None,
+   300→        dependency: Optional[dict] = None,
+   301→    ) -> ExecuteResponse:
+   302→        """
+   303→        Place a price trigger order.
+   304→
+   305→        Args:
+   306→            product_id: The product ID for the order.
+   307→            price_x18: The limit price multiplied by 1e18.
+   308→            amount_x18: The amount to trade (signed, negative for sell).
+   309→            trigger_price_x18: The trigger price multiplied by 1e18.
+   310→            trigger_type: Type of price trigger.
+   311→            sender: The sender address.
+   312→            subaccount_owner: The subaccount owner address.
+   313→            subaccount_name: The subaccount name. Defaults to "default".
+   314→            expiration: Order expiration timestamp.
+   315→            nonce: Order nonce.
+   316→            reduce_only: Whether this is a reduce-only order.
+   317→            order_type: Order execution type.
+   318→            spot_leverage: Whether to use spot leverage.
+   319→            id: Optional order ID.
+   320→            dependency: Optional dependency trigger dict.
+   321→
+   322→        Returns:
+   323→            ExecuteResponse: The response from placing the price trigger order.
+   324→
+   325→        Raises:
+   326→            MissingTriggerClient: If trigger client is not configured.
+   327→        """
+   328→        if self.context.trigger_client is None:
+   329→            raise MissingTriggerClient()
+   330→
+   331→        from nado_api.types import Dependency
+   332→
+   333→        dependency_obj = None
+   334→        if dependency is not None:
+   335→            dependency_obj = Dependency.parse_obj(dependency)
+   336→
+   337→        return await self.context.trigger_client.place_price_trigger_order(
+   338→            product_id=product_id,
+   339→            price_x18=price_x18,
+   340→            amount_x18=amount_x18,
+   341→            trigger_price_x18=trigger_price_x18,
+   342→            trigger_type=trigger_type,
+   343→            sender=sender,
+   344→            subaccount_owner=subaccount_owner,
+   345→            subaccount_name=subaccount_name,
+   346→            expiration=expiration,
+   347→            nonce=nonce,
+   348→            reduce_only=reduce_only,
+   349→            order_type=order_type,
+   350→            spot_leverage=spot_leverage,
+   351→            id=id,
+   352→            dependency=dependency_obj,
+   353→        )
+   354→
+   355→    # ==================== Query Operations ====================
+   356→
+   357→    async def get_all_engine_markets(self) -> AllProductsData:
+   358→        """
+   359→        Retrieves all market states from the off-chain engine.
+   360→
+   361→        Returns:
+   362→            AllProductsData: Information about all products in the engine.
+   363→        """
+   364→        return await self.context.engine_client.get_all_products()
+   365→
+   366→    async def get_all_product_symbols(self) -> ProductSymbolsData:
+   367→        """
+   368→        Retrieves all product symbols from the off-chain engine.
+   369→
+   370→        Returns:
+   371→            ProductSymbolsData: A list of all products with corresponding symbol.
+   372→        """
+   373→        return await self.context.engine_client.get_product_symbols()
+   374→
+   375→    async def get_market_liquidity(
+   376→        self, product_id: int, depth: int
+   377→    ) -> MarketLiquidityData:
+   378→        """
+   379→        Retrieves liquidity per price tick from the engine.
+   380→
+   381→        Args:
+   382→            product_id: The product ID for which liquidity is to be fetched.
+   383→            depth: The depth of the order book to retrieve liquidity from.
+   384→
+   385→        Returns:
+   386→            MarketLiquidityData: Liquidity information for the specified product.
+   387→        """
+   388→        return await self.context.engine_client.get_market_liquidity(product_id, depth)
+   389→
+   390→    async def get_latest_market_price(self, product_id: int) -> MarketPriceData:
+   391→        """
+   392→        Retrieves the latest off-chain orderbook price for a specific product.
+   393→
+   394→        Args:
+   395→            product_id: The identifier for the product.
+   396→
+   397→        Returns:
+   398→            MarketPriceData: The latest market price for the given product.
+   399→        """
+   400→        return await self.context.engine_client.get_market_price(product_id)
+   401→
+   402→    async def get_subaccount_open_orders(
+   403→        self, product_id: int, sender: str
+   404→    ) -> SubaccountOpenOrdersData:
+   405→        """
+   406→        Queries the off-chain engine for open orders for a given subaccount.
+   407→
+   408→        Args:
+   409→            product_id: The identifier for the product.
+   410→            sender: The address and subaccount identifier as a bytes32 hex string.
+   411→
+   412→        Returns:
+   413→            SubaccountOpenOrdersData: Open orders for the subaccount.
+   414→        """
+   415→        return await self.context.engine_client.get_subaccount_open_orders(
+   416→            product_id, sender
+   417→        )
+   418→
+   419→    async def get_subaccount_multi_products_open_orders(
+   420→        self, product_ids: list[int], sender: str
+   421→    ) -> SubaccountMultiProductsOpenOrdersData:
+   422→        """
+   423→        Queries for open orders for a subaccount across multiple products.
+   424→
+   425→        Args:
+   426→            product_ids: List of product ids.
+   427→            sender: The address and subaccount identifier as a bytes32 hex string.
+   428→
+   429→        Returns:
+   430→            SubaccountMultiProductsOpenOrdersData: Open orders across multiple products.
+   431→        """
+   432→        return await self.context.engine_client.get_subaccount_multi_products_open_orders(
+   433→            product_ids, sender
+   434→        )
+   435→
+   436→    async def get_subaccount_historical_orders(
+   437→        self, params: IndexerSubaccountHistoricalOrdersParams
+   438→    ) -> IndexerHistoricalOrdersData:
+   439→        """
+   440→        Queries the indexer for historical orders of a specific subaccount.
+   441→
+   442→        Args:
+   443→            params: Parameters to filter the historical orders data.
+   444→
+   445→        Returns:
+   446→            IndexerHistoricalOrdersData: Historical orders for the subaccount.
+   447→        """
+   448→        return await self.context.indexer_client.get_subaccount_historical_orders(
+   449→            params
+   450→        )
+   451→
+   452→    async def get_historical_orders_by_digest(
+   453→        self, digests: list[str]
+   454→    ) -> IndexerHistoricalOrdersData:
+   455→        """
+   456→        Queries the indexer for historical orders by digest.
+   457→
+   458→        Args:
+   459→            digests: List of order digests.
+   460→
+   461→        Returns:
+   462→            IndexerHistoricalOrdersData: Historical orders for the provided digests.
+   463→        """
+   464→        return await self.context.indexer_client.get_historical_orders_by_digest(
+   465→            digests
+   466→        )
+   467→
+   468→    async def get_max_order_size(
+   469→        self, params: QueryMaxOrderSizeParams
+   470→    ) -> MaxOrderSizeData:
+   471→        """
+   472→        Queries the engine for the maximum order size within health requirements.
+   473→
+   474→        Args:
+   475→            params: Query parameters.
+   476→
+   477→        Returns:
+   478→            MaxOrderSizeData: Maximum size of the order that can be placed.
+   479→        """
+   480→        return await self.context.engine_client.get_max_order_size(params)
+   481→
+   482→    async def get_max_nlp_mintable(
+   483→        self, product_id: int, sender: str, spot_leverage: Optional[bool] = None
+   484→    ) -> MaxLpMintableData:
+   485→        """
+   486→        Queries the engine for the maximum base amount for minting LPs.
+   487→
+   488→        Args:
+   489→            product_id: The identifier for the spot/perp product.
+   490→            sender: The address and subaccount identifier in a bytes32 hex string.
+   491→            spot_leverage: If False, calculates without considering leverage.
+   492→
+   493→        Returns:
+   494→            MaxLpMintableData: Maximum base amount that can be contributed.
+   495→        """
+   496→        return await self.context.engine_client.get_max_nlp_mintable(
+   497→            product_id, sender, spot_leverage
+   498→        )
+   499→
+   500→    async def get_candlesticks(
+   501→        self, params: IndexerCandlesticksParams
+   502→    ) -> IndexerCandlesticksData:
+   503→        """
+   504→        Fetches historical candlestick data for a specific product.
+   505→
+   506→        Args:
+   507→            params: Parameters for the query.
+   508→
+   509→        Returns:
+   510→            IndexerCandlesticksData: Historical candlestick data.
+   511→        """
+   512→        return await self.context.indexer_client.get_candlesticks(params)
+   513→
+   514→    async def get_perp_funding_rate(self, product_id: int) -> IndexerFundingRateData:
+   515→        """
+   516→        Fetches the latest funding rate for a specific perp product.
+   517→
+   518→        Args:
+   519→            product_id: Identifier for the perp product.
+   520→
+   521→        Returns:
+   522→            IndexerFundingRateData: Funding rate and related details.
+   523→        """
+   524→        return await self.context.indexer_client.get_perp_funding_rate(product_id)
+   525→
+   526→    async def get_perp_funding_rates(
+   527→        self, product_ids: list
+   528→    ) -> IndexerFundingRatesData:
+   529→        """
+   530→        Fetches the latest funding rates for a list of perp products.
+   531→
+   532→        Args:
+   533→            product_ids: List of identifiers for the perp products.
+   534→
+   535→        Returns:
+   536→            dict: Mapping of product_id to funding rate details.
+   537→        """
+   538→        return await self.context.indexer_client.get_perp_funding_rates(product_ids)
+   539→
+   540→    async def get_product_snapshots(
+   541→        self, params: IndexerProductSnapshotsParams
+   542→    ) -> IndexerProductSnapshotsData:
+   543→        """
+   544→        Fetches historical snapshots for a specific product.
+   545→
+   546→        Args:
+   547→            params: Query parameters.
+   548→
+   549→        Returns:
+   550→            IndexerProductSnapshotsData: Product snapshots and related data.
+   551→        """
+   552→        return await self.context.indexer_client.get_product_snapshots(params)
+   553→
+   554→    async def get_market_snapshots(
+   555→        self, params: IndexerMarketSnapshotsParams
+   556→    ) -> IndexerMarketSnapshotsData:
+   557→        """
+   558→        Fetches historical market snapshots.
+   559→
+   560→        Args:
+   561→            params: Parameters for the historical market snapshot request.
+   562→
+   563→        Returns:
+   564→            IndexerMarketSnapshotsData: Market snapshot data.
+   565→        """
+   566→        return await self.context.indexer_client.get_market_snapshots(params)
+   567→
+   568→    async def get_trigger_orders(
+   569→        self, params: ListTriggerOrdersParams
+   570→    ) -> TriggerQueryResponse:
+   571→        """
+   572→        Get trigger orders for a subaccount.
+   573→
+   574→        Args:
+   575→            params: Parameters for listing trigger orders.
+   576→
+   577→        Returns:
+   578→            TriggerQueryResponse: Trigger orders data.
+   579→
+   580→        Raises:
+   581→            MissingTriggerClient: If trigger client is not configured.
+   582→        """
+   583→        if self.context.trigger_client is None:
+   584→            raise MissingTriggerClient()
+   585→        return await self.context.trigger_client.list_trigger_orders(params)
+   586→
+   587→    async def get_isolated_positions(self, subaccount: str) -> IsolatedPositionsData:
+   588→        """
+   589→        Retrieve isolated positions for a specific subaccount.
+   590→
+   591→        Args:
+   592→            subaccount: Unique identifier for the subaccount.
+   593→
+   594→        Returns:
+   595→            IsolatedPositionsData: Isolated positions for the subaccount.
+   596→        """
+   597→        return await self.context.engine_client.get_isolated_positions(subaccount)
+   598→
+   599→
+   600→__all__ = ["AsyncMarketAPI"]
+   601→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

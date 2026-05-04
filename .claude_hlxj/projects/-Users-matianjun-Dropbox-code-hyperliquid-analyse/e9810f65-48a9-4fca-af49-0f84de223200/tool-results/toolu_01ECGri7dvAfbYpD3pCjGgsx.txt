@@ -1,0 +1,84 @@
+   480→        logger.info(f"max time of token level feature {df.index.max()}")
+   481→        return df
+   482→
+   483→    def cross_section_feature(self, df: pd.DataFrame, target: bool):
+   484→        if target:
+   485→            df.dropna(inplace=True)
+   486→            bar = tqdm(df.groupby(level=0))
+   487→        else:
+   488→            bar = df.groupby(level=0)
+   489→
+   490→        dfs = []
+   491→        for time, time_df in bar:
+   492→            if target:
+   493→                bar.set_description(f"{time} , total symbol: {len(time_df)}")
+   494→            try:
+   495→                if len(time_df) < 5:
+   496→                    logger.warning(
+   497→                        f"Skipping time {time} due to extremely low symbol count: {len(time_df)}"
+   498→                    )
+   499→                    continue
+   500→
+   501→                # Target 处理 (Gaussian Rank)
+   502→                if target:
+   503→                    for column in target_columns:
+   504→                        time_df[f"{column}_number"] = time_df[column]
+   505→
+   506→                        epsilon = 1e-6
+   507→                        pct_rank = time_df[column].rank(pct=True)
+   508→                        pct_rank = pct_rank * (1 - 2 * epsilon) + epsilon
+   509→
+   510→                        time_df[f"{column}_zscore"] = norm.ppf(pct_rank)
+   511→                        time_df[column] = time_df[column].rank(pct=True)
+   512→
+   513→                # Market Cap / Momentum Label 处理
+   514→                if not target and not all(time_df["momentum_4h"].isna()):
+   515→                    time_df["momentum_4h_label"] = time_df["momentum_4h"].rank(pct=True)
+   516→
+   517→                time_df["market_cap_rank_50"] = time_df["market_cap"].rank(pct=True)
+   518→                time_df["market_cap_rank_10"] = time_df["market_cap"].rank(pct=True)
+   519→
+   520→                # Numeric Features 标准化 (Percentile Rank)
+   521→                numeric_features_to_standardize = self.get_numeric_feature_names()
+   522→
+   523→                volatility_features = [
+   524→                    f.replace("momentum", "volatility") for f in key_windows.keys()
+   525→                ]
+   526→                features_to_exclude = set(volatility_features)
+   527→                numeric_features_to_standardize = [
+   528→                    f
+   529→                    for f in numeric_features_to_standardize
+   530→                    if f not in features_to_exclude
+   531→                ]
+   532→
+   533→                time_df[numeric_features_to_standardize] = time_df[
+   534→                    numeric_features_to_standardize
+   535→                ].rank(pct=True)
+   536→
+   537→                # 均值特征
+   538→                time_df["momentum_1h_mean"] = time_df["momentum_1h"].mean()
+   539→                time_df["momentum_4h_mean"] = time_df["momentum_4h"].mean()
+   540→                time_df["momentum_24h_mean"] = time_df["momentum_24h"].mean()
+   541→                time_df["momentum_72h_mean"] = time_df["momentum_72h"].mean()
+   542→
+   543→                dfs.append(time_df)
+   544→
+   545→            except Exception as e:
+   546→                logger.error(
+   547→                    f"Failed to generate cross section feature {time}: {e}",
+   548→                    exc_info=True,
+   549→                )
+   550→
+   551→        df = pd.concat(dfs)
+   552→
+   553→        # 时间特征
+   554→        df["day_of_week"] = df.index.get_level_values(0).dayofweek
+   555→        df["hour_of_day"] = df.index.get_level_values(0).hour
+   556→
+   557→        # BTC/ETH 标记
+   558→        df["is_btc"] = (df.index.get_level_values(1) == "BTCUSDT").astype(int)
+   559→        df["is_eth"] = (df.index.get_level_values(1) == "ETHUSDT").astype(int)
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

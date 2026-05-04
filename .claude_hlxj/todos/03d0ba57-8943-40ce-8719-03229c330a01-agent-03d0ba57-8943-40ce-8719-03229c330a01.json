@@ -1,0 +1,17 @@
+[
+  {
+    "content": "Create Python script to parse diary entries",
+    "status": "in_progress",
+    "activeForm": "Creating Python script to parse diary entries"
+  },
+  {
+    "content": "Run script to generate daily note files",
+    "status": "pending",
+    "activeForm": "Running script to generate daily note files"
+  },
+  {
+    "content": "Verify files were created correctly",
+    "status": "pending",
+    "activeForm": "Verifying files were created correctly"
+  }
+]

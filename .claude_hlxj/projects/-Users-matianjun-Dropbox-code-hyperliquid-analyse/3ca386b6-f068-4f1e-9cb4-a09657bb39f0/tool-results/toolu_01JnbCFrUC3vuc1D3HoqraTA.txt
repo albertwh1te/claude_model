@@ -1,0 +1,1365 @@
+     1→import asyncio
+     2→import json
+     3→import math
+     4→import os
+     5→import time
+     6→from datetime import datetime, timezone, timedelta
+     7→from decimal import Decimal
+     8→from enum import Enum
+     9→
+    10→import arrow
+    11→import pandas as pd
+    12→import websockets
+    13→from pytz import utc
+    14→
+    15→from binance_api.base_request import BinanceRequest
+    16→
+    17→
+    18→class BacktestDetailType:
+    19→    TRADE = "TRADE"
+    20→    SNAPSHOT = "SNAPSHOT"
+    21→
+    22→
+    23→class Direction:
+    24→    OPEN_LONG = "OPEN_LONG"  # 开多
+    25→    OPEN_SHORT = "OPEN_SHORT"  # 开空
+    26→    CLOSE_LONG = "CLOSE_LONG"  # 平多
+    27→    CLOSE_SHORT = "CLOSE_SHORT"  # 平空
+    28→
+    29→
+    30→class OrderType:
+    31→    LIMIT = "LIMIT"  # 普通委托
+    32→    MAKER = "MAKER"  # 只做maker
+    33→    FOK = "FOK"  # 全部成交或者立即取消
+    34→    IOC = "IOC"  # 立即成交并取消剩余
+    35→    MARKET = "MARKET"  # 市价委托
+    36→
+    37→
+    38→class OrderState:
+    39→    FAILED = "FAILED"  # 失败
+    40→    CANCELD = "CANCELD"  # 撤单成功
+    41→    WAIT = "WAIT"  # 等待成交
+    42→    PARTIAL = "PARTIAL"  # 部分成交
+    43→    COMPLETE = "COMPLETE"  # 完全成交
+    44→    CREATING = "CREATING"  # 下单中
+    45→    CANCELING = "CANCELING"  # 撤单中
+    46→
+    47→
+    48→def my_round(num, n) -> float:
+    49→    """
+    50→    Returns a value rounded down to a specific number of decimal places.
+    51→
+    52→    Args:
+    53→        num: the number you want to round
+    54→        n: the decimal precision
+    55→
+    56→    Returns:
+    57→
+    58→    """
+    59→    # history reason to have this code
+    60→    # TODO: delete this code and find out where the num is not a float
+    61→    if isinstance(num, str):
+    62→        num = float(num)
+    63→
+    64→    if not isinstance(n, int):
+    65→        raise TypeError("decimal places must be an integer")
+    66→    elif n < 0:
+    67→        raise ValueError("decimal places has to be 0 or more")
+    68→    elif n == 0:
+    69→        return math.floor(num)
+    70→
+    71→    factor = 10**n
+    72→    return math.floor(num * factor) / factor
+    73→
+    74→
+    75→class BinanceApi(BinanceRequest):
+    76→    class BinanceOrderType(Enum):
+    77→        LIMIT = "GTC"  # 普通委托
+    78→        MARKET = "MARKET"  # 市价委托
+    79→        MAKER = "GTX"  # 只做maker
+    80→        FOK = "FOK"  # 全部成交或者立即取消
+    81→        IOC = "IOC"  # 立即成交并取消剩余
+    82→
+    83→    class BinanceOrderState(Enum):
+    84→        FAILED = "-2"  # 失败
+    85→        CANCELD = "-1"  # 撤单成功
+    86→        WAIT = "0"  # 等待成交
+    87→        PARTIAL = "1"  # 部分成交
+    88→        COMPLETE = "2"  # 完全成交
+    89→        CREATING = "3"  # 下单中
+    90→        CANCELING = "4"  # 撤单中
+    91→
+    92→    class BinanceSide(Enum):
+    93→        OPEN_LONG = "BUY"  # 开多
+    94→        OPEN_SHORT = "SELL"  # 开空
+    95→        CLOSE_LONG = "SELL"  # 平多
+    96→        CLOSE_SHORT = "BUY"  # 平空
+    97→
+    98→    class BinancePositionSide(Enum):
+    99→        OPEN_LONG = "LONG"  # 开多
+   100→        OPEN_SHORT = "SHORT"  # 开空
+   101→        CLOSE_LONG = "LONG"  # 平多
+   102→        CLOSE_SHORT = "SHORT"  # 平空
+   103→
+   104→    future_list = [
+   105→        ("next_quarter", "this_quarter"),
+   106→        ("next_quarter", "perpetual"),
+   107→        ("this_quarter", "perpetual"),
+   108→    ]
+   109→
+   110→    async def get_kline(
+   111→        self,
+   112→        symbol: str,
+   113→        timeframe: str,
+   114→        start_date: str,
+   115→        end_date: str = None,
+   116→        to_db: bool = False,
+   117→        to_local: bool = False,
+   118→        limit=None,
+   119→    ) -> pd.DataFrame:
+   120→        """
+   121→        Args:
+   122→            to_db: 是否入库，默认不入库
+   123→            timeframe: '1m','5m','15m','30m','1h','2h','4h','6h','12h','1d'
+   124→            start_date: K线起始时间，"%Y-%m-%d %H:%M:%S"
+   125→            end_date: K线结束时间，"%Y-%m-%d %H:%M:%S"
+   126→        Returns:[
+   127→        ]
+   128→        """
+   129→        granularity = self.parse_time_frame(timeframe) * 1000
+   130→        startTime = int(arrow.get(start_date).timestamp() * 1000)
+   131→        end = int(arrow.get(end_date).timestamp() * 1000)
+   132→        if not limit:
+   133→            limit = 1500
+   134→        path = f"{self.get_url(self.MarketType.USDT_FUTURE)}/v1/klines"
+   135→        data = []
+   136→        while startTime < end:
+   137→            endTime = min(startTime + granularity * limit, end)
+   138→            param = {
+   139→                "symbol": symbol,
+   140→                "startTime": startTime,
+   141→                "endTime": endTime,
+   142→                "interval": timeframe,
+   143→                "limit": limit,
+   144→            }
+   145→            self.logger.info(
+   146→                f"正在获取{symbol}-{timeframe.upper()} K线数据:{datetime.fromtimestamp(startTime / 1000, tz=utc)} - {datetime.fromtimestamp(endTime / 1000, tz=utc)}"
+   147→            )
+   148→            startTime = endTime
+   149→            for i in range(2):
+   150→                try:
+   151→                    res = await self.public_request_get(path, data=param)
+   152→                    data.extend(res)
+   153→                    break
+   154→                except Exception as e:
+   155→                    self.logger.error(f"获取K线异常:{e} 开始第{i}次重试", exc_info=True)
+   156→                    await asyncio.sleep(10)
+   157→
+   158→            # 1 / (2400 /60) = 0.025
+   159→            await asyncio.sleep(0.02)
+   160→
+   161→        df = pd.DataFrame(data)
+   162→        df = df[[0, 1, 2, 3, 4, 7]]
+   163→        df[7] = round(df[7].astype(float) / 10000, 1)
+   164→
+   165→        df.columns = ["candle_begin_time", "open", "high", "low", "close", "volume"]
+   166→        df["candle_begin_time"] = pd.to_datetime(df["candle_begin_time"], unit="ms")
+   167→        df.drop_duplicates("candle_begin_time", inplace=True)
+   168→        df.sort_values(["candle_begin_time"], inplace=True)
+   169→        self.logger.info(
+   170→            f"获取{symbol}-{timeframe.upper()} K线数据完毕，共计{len(df)}条记录"
+   171→        )
+   172→        return df
+   173→
+   174→    @classmethod
+   175→    async def get_symbols(cls, market_type: str, to_db: bool = True):
+   176→        """获取所有的交易对
+   177→
+   178→        Args:
+   179→            market_type:  市场类型
+   180→            to_db:  是否把结果存入数据库
+   181→
+   182→        Returns:
+   183→
+   184→        """
+   185→        path = f"{cls.get_url(market_type)}/v1/exchangeInfo"
+   186→        data = (await cls.public_request_get(path))["symbols"]
+   187→        symbols = {}
+   188→        for d in data:
+   189→            try:
+   190→                symbol = d["symbol"]
+   191→                amount_precision = 0
+   192→                price_precision = 0
+   193→                min_amount = 0
+   194→                min_cost = 0
+   195→
+   196→                max_amount = 0
+   197→
+   198→                note = ""
+   199→                if market_type == cls.MarketType.SPOT:
+   200→                    for x in d["filters"]:
+   201→                        if x["filterType"] == "LOT_SIZE":
+   202→                            amount_precision = (
+   203→                                -Decimal(str(float(x["stepSize"]))).as_tuple().exponent
+   204→                            )
+   205→                            min_amount = float(x["stepSize"])
+   206→
+   207→                        if x["filterType"] == "PRICE_FILTER":
+   208→                            price_precision = (
+   209→                                -Decimal(str(float(x["tickSize"]))).as_tuple().exponent
+   210→                            )
+   211→
+   212→                        if x["filterType"] == "MIN_NOTIONAL":
+   213→                            min_cost = int(float(x["minNotional"]))
+   214→
+   215→                elif market_type == cls.MarketType.USDT_FUTURE:
+   216→                    for x in d["filters"]:
+   217→                        if x["filterType"] == "MARKET_LOT_SIZE":
+   218→                            min_amount = float(x["minQty"])
+   219→                            max_amount = float(x["maxQty"])
+   220→                        elif x["filterType"] == "PRICE_FILTER":
+   221→                            note = x["tickSize"]
+   222→
+   223→                    amount_precision = d.get("quantityPrecision")
+   224→                    price_precision = d.get("pricePrecision")
+   225→
+   226→                symbols[symbol] = {
+   227→                    "symbol": symbol,
+   228→                    "underlying": f"{d['baseAsset']}{d['quoteAsset']}",
+   229→                    "exchange": cls.EXCHANGE,
+   230→                    "market_type": market_type,
+   231→                    "contract_val": (
+   232→                        d["contractSize"]
+   233→                        if market_type == cls.MarketType.COIN_FUTURE
+   234→                        else 1
+   235→                    ),
+   236→                    "is_coin_base": True,
+   237→                    "is_tradable": True,
+   238→                    "amount_precision": amount_precision,
+   239→                    "price_precision": price_precision,
+   240→                    "min_amount": min_amount,
+   241→                    "max_amount": max_amount,
+   242→                    "min_cost": min_cost,
+   243→                    "category": 0,
+   244→                    "volume": 0,
+   245→                    "base_coin": d.get("baseAsset"),
+   246→                    "quote_coin": d.get("quoteAsset"),
+   247→                    "note": note,
+   248→                }
+   249→            except Exception as e:
+   250→                cls.logger.info(d)
+   251→                cls.logger.info(e)
+   252→
+   253→        return symbols
+   254→
+   255→    @classmethod
+   256→    async def get_all_symbols(cls):
+   257→        """获取全部symbol"""
+   258→        return await cls.get_symbols(cls.MarketType.USDT_FUTURE)
+   259→
+   260→    @staticmethod
+   261→    def ticker_process(data):
+   262→        ticker = {
+   263→            "timestamp": datetime.fromtimestamp(
+   264→                float(data["time"]) / 1000, timezone.utc
+   265→            ).strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+   266→            "symbol": data["symbol"],
+   267→            "last": float(data["bidPrice"]),
+   268→            "last_qty": float(data["bidQty"]),
+   269→            "best_ask": float(data["askPrice"]),
+   270→            "best_ask_size": float(data["askQty"]),
+   271→            "best_bid": float(data["bidPrice"]),
+   272→            "best_bid_size": float(data["bidQty"]),
+   273→        }
+   274→        return ticker
+   275→
+   276→    @classmethod
+   277→    async def get_tickers(cls, market_type: str):
+   278→        """获取所有tick"""
+   279→        path = f"{cls.get_url(market_type)}/v1/ticker/bookTicker"
+   280→        data = await cls.public_request_get(path)
+   281→        tickers = {}
+   282→        timestamp = time.time() * 1000
+   283→        for t in data:
+   284→            if market_type == cls.MarketType.SPOT:
+   285→                t["time"] = timestamp
+   286→            ticker = cls.ticker_process(t)
+   287→            tickers[t["symbol"]] = ticker
+   288→        cls.logger.info(f"{cls.EXCHANGE} {market_type}")
+   289→        return tickers
+   290→
+   291→    @classmethod
+   292→    async def get_future_all_prices(cls):
+   293→        results = {}
+   294→        all_tickers = await cls.get_tickers(
+   295→            market_type=BinanceApi.MarketType.USDT_FUTURE
+   296→        )
+   297→        for symbol, value in all_tickers.items():
+   298→            if symbol.endswith("USDT"):
+   299→                results[symbol] = {}
+   300→                results[symbol]["price"] = (value["best_ask"] + value["best_bid"]) / 2
+   301→        return results
+   302→
+   303→    async def position_side(self):
+   304→        market_type = "usdt_future"
+   305→        path = f"{self.get_url(market_type)}/v1/positionSide/dual"
+   306→        data = await self._request(self.GET, path)
+   307→        return data
+   308→
+   309→    async def change_position_side(self, dual_side: bool = False):
+   310→        market_type = "usdt_future"
+   311→        path = f"{self.get_url(market_type)}/v1/positionSide/dual"
+   312→        data = {}
+   313→        data["dualSidePosition"] = dual_side
+   314→        response = await self._request(self.POST, path, data=data)
+   315→        return response
+   316→
+   317→    async def get_account_info(self, market_type, to_redis=False):
+   318→        if market_type == self.MarketType.USDT_FUTURE:
+   319→            path = f"{self.get_url(market_type)}/v2/balance"
+   320→        elif market_type == self.MarketType.COIN_FUTURE:
+   321→            path = f"{self.get_url(market_type)}/v1/balance"
+   322→        else:
+   323→            path = f"{self.get_url(market_type)}/v3/account"
+   324→
+   325→        data = await self._request(self.GET, path)
+   326→        all_balance = {}
+   327→        if market_type == self.MarketType.SPOT:
+   328→            t = datetime.fromtimestamp(data["updateTime"] / 1000).strftime(
+   329→                "%Y-%m-%dT%H:%M:%S.%fZ"
+   330→            )
+   331→            data = data["balances"]
+   332→            for d in data:
+   333→                equity = float(d["free"]) + float(d["locked"])
+   334→                if equity > 0:
+   335→                    print(d)
+   336→                    all_balance[d["asset"]] = {
+   337→                        "frozen": float(d["locked"]),
+   338→                        "equity": equity,
+   339→                        "available": float(d["free"]),
+   340→                        "pnl": 0,
+   341→                        "margin_ratio": 0,
+   342→                        "maint_margin_ratio": 0,
+   343→                        "underlying": d["asset"],
+   344→                        "timestamp": t,
+   345→                        "currency": d["asset"],
+   346→                        "market_type": market_type,
+   347→                        "api_id": self.api.id,
+   348→                    }
+   349→        else:
+   350→            for d in data:
+   351→                if float(d["balance"]) > 0:
+   352→                    all_balance[d["asset"]] = {
+   353→                        "frozen": float(d["balance"]) - float(d["availableBalance"]),
+   354→                        "equity": float(d["balance"]) + float(d["crossUnPnl"]),
+   355→                        "available": float(d["availableBalance"]),
+   356→                        "pnl": float(d["crossUnPnl"]),
+   357→                        "margin_ratio": 0,
+   358→                        "maint_margin_ratio": 0,
+   359→                        "underlying": d["asset"],
+   360→                        "timestamp": (
+   361→                            datetime.fromtimestamp(d["updateTime"] / 1000)
+   362→                            if market_type == self.MarketType.COIN_FUTURE
+   363→                            else datetime.utcnow()
+   364→                        ).strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+   365→                        "currency": d["asset"],
+   366→                        "market_type": market_type,
+   367→                        "api_id": self.api.id,
+   368→                    }
+   369→        total_value = 0
+   370→        return all_balance, total_value
+   371→
+   372→    async def get_account(self, market_type, to_redis=False):
+   373→        all_balance, value = await self.get_account_info(market_type, to_redis)
+   374→        return all_balance
+   375→
+   376→    async def get_all_accounts(self):
+   377→        """获取全部账户余额，定时任务"""
+   378→        await asyncio.wait(
+   379→            [
+   380→                self.get_account(self.MarketType.USDT_FUTURE, True),
+   381→                self.get_account(self.MarketType.COIN_FUTURE, True),
+   382→                self.get_account(self.MarketType.SPOT, True),
+   383→            ]
+   384→        )
+   385→
+   386→    async def api_test(self):
+   387→        """获取全部账户余额，定时任务"""
+   388→        await self.get_account(self.MarketType.SPOT, True)
+   389→
+   390→    async def get_all_positions(self):
+   391→        """获取全部，定时任务"""
+   392→        await asyncio.wait(
+   393→            [
+   394→                self.get_all_position(self.MarketType.COIN_FUTURE),
+   395→                self.get_all_position(self.MarketType.USDT_FUTURE),
+   396→                # self.get_all_position(self.MarketType.SPOT),
+   397→            ]
+   398→        )
+   399→
+   400→    def process_position(self, data, market_type):
+   401→        positions = {}
+   402→        if market_type == self.MarketType.SPOT:
+   403→            for d in data["balances"]:
+   404→                amount = float(d["free"]) + float(d["locked"])
+   405→                symbol = d["asset"]
+   406→                if amount > 0:
+   407→                    positions[symbol] = [
+   408→                        {
+   409→                            "api_id": self.api.id,
+   410→                            "amount": amount,
+   411→                            "available": float(d["free"]),
+   412→                            "price": 0,
+   413→                            "last": 0,
+   414→                            "margin": 0,
+   415→                            "symbol": symbol,
+   416→                            "leverage": 1,
+   417→                            "liquidation": 0,
+   418→                            "pnl": 0,
+   419→                            "direction": "long",
+   420→                            "create_time": datetime.utcnow().strftime(
+   421→                                "%Y-%m-%dT%H:%M:%S.%fZ"
+   422→                            ),
+   423→                            "timestamp": datetime.utcnow().strftime(
+   424→                                "%Y-%m-%dT%H:%M:%S.%fZ"
+   425→                            ),
+   426→                        }
+   427→                    ]
+   428→        else:
+   429→            for d in data:
+   430→                symbol = d["symbol"]
+   431→                amount = abs(float(d["positionAmt"]))
+   432→                if amount > 0:
+   433→                    pos = {
+   434→                        "api_id": self.api.id,
+   435→                        "amount": amount,
+   436→                        "available": amount,
+   437→                        "price": round(float(d["entryPrice"]), 3),
+   438→                        "last": round(float(d["markPrice"]), 3),
+   439→                        "margin": 0,
+   440→                        "symbol": symbol,
+   441→                        "leverage": float(d["leverage"]),
+   442→                        "liquidation": round(float(d["liquidationPrice"]), 3),
+   443→                        "pnl": round(float(d[f"unRealizedProfit"]), 3),
+   444→                        "direction": d["positionSide"].lower(),
+   445→                        "create_time": datetime.utcnow().strftime(
+   446→                            "%Y-%m-%dT%H:%M:%S.%fZ"
+   447→                        ),
+   448→                        "timestamp": datetime.utcnow().strftime(
+   449→                            "%Y-%m-%dT%H:%M:%S.%fZ"
+   450→                        ),
+   451→                    }
+   452→                    if positions.get(symbol, False):
+   453→                        positions[symbol].append(pos)
+   454→                    else:
+   455→                        positions[symbol] = [pos]
+   456→        return positions
+   457→
+   458→    async def get_all_position(self, market_type, to_redis=True):
+   459→        if market_type == self.MarketType.USDT_FUTURE:
+   460→            path = f"{self.get_url(market_type)}/v2/positionRisk"
+   461→        elif market_type == self.MarketType.COIN_FUTURE:
+   462→            path = f"{self.get_url(market_type)}/v1/positionRisk"
+   463→        elif market_type == self.MarketType.SPOT:
+   464→            path = f"{self.get_url(market_type)}/v3/account"
+   465→        else:
+   466→            raise Exception("暂不支持")
+   467→        data = await self._request(self.GET, path)
+   468→
+   469→        positions = self.process_position(data, market_type)
+   470→        return positions
+   471→
+   472→    async def get_symbol_position(self):
+   473→        data = await self.get_all_position(self.symbol.market_type, False)
+   474→        if self.symbol.market_type == self.MarketType.SPOT:
+   475→            data: dict = data.get(self.symbol.base_coin.upper(), [{}])
+   476→        else:
+   477→            data: dict = data.get(self.symbol.symbol.upper(), [])
+   478→            if self.symbol.market_type == self.MarketType.COIN_FUTURE:
+   479→                for d in data:
+   480→                    d["amount"] = int(d["amount"])
+   481→                    d["available"] = int(d["amount"])
+   482→        return data
+   483→
+   484→    async def change_usdt_future_leverage(self, symbol: str, leverage: int):
+   485→        path = f'{self.get_url("usdt_future")}/v1/leverage'
+   486→        data = {}
+   487→        data["symbol"] = symbol
+   488→        data["leverage"] = int(leverage)
+   489→        await self._request(self.POST, path, data=data)
+   490→        self.logger.info(f"{symbol},{leverage}修改杠杆倍数成功")
+   491→
+   492→    async def get_usdt_one_way_position(self):
+   493→        path = f'{self.get_url("usdt_future")}/v2/positionRisk'
+   494→        data = await self._request(self.GET, path)
+   495→        positions = {}
+   496→        for d in data:
+   497→            symbol = d["symbol"]
+   498→            amount = float(d["positionAmt"])
+   499→            if amount != 0:
+   500→                pos = {
+   501→                    "api_id": self.api.id,
+   502→                    "amount": amount,
+   503→                    "available": amount,
+   504→                    "price": round(float(d["entryPrice"]), 3),
+   505→                    "last": round(float(d["markPrice"]), 3),
+   506→                    "margin": 0,
+   507→                    "symbol": symbol,
+   508→                    "leverage": float(d["leverage"]),
+   509→                    "liquidation": round(float(d["liquidationPrice"]), 3),
+   510→                    "pnl": round(float(d[f"unRealizedProfit"]), 3),
+   511→                    "direction": d["positionSide"].lower(),
+   512→                    "create_time": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+   513→                    "timestamp": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+   514→                }
+   515→
+   516→                if positions.get(symbol, False):
+   517→                    positions[symbol].append(pos)
+   518→                else:
+   519→                    positions[symbol] = [pos]
+   520→
+   521→        return positions
+   522→
+   523→    async def usdt_one_way_position_create_order(
+   524→        self,
+   525→        amount: float,
+   526→        order_type: str,
+   527→        direction: str,
+   528→        price: float = None,
+   529→        client_oid: str = None,
+   530→        use_cost: bool = False,
+   531→        order_resp_type: str = "ACK",
+   532→        reduce_only: bool = False,
+   533→        kickback: bool = False,
+   534→        broker_id: str = "EU1quTH9",
+   535→    ):
+   536→        amount = my_round(amount, self.symbol.amount_precision)
+   537→        self.logger.info(
+   538→            f"准备下单：{self.api.account}:{self.symbol.symbol},数量：{amount},价格：{price}"
+   539→        )
+   540→        amount = my_round(amount, self.symbol.amount_precision)
+   541→        self.logger.info(
+   542→            f"准备下单：{self.api.account}:{self.symbol.symbol},数量：{amount},价格：{price}"
+   543→        )
+   544→        if amount <= 0:
+   545→            self.logger.error(f"{self.symbol.symbol}订单数量应该大于0")
+   546→            return False
+   547→        if all([price, self.symbol.min_cost]):
+   548→            if price * amount < self.symbol.min_cost:
+   549→                self.logger.error(
+   550→                    f"{self.symbol.symbol}订单金额应该大于{self.symbol.min_cost}"
+   551→                )
+   552→                return False
+   553→        if all([use_cost, self.symbol.min_cost]):
+   554→            if amount < self.symbol.min_cost:
+   555→                self.logger.error(
+   556→                    f"{self.symbol.symbol}订单金额应该大于{self.symbol.min_cost}"
+   557→                )
+   558→                return False
+   559→
+   560→        data = {
+   561→            "symbol": self.symbol.symbol,
+   562→            "side": self.BinanceSide[direction].value,
+   563→            "quantity": amount,
+   564→            "newOrderRespType": order_resp_type,
+   565→        }
+   566→        path = f"{self.get_url(self.symbol.market_type)}/v1/order"
+   567→
+   568→        if order_type == OrderType.MARKET:
+   569→            data["type"] = self.BinanceOrderType[order_type].value
+   570→        else:
+   571→            data["type"] = "LIMIT"
+   572→            # price = my_round(price, self.symbol.price_precision)
+   573→            price = Decimal(price).quantize(Decimal(str(float(self.symbol.note))))
+   574→            data["price"] = price
+   575→            data["timeInForce"] = self.BinanceOrderType[order_type].value
+   576→        if client_oid:
+   577→            data["newClientOrderId"] = client_oid
+   578→
+   579→        if reduce_only:
+   580→            data["reduceOnly"] = "true"
+   581→
+   582→        if kickback:
+   583→            # TODO:change to our broker id
+   584→            broker_id = broker_id
+   585→            data["newClientOrderId"] = f"x-{broker_id}{int(time.time_ns())}"
+   586→
+   587→        print(data)
+   588→        order = await self._request(self.POST, path, data=data)
+   589→        self.logger.info(
+   590→            f"{self.api.account},{self.symbol.symbol},{self.symbol.market_type},{order_type},{client_oid},{reduce_only}下单成功"
+   591→        )
+   592→        return order
+   593→
+   594→    async def create_order(
+   595→        self,
+   596→        amount: float,
+   597→        order_type: str,
+   598→        direction: str,
+   599→        price: float = None,
+   600→        client_oid: str = None,
+   601→        use_cost: bool = False,
+   602→        order_resp_type: str = "ACK",
+   603→        reduce_only: bool = False,
+   604→    ):
+   605→
+   606→        amount = my_round(amount, self.symbol.amount_precision)
+   607→        self.logger.info(
+   608→            f"准备下单：{self.api.account}:{self.symbol.symbol},数量：{amount},价格：{price}"
+   609→        )
+   610→
+   611→        if amount <= 0:
+   612→            raise Exception(f"{self.symbol.symbol}订单数量应该大于0")
+   613→        if all([price, self.symbol.min_cost]):
+   614→            if price * amount < self.symbol.min_cost:
+   615→                raise Exception(
+   616→                    f"{self.symbol.symbol}订单金额应该大于{self.symbol.min_cost}"
+   617→                )
+   618→        if all([use_cost, self.symbol.min_cost]):
+   619→            if amount < self.symbol.min_cost:
+   620→                raise Exception(
+   621→                    f"{self.symbol.symbol}订单金额应该大于{self.symbol.min_cost}"
+   622→                )
+   623→
+   624→        data = {
+   625→            "symbol": self.symbol.symbol,
+   626→            "side": self.BinanceSide[direction].value,
+   627→            "quantity": amount,
+   628→            "newOrderRespType": order_resp_type,
+   629→        }
+   630→        if self.symbol.market_type in [
+   631→            self.MarketType.COIN_FUTURE,
+   632→            self.MarketType.USDT_FUTURE,
+   633→        ]:
+   634→            path = f"{self.get_url(self.symbol.market_type)}/v1/order"
+   635→            data["positionSide"] = self.BinancePositionSide[direction].value
+   636→
+   637→        elif self.symbol.market_type == self.MarketType.SPOT:
+   638→            path = f"{self.get_url(self.symbol.market_type)}/v3/order"
+   639→            if use_cost:
+   640→                if amount > 10:
+   641→                    data["quoteOrderQty"] = data.pop("quantity")
+   642→                else:
+   643→                    return {}
+   644→        else:
+   645→            raise Exception("暂不支持")
+   646→
+   647→        if order_type == OrderType.MARKET:
+   648→            data["type"] = self.BinanceOrderType[order_type].value
+   649→        else:
+   650→            data["type"] = "LIMIT"
+   651→            price = my_round(price, self.symbol.price_precision)
+   652→            if self.symbol.note:
+   653→                price = Decimal(price).quantize(Decimal(str(float(self.symbol.note))))
+   654→            data["price"] = price
+   655→            data["timeInForce"] = self.BinanceOrderType[order_type].value
+   656→        if client_oid:
+   657→            data["newClientOrderId"] = client_oid
+   658→        if reduce_only:
+   659→            data["reduceOnly"] = "true"
+   660→        order = await self._request(self.POST, path, data=data)
+   661→        self.logger.info(
+   662→            f"{self.api.account},{self.symbol.symbol},{self.symbol.market_type},{order_type},{client_oid}下单成功"
+   663→        )
+   664→        return order
+   665→
+   666→    async def close_symbol_position(self):
+   667→        positions = await self.get_symbol_position()
+   668→        for p in positions:
+   669→            if p["direction"] == "long":
+   670→                await self.create_order(
+   671→                    amount=p["available"],
+   672→                    order_type=OrderType.MARKET,
+   673→                    direction=Direction.CLOSE_LONG,
+   674→                )
+   675→            if p["direction"] == "short":
+   676→                await self.create_order(
+   677→                    amount=p["available"],
+   678→                    order_type=OrderType.MARKET,
+   679→                    direction=Direction.CLOSE_SHORT,
+   680→                )
+   681→
+   682→    async def set_position_mode(self):
+   683→        params = {"dualSidePosition": "true"}
+   684→        try:
+   685→            path = f"{self.get_url(self.MarketType.COIN_FUTURE)}/v1/positionSide/dual"
+   686→            data = await self._request(self.POST, path, data=params)
+   687→            self.logger.info(data)
+   688→        except Exception as e:
+   689→            self.logger.error(e, exc_info=True)
+   690→        try:
+   691→            path = f"{self.get_url(self.MarketType.USDT_FUTURE)}/v1/positionSide/dual"
+   692→            data = await self._request(self.POST, path, data=params)
+   693→            self.logger.info(data)
+   694→        except Exception as e:
+   695→            self.logger.error(e, exc_info=True)
+   696→
+   697→    @classmethod
+   698→    def order_type(cls, side, position_side):
+   699→        if (side == cls.BinanceSide.OPEN_LONG.value) & (
+   700→            position_side == cls.BinancePositionSide.OPEN_LONG.value
+   701→        ):
+   702→            return "做多"
+   703→        elif (side == cls.BinanceSide.CLOSE_LONG.value) & (
+   704→            position_side == cls.BinancePositionSide.CLOSE_LONG.value
+   705→        ):
+   706→            return "平多"
+   707→        elif (side == cls.BinanceSide.OPEN_SHORT.value) & (
+   708→            position_side == cls.BinancePositionSide.OPEN_SHORT.value
+   709→        ):
+   710→            return "做空"
+   711→        elif (side == cls.BinanceSide.CLOSE_SHORT.value) & (
+   712→            position_side == cls.BinancePositionSide.CLOSE_SHORT.value
+   713→        ):
+   714→            return "平空"
+   715→        else:
+   716→            return "解析失败"
+   717→
+   718→    states = {
+   719→        "EXPIRED": "失败",
+   720→        "CANCELED": "撤单成功",
+   721→        "NEW": "等待成交",
+   722→        "PARTIALLY_FILLED": "部分成交",
+   723→        "FILLED": "完全成交",
+   724→        "NEW_INSURANCE": "爆仓",
+   725→        "NEW_ADL": "强行减仓",
+   726→        "REJECTED": "订单被拒绝",
+   727→        "TRADE": "订单有新成交",
+   728→    }
+   729→
+   730→    def parser_order(self, order, market_type):
+   731→        unit = "（张）" if market_type == self.MarketType.COIN_FUTURE else "个"
+   732→        if market_type == self.MarketType.SPOT:
+   733→            side = order["S"]
+   734→            avg_price = round(float(order["L"]), 4)
+   735→        else:
+   736→            side = self.order_type(order["S"], order["ps"])
+   737→            avg_price = round(float(order["ap"]), 4)
+   738→        info = (
+   739→            f'> **账户：<font color="info">{self.api.account}</font>**，'
+   740→            f"> **时间：<font color=\"info\">{datetime.fromtimestamp(order['T'] / 1000).strftime('%Y-%m-%d %H:%M:%S')}</font>**，"
+   741→            f'> **交易所：<font color="info">{self.EXCHANGE.upper()}</font>**，'
+   742→            f"> **交易对：<font color=\"info\">{order['s']}</font>**，"
+   743→            f'> **订单方向：<font color="info">{side}</font>**，'
+   744→            f"> **委托数量：<font color=\"info\">{round(float(order['q']), 4)} {unit}</font>**，"
+   745→            f"> **成交数量：<font color=\"info\">{round(float(order['z']), 4)} {unit}</font>**，"
+   746→            f"> **委托价格：<font color=\"info\">{round(float(order['p']), 4)}</font>**，"
+   747→            f'> **成交价格：<font color="info">{avg_price}</font>**，'
+   748→            f"> **状态：<font color=\"info\">{self.states.get(order['X'], order['X'])}</font>**"
+   749→        )
+   750→        info = info.replace("，", "\n")
+   751→        return info
+   752→
+   753→    async def subscribe_account(self):
+   754→        """获取全部，定时任务"""
+   755→        await asyncio.wait(
+   756→            [
+   757→                self.ws_account(self.MarketType.COIN_FUTURE),
+   758→                self.ws_account(self.MarketType.USDT_FUTURE),
+   759→                self.ws_account(self.MarketType.SPOT),
+   760→            ]
+   761→        )
+   762→
+   763→    @classmethod
+   764→    async def rate(cls, market_type, symbol, limit):
+   765→        path = (
+   766→            f"{cls.get_url(market_type)}/v1/fundingRate?symbol={symbol}&limit={limit}"
+   767→        )
+   768→        data = await cls.public_request_get(path)
+   769→        return data
+   770→
+   771→    @classmethod
+   772→    async def real_rate(cls, market_type, symbol=None):
+   773→        if symbol:
+   774→            path = f"{cls.get_url(market_type)}/v1/premiumIndex?symbol={symbol}"
+   775→        else:
+   776→            path = f"{cls.get_url(market_type)}/v1/premiumIndex"
+   777→        data = await cls.public_request_get(path)
+   778→        premium = {}
+   779→        for d in data:
+   780→            if d["symbol"].endswith("PERP"):
+   781→                premium[d["symbol"]] = d
+   782→        return premium
+   783→
+   784→    transfer_type = {
+   785→        "spot_usdt_future": "MAIN_UMFUTURE",
+   786→        "spot_coin_future": "MAIN_CMFUTURE",
+   787→        "usdt_future_spot": "UMFUTURE_MAIN",
+   788→        "coin_future_spot": "CMFUTURE_MAIN",
+   789→    }
+   790→
+   791→    async def asset_transfer(self, market_from, market_to, asset, amount):
+   792→        path = f"https://api.binance.com/sapi/v1/asset/transfer"
+   793→        data = {
+   794→            "type": self.transfer_type[f"{market_from}_{market_to}"],
+   795→            "amount": amount,
+   796→            "asset": asset,
+   797→        }
+   798→        return await self.request_post(path, data)
+   799→
+   800→    async def asset_transfer_all(self, market_from, market_to, asset):
+   801→        account = await self.get_account_info(market_from, False)
+   802→        amount = account[0].get(asset, {}).get("available", 0)
+   803→        if amount > 0:
+   804→            result = await self.asset_transfer(market_from, market_to, asset, amount)
+   805→            self.logger.info(f"{self.api.account} {asset} 划转成功:{result}")
+   806→        else:
+   807→            result = 0
+   808→        return result
+   809→
+   810→    async def hedge(self):
+   811→        balance = await self.get_symbol_balance()
+   812→        self.logger.info(f"准备对冲下单，余额：{balance}")
+   813→        if self.symbol.market_type == self.MarketType.COIN_FUTURE:
+   814→            dest_amount = balance.get("cont", 0)
+   815→            amount = dest_amount
+   816→            positions = await self.get_symbol_position()
+   817→            for p in positions:
+   818→                if p["direction"] == "short":
+   819→                    amount = dest_amount - p["amount"]
+   820→            if amount > 0:
+   821→                self.logger.info("对冲单：开空")
+   822→                await self.create_order(
+   823→                    amount=abs(amount),
+   824→                    order_type=OrderType.MARKET,
+   825→                    direction=Direction.OPEN_SHORT,
+   826→                )
+   827→            elif amount < 0:
+   828→                self.logger.info("对冲单：减空")
+   829→                await self.create_order(
+   830→                    amount=abs(amount),
+   831→                    order_type=OrderType.MARKET,
+   832→                    direction=Direction.CLOSE_SHORT,
+   833→                )
+   834→        else:
+   835→            raise Exception("市场类型错误")
+   836→
+   837→    async def get_ticker(self):
+   838→        """获取某个交易对的tick"""
+   839→        path = f"{self.get_url(self.symbol.market_type)}/v1/ticker/bookTicker?symbol={self.symbol.symbol}"
+   840→        data = await self.public_request_get(path)
+   841→        # data["time"] = time.time() * 1000
+   842→        # ticker = self.ticker_process(data)
+   843→        return data
+   844→
+   845→    async def cancel_symbol_order(self):
+   846→        if self.symbol.market_type == self.MarketType.USDT_FUTURE:
+   847→            path = f"{self.get_url(self.symbol.market_type)}/v1/allOpenOrders"
+   848→        elif self.symbol.market_type == self.MarketType.COIN_FUTURE:
+   849→            path = f"{self.get_url(self.symbol.market_type)}/v1/allOpenOrders"
+   850→        elif self.symbol.market_type == self.MarketType.SPOT:
+   851→            path = f"{self.get_url(self.symbol.market_type)}/v3/openOrders"
+   852→        else:
+   853→            raise Exception("暂不支持")
+   854→        data = await self._request(
+   855→            self.DELETE, path, data={"symbol": self.symbol.symbol}
+   856→        )
+   857→        self.logger.info(f"撤单成功{data}")
+   858→        return data
+   859→
+   860→    async def cancel_order(self, order_id: str = "", client_order_id: str = ""):
+   861→        if self.symbol.market_type == self.MarketType.USDT_FUTURE:
+   862→            path = f"{self.get_url(self.symbol.market_type)}/v1/order"
+   863→        elif self.symbol.market_type == self.MarketType.COIN_FUTURE:
+   864→            path = f"{self.get_url(self.symbol.market_type)}/v1/order"
+   865→        elif self.symbol.market_type == self.MarketType.SPOT:
+   866→            path = f"{self.get_url(self.symbol.market_type)}/v3/order"
+   867→        else:
+   868→            raise Exception("暂不支持")
+   869→        try:
+   870→            if client_order_id:
+   871→                data = await self._request(
+   872→                    self.DELETE,
+   873→                    path,
+   874→                    data={
+   875→                        "symbol": self.symbol.symbol,
+   876→                        "origClientOrderId": client_order_id,
+   877→                    },
+   878→                )
+   879→            else:
+   880→                data = await self._request(
+   881→                    self.DELETE,
+   882→                    path,
+   883→                    data={"symbol": self.symbol.symbol, "orderId": order_id},
+   884→                )
+   885→            self.logger.info(f"撤单成功")
+   886→            return data
+   887→        except Exception as e:
+   888→            self.logger.error(e)
+   889→
+   890→    async def get_order_by_id(self, order_id: str = "", client_order_id: str = ""):
+   891→        if self.symbol.market_type == self.MarketType.USDT_FUTURE:
+   892→            path = f"{self.get_url(self.symbol.market_type)}/v1/order"
+   893→        elif self.symbol.market_type == self.MarketType.COIN_FUTURE:
+   894→            path = f"{self.get_url(self.symbol.market_type)}/v1/order"
+   895→        elif self.symbol.market_type == self.MarketType.SPOT:
+   896→            path = f"{self.get_url(self.symbol.market_type)}/v3/order"
+   897→        else:
+   898→            raise Exception("暂不支持")
+   899→        try:
+   900→            if client_order_id:
+   901→                data = await self._request(
+   902→                    self.GET,
+   903→                    path=path,
+   904→                    data={
+   905→                        "symbol": self.symbol.symbol,
+   906→                        "origClientOrderId": client_order_id,
+   907→                    },
+   908→                )
+   909→            else:
+   910→                data = await self._request(
+   911→                    self.GET,
+   912→                    path=path,
+   913→                    data={"symbol": self.symbol.symbol, "orderId": order_id},
+   914→                )
+   915→            return data
+   916→        except Exception as e:
+   917→            self.logger.error(e)
+   918→
+   919→    async def get_symbol_order(self):
+   920→        if self.symbol.market_type == self.MarketType.USDT_FUTURE:
+   921→            path = f"{self.get_url(self.symbol.market_type)}/v1/openOrders"
+   922→        elif self.symbol.market_type == self.MarketType.COIN_FUTURE:
+   923→            path = f"{self.get_url(self.symbol.market_type)}/v1/openOrders"
+   924→        elif self.symbol.market_type == self.MarketType.SPOT:
+   925→            path = f"{self.get_url(self.symbol.market_type)}/v3/openOrders"
+   926→        else:
+   927→            raise Exception("暂不支持")
+   928→        try:
+   929→            data = await self._request(
+   930→                self.GET, path, data={"symbol": self.symbol.symbol}
+   931→            )
+   932→            return data
+   933→        except Exception as e:
+   934→            self.logger.error(e)
+   935→
+   936→    async def get_all_least_price(self, market_type: str):
+   937→        if market_type == "spot":
+   938→            path = f"{self.get_url(market_type)}/v3/ticker/price"
+   939→        elif market_type == "usdt_future":
+   940→            path = f"{self.get_url(market_type)}/v1/ticker/price"
+   941→        else:
+   942→            raise Exception("暂不支持")
+   943→        data = await self.public_request_get(path)
+   944→        prices = {}
+   945→        for info in data:
+   946→            prices[info["symbol"]] = float(info["price"])
+   947→        return prices
+   948→
+   949→    async def get_symbol_orders(self):
+   950→        if self.symbol.market_type == self.MarketType.USDT_FUTURE:
+   951→            path = f"{self.get_url(self.symbol.market_type)}/v1/openOrders"
+   952→            data = await self._request(
+   953→                self.GET, path, data={"symbol": self.symbol.symbol}
+   954→            )
+   955→            return data
+   956→        elif self.symbol.market_type == self.MarketType.COIN_FUTURE:
+   957→            path = f"{self.get_url(self.symbol.market_type)}/v1/openOrders"
+   958→            data = await self._request(
+   959→                self.GET, path, data={"symbol": self.symbol.symbol}
+   960→            )
+   961→            if data:
+   962→                df = pd.DataFrame(data)
+   963→                df = df[
+   964→                    [
+   965→                        "symbol",
+   966→                        "price",
+   967→                        "orderId",
+   968→                        "origQty",
+   969→                        "executedQty",
+   970→                        "type",
+   971→                        "side",
+   972→                        "positionSide",
+   973→                        "time",
+   974→                        "clientOrderId",
+   975→                    ]
+   976→                ]
+   977→                df.columns = [
+   978→                    "symbol",
+   979→                    "price",
+   980→                    "order_id",
+   981→                    "amount",
+   982→                    "filled_amount",
+   983→                    "order_type",
+   984→                    "side",
+   985→                    "direction",
+   986→                    "timestamp",
+   987→                    "clientOrderId",
+   988→                ]
+   989→                df = df.sort_values(by="price", ascending=False)
+   990→                return df
+   991→            return pd.DataFrame()
+   992→        elif self.symbol.market_type == self.MarketType.SPOT:
+   993→            path = f"{self.get_url(self.symbol.market_type)}/v3/openOrders"
+   994→            data = await self._request(
+   995→                self.GET, path, data={"symbol": self.symbol.symbol}
+   996→            )
+   997→            if data:
+   998→                df = pd.DataFrame(data)
+   999→                df = df[
+  1000→                    [
+  1001→                        "symbol",
+  1002→                        "price",
+  1003→                        "orderId",
+  1004→                        "origQty",
+  1005→                        "executedQty",
+  1006→                        "type",
+  1007→                        "side",
+  1008→                        "time",
+  1009→                        "clientOrderId",
+  1010→                    ]
+  1011→                ]
+  1012→                df.columns = [
+  1013→                    "symbol",
+  1014→                    "price",
+  1015→                    "order_id",
+  1016→                    "amount",
+  1017→                    "filled_amount",
+  1018→                    "order_type",
+  1019→                    "direction",
+  1020→                    "timestamp",
+  1021→                    "client_id",
+  1022→                ]
+  1023→                df[["price", "amount", "filled_amount"]] = df[
+  1024→                    ["price", "amount", "filled_amount"]
+  1025→                ].astype(float)
+  1026→                df = df.sort_values(by="price", ascending=False)
+  1027→                return df
+  1028→            return pd.DataFrame()
+  1029→        else:
+  1030→            raise Exception("暂不支持")
+  1031→
+  1032→    async def get_margin_history_order_detail(self):
+  1033→        path = f'{self.get_url("margin")}/v1/margin/allOrders'
+  1034→        param = {"symbol": self.symbol.symbol}
+  1035→        # TODO: add more param
+  1036→        """
+  1037→        symbol	STRING	YES	
+  1038→        isIsolated	STRING	NO	是否逐仓杠杆，"TRUE", "FALSE", 默认 "FALSE"
+  1039→        orderId	LONG	NO	
+  1040→        startTime	LONG	NO	
+  1041→        endTime	LONG	NO	
+  1042→        limit	INT	NO	默认 500;最大500.
+  1043→        recvWindow	LONG	NO	赋值不能大于 60000
+  1044→        timestamp	LONG	YES
+  1045→        """
+  1046→
+  1047→        try:
+  1048→            data = await self._request(self.GET, path, data=param)
+  1049→            self.logger.info("正在获取杠杆历史交易记录")
+  1050→            return data
+  1051→
+  1052→        except Exception as e:
+  1053→            self.logger.error(e)
+  1054→
+  1055→    async def get_symbol_history_order_detail(
+  1056→        self, trade_id=None, start_time=None, end_time=None, limit=100
+  1057→    ):
+  1058→        if self.symbol.market_type == self.MarketType.USDT_FUTURE:
+  1059→            path = f"{self.get_url(self.symbol.market_type)}/v1/userTrades"
+  1060→        elif self.symbol.market_type == self.MarketType.COIN_FUTURE:
+  1061→            path = f"{self.get_url(self.symbol.market_type)}/v1/userTrades"
+  1062→        elif self.symbol.market_type == self.MarketType.SPOT:
+  1063→            path = f"{self.get_url(self.symbol.market_type)}/v3/myTrades"
+  1064→        else:
+  1065→            raise Exception("暂不支持")
+  1066→
+  1067→        param = {"symbol": self.symbol.symbol}
+  1068→        if trade_id:
+  1069→            param.update({"fromId": trade_id})
+  1070→        if start_time:
+  1071→            param.update(
+  1072→                {
+  1073→                    "startTime": arrow.get(
+  1074→                        start_time, tzinfo="Asia/Hong_Kong"
+  1075→                    ).timestamp
+  1076→                    * 1000
+  1077→                }
+  1078→            )
+  1079→        if end_time:
+  1080→            param.update(
+  1081→                {
+  1082→                    "endTime": arrow.get(end_time, tzinfo="Asia/Hong_Kong").timestamp
+  1083→                    * 1000
+  1084→                }
+  1085→            )
+  1086→        if limit:
+  1087→            param.update({"limit": limit})
+  1088→        try:
+  1089→            data = await self._request(self.GET, path, data=param)
+  1090→            self.logger.info("正在获取历史交易记录")
+  1091→            return data
+  1092→        except Exception as e:
+  1093→            self.logger.error(e)
+  1094→
+  1095→    async def get_symbol_history_order_by_startime(self, start_time=None):
+  1096→        all_orders = []
+  1097→        orders: list = await self.get_symbol_history_order_detail(
+  1098→            start_time=arrow.get(start_time) if start_time else None
+  1099→        )
+  1100→        while orders:
+  1101→            all_orders.extend(orders)
+  1102→            trade_id = orders[-1]["id"] + 1
+  1103→            orders = await self.get_symbol_history_order_detail(trade_id)
+  1104→        df = pd.DataFrame(all_orders)
+  1105→        if self.symbol.market_type == self.MarketType.SPOT:
+  1106→            df = df[
+  1107→                [
+  1108→                    "price",
+  1109→                    "orderId",
+  1110→                    "qty",
+  1111→                    "quoteQty",
+  1112→                    "commission",
+  1113→                    "commissionAsset",
+  1114→                    "isMaker",
+  1115→                    "isBuyer",
+  1116→                    "time",
+  1117→                ]
+  1118→            ]
+  1119→            df.columns = [
+  1120→                "price",
+  1121→                "order_id",
+  1122→                "amount",
+  1123→                "cost",
+  1124→                "fee",
+  1125→                "fee_coin",
+  1126→                "maker",
+  1127→                "buyer",
+  1128→                "timestamp",
+  1129→            ]
+  1130→        elif self.symbol.market_type == self.MarketType.COIN_FUTURE:
+  1131→            df = df[
+  1132→                [
+  1133→                    "price",
+  1134→                    "orderId",
+  1135→                    "qty",
+  1136→                    "baseQty",
+  1137→                    "commission",
+  1138→                    "commissionAsset",
+  1139→                    "maker",
+  1140→                    "buyer",
+  1141→                    "realizedPnl",
+  1142→                    "time",
+  1143→                ]
+  1144→            ]
+  1145→            df.columns = [
+  1146→                "price",
+  1147→                "order_id",
+  1148→                "amount",
+  1149→                "cost",
+  1150→                "fee",
+  1151→                "fee_coin",
+  1152→                "maker",
+  1153→                "buyer",
+  1154→                "pnl",
+  1155→                "timestamp",
+  1156→            ]
+  1157→        elif self.symbol.market_type == self.MarketType.USDT_FUTURE:
+  1158→            df = df[
+  1159→                [
+  1160→                    "price",
+  1161→                    "orderId",
+  1162→                    "qty",
+  1163→                    "quoteQty",
+  1164→                    "commission",
+  1165→                    "commissionAsset",
+  1166→                    "maker",
+  1167→                    "buyer",
+  1168→                    "realizedPnl",
+  1169→                    "time",
+  1170→                ]
+  1171→            ]
+  1172→            df.columns = [
+  1173→                "price",
+  1174→                "order_id",
+  1175→                "amount",
+  1176→                "cost",
+  1177→                "fee",
+  1178→                "fee_coin",
+  1179→                "maker",
+  1180→                "buyer",
+  1181→                "pnl",
+  1182→                "timestamp",
+  1183→            ]
+  1184→
+  1185→        return df
+  1186→
+  1187→    async def get_symbol_history_order(
+  1188→        self, order_id=None, start_time=None, end_time=None, limit=1000
+  1189→    ):
+  1190→        if self.symbol.market_type == self.MarketType.USDT_FUTURE:
+  1191→            path = f"{self.get_url(self.symbol.market_type)}/v1/allOrders"
+  1192→        elif self.symbol.market_type == self.MarketType.COIN_FUTURE:
+  1193→            path = f"{self.get_url(self.symbol.market_type)}/v1/allOrders"
+  1194→        elif self.symbol.market_type == self.MarketType.SPOT:
+  1195→            path = f"{self.get_url(self.symbol.market_type)}/v3/allOrders"
+  1196→        else:
+  1197→            raise Exception("暂不支持")
+  1198→
+  1199→        param = {"symbol": self.symbol.symbol}
+  1200→        if order_id:
+  1201→            param.update({"orderId": order_id})
+  1202→        if start_time:
+  1203→            param.update(
+  1204→                {
+  1205→                    "startTime": arrow.get(
+  1206→                        start_time, tzinfo="Asia/Hong_Kong"
+  1207→                    ).timestamp
+  1208→                    * 1000
+  1209→                }
+  1210→            )
+  1211→        if end_time:
+  1212→            param.update(
+  1213→                {
+  1214→                    "endTime": arrow.get(end_time, tzinfo="Asia/Hong_Kong").timestamp
+  1215→                    * 1000
+  1216→                }
+  1217→            )
+  1218→        param.update({"limit": limit})
+  1219→        try:
+  1220→            data = await self._request(self.GET, path, data=param)
+  1221→            return data
+  1222→        except Exception as e:
+  1223→            self.logger.error(e)
+  1224→
+  1225→    async def get_usdt_account_money_history(self):
+  1226→        path = f'{self.get_url("usdt_future")}/v1/income'
+  1227→        param = {
+  1228→            "limit": 100,
+  1229→            # "incomeType": "COMMISSION"
+  1230→        }
+  1231→        data = await self._request(self.GET, path, data=param)
+  1232→        return data
+  1233→
+  1234→    async def get_balance_history(
+  1235→        self, market_type, symbol, income_type=None, start_time=None, limit=1000
+  1236→    ):
+  1237→        if market_type in [self.MarketType.USDT_FUTURE, self.MarketType.COIN_FUTURE]:
+  1238→            path = f"{self.get_url(market_type)}/v1/income"
+  1239→        else:
+  1240→            raise Exception("暂不支持")
+  1241→        param = {"limit": limit}
+  1242→        if symbol:
+  1243→            if income_type:
+  1244→                param.update({"symbol": symbol})
+  1245→        if income_type:
+  1246→            param.update({"incomeType": income_type})
+  1247→        history_data = []
+  1248→        while 1:
+  1249→            now = arrow.get().timestamp * 1000
+  1250→            start_time = arrow.get(start_time, tzinfo="Asia/Hong_Kong").timestamp * 1000
+  1251→            if start_time > now:
+  1252→                break
+  1253→            else:
+  1254→                param.update({"startTime": start_time})
+  1255→                data = await self._request(self.GET, path, data=param)
+  1256→                if data:
+  1257→                    history_data.extend(data)
+  1258→                    start_time = int(data[-1]["time"]) + 1000
+  1259→                else:
+  1260→                    break
+  1261→
+  1262→        df = pd.DataFrame(history_data)
+  1263→        if not df.empty:
+  1264→            df = df[["symbol", "incomeType", "income", "asset", "time", "info"]]
+  1265→            df.columns = [
+  1266→                "symbol",
+  1267→                "income_type",
+  1268→                "amount",
+  1269→                "coin",
+  1270→                "timestamp",
+  1271→                "note",
+  1272→            ]
+  1273→            df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
+  1274→            df["timestamp"] = df["timestamp"] + timedelta(hours=8)
+  1275→        return df
+  1276→
+  1277→    async def get_transfer_history(
+  1278→        self, from_email=None, to_email=None, start_time=None, end_time=None, limit=500
+  1279→    ):
+  1280→        path = f"https://api.binance.com/sapi/v1/sub-account/universalTransfer"
+  1281→
+  1282→        param = {}
+  1283→        if from_email:
+  1284→            param.update({"fromEmail": from_email})
+  1285→        if to_email:
+  1286→            param.update({"toEmail": to_email})
+  1287→        if start_time:
+  1288→            param.update(
+  1289→                {
+  1290→                    "startTime": arrow.get(
+  1291→                        start_time, tzinfo="Asia/Hong_Kong"
+  1292→                    ).timestamp
+  1293→                    * 1000
+  1294→                }
+  1295→            )
+  1296→        if end_time:
+  1297→            param.update(
+  1298→                {
+  1299→                    "endTime": arrow.get(end_time, tzinfo="Asia/Hong_Kong").timestamp
+  1300→                    * 1000
+  1301→                }
+  1302→            )
+  1303→        if limit:
+  1304→            param.update({"limit": limit})
+  1305→        try:
+  1306→            data = await self._request(self.GET, path, data=param)
+  1307→            self.logger.info("正在获取历史划转交易记录")
+  1308→            return data
+  1309→        except Exception as e:
+  1310→            self.logger.error(e)
+  1311→
+  1312→    async def get_equity_snapshot(
+  1313→        self, market_type="SPOT", coin=None, start_time=None, end_time=None, limit=30
+  1314→    ):
+  1315→        path = f"https://api.binance.com/sapi/v1/accountSnapshot"
+  1316→
+  1317→        param = {"type": market_type.upper()}
+  1318→        if start_time:
+  1319→            param.update(
+  1320→                {
+  1321→                    "startTime": arrow.get(
+  1322→                        start_time, tzinfo="Asia/Hong_Kong"
+  1323→                    ).timestamp
+  1324→                    * 1000
+  1325→                }
+  1326→            )
+  1327→        if end_time:
+  1328→            param.update(
+  1329→                {
+  1330→                    "endTime": arrow.get(end_time, tzinfo="Asia/Hong_Kong").timestamp
+  1331→                    * 1000
+  1332→                }
+  1333→            )
+  1334→        if limit:
+  1335→            param.update({"limit": limit})
+  1336→        self.logger.info("正在获取资产快照")
+  1337→        data = await self._request(self.GET, path, data=param)
+  1338→        snapshot = data.get("snapshotVos", [])
+  1339→
+  1340→        df = pd.DataFrame(snapshot)
+  1341→        if market_type == "SPOT":
+  1342→            df["total"] = df["data"].apply(lambda x: x.get("totalAssetOfBtc"))
+  1343→            df = df[["updateTime", "total"]]
+  1344→            df.columns = ["timestamp", "amount"]
+  1345→            df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
+  1346→            df["timestamp"] = (
+  1347→                df["timestamp"] + timedelta(seconds=1) + timedelta(hours=8)
+  1348→            )
+  1349→            return df
+  1350→        elif market_type == "FUTURES":
+  1351→
+  1352→            def get_assert(x):
+  1353→                assets = x.get("assets", [])
+  1354→                for a in assets:
+  1355→                    print(a)
+  1356→                    if a.get("asset") == coin:
+  1357→                        amount = a.get("walletBalance")
+  1358→                        return amount
+  1359→
+  1360→            df[coin] = df["data"].apply(lambda x: get_assert(x))
+  1361→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

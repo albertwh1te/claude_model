@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+CLAUDE_BIN="$HOME/Dropbox/code/claude_model/node_modules/.bin/claude"
+
+# Set these in your shell (e.g., ~/.bashrc, ~/.zshrc)
+export ANTHROPIC_BASE_URL="https://api.minimaxi.com/anthropic"
+export ANTHROPIC_AUTH_TOKEN="sk-cp-MhEs9FNTxOqhHMXi_m5e_bqLbP_iQPorpUPneOSdYAslNkoLT79SZMDQZYJ20cpdCOSoH_38rA8zbFJ3ElthXULdVF5sMQYkzh3wCsMSsf37u3xczaBnS_8"
+export ANTHROPIC_API_KEY="" # Important: Must be explicitly empty
+
+export ANTHROPIC_MODEL="MiniMax-M2.7"
+
+export API_TIMEOUT_MS=3000000
+
+export CLAUDE_CONFIG_DIR="$HOME/Dropbox/code/claude_model/.claude_glm"
+
+# --- 启动 ---
+exec "$CLAUDE_BIN" "$@"

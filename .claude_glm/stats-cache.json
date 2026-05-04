@@ -1,0 +1,137 @@
+{
+  "version": 2,
+  "lastComputedDate": "2026-05-03",
+  "dailyActivity": [
+    {
+      "date": "2026-01-19",
+      "messageCount": 980,
+      "sessionCount": 16,
+      "toolCallCount": 263
+    },
+    {
+      "date": "2026-01-20",
+      "messageCount": 453,
+      "sessionCount": 1,
+      "toolCallCount": 122
+    },
+    {
+      "date": "2026-02-12",
+      "messageCount": 22,
+      "sessionCount": 3,
+      "toolCallCount": 0
+    },
+    {
+      "date": "2026-02-18",
+      "messageCount": 3,
+      "sessionCount": 1,
+      "toolCallCount": 0
+    },
+    {
+      "date": "2026-02-20",
+      "messageCount": 3,
+      "sessionCount": 1,
+      "toolCallCount": 0
+    },
+    {
+      "date": "2026-02-24",
+      "messageCount": 6,
+      "sessionCount": 1,
+      "toolCallCount": 0
+    },
+    {
+      "date": "2026-03-12",
+      "messageCount": 15,
+      "sessionCount": 6,
+      "toolCallCount": 0
+    }
+  ],
+  "dailyModelTokens": [
+    {
+      "date": "2026-01-19",
+      "tokensByModel": {
+        "glm-4.7": 1340552
+      }
+    },
+    {
+      "date": "2026-01-20",
+      "tokensByModel": {
+        "glm-4.7": 362977
+      }
+    },
+    {
+      "date": "2026-02-18",
+      "tokensByModel": {
+        "glm-5": 7536
+      }
+    },
+    {
+      "date": "2026-02-20",
+      "tokensByModel": {
+        "glm-5": 7435
+      }
+    },
+    {
+      "date": "2026-03-12",
+      "tokensByModel": {
+        "MiniMax-M2.5": 676
+      }
+    }
+  ],
+  "modelUsage": {
+    "glm-4.7": {
+      "inputTokens": 1557613,
+      "outputTokens": 145916,
+      "cacheReadInputTokens": 20822016,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0,
+      "contextWindow": 0,
+      "maxOutputTokens": 0
+    },
+    "glm-5": {
+      "inputTokens": 14788,
+      "outputTokens": 183,
+      "cacheReadInputTokens": 26944,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0,
+      "contextWindow": 0,
+      "maxOutputTokens": 0
+    },
+    "MiniMax-M2.5": {
+      "inputTokens": 508,
+      "outputTokens": 168,
+      "cacheReadInputTokens": 83768,
+      "cacheCreationInputTokens": 298,
+      "webSearchRequests": 0,
+      "costUSD": 0,
+      "contextWindow": 0,
+      "maxOutputTokens": 0
+    }
+  },
+  "totalSessions": 29,
+  "totalMessages": 1482,
+  "longestSession": {
+    "sessionId": "d50f8952-938b-4e8e-bb3b-e0d3e9a715d4",
+    "duration": 3586290,
+    "messageCount": 108,
+    "timestamp": "2026-01-19T09:24:21.880Z"
+  },
+  "firstSessionDate": "2026-01-19T08:31:12.641Z",
+  "hourCounts": {
+    "0": 3,
+    "9": 1,
+    "12": 1,
+    "13": 1,
+    "14": 6,
+    "16": 6,
+    "17": 4,
+    "18": 1,
+    "19": 2,
+    "20": 1,
+    "21": 1,
+    "22": 1,
+    "23": 1
+  },
+  "totalSpeculationTimeSavedMs": 0
+}

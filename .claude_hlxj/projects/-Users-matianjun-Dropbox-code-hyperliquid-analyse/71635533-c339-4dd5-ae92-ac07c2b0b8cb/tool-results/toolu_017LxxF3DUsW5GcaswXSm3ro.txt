@@ -1,0 +1,272 @@
+     1→"""Async Nado Client for Nado Protocol."""
+     2→
+     3→import logging
+     4→from typing import Optional
+     5→
+     6→from pydantic import AnyUrl
+     7→try:
+     8→    from pydantic import TypeAdapter
+     9→except ImportError:
+    10→    # pydantic v1 compatibility - create a simple adapter
+    11→    TypeAdapter = None
+    12→
+    13→from nado_api.context import (
+    14→    AsyncNadoClientContext,
+    15→    AsyncNadoClientContextOpts,
+    16→    create_async_nado_client_context,
+    17→)
+    18→from nado_api.apis import (
+    19→    AsyncMarketAPI,
+    20→    AsyncSpotAPI,
+    21→    AsyncSubaccountAPI,
+    22→    AsyncPerpAPI,
+    23→)
+    24→from nado_api.types import (
+    25→    NadoContractsContext,
+    26→    NadoNetwork,
+    27→    NadoBackendURL,
+    28→    Signer,
+    29→    load_deployment,
+    30→    StrEnum,
+    31→)
+    32→
+    33→
+    34→class AsyncNadoClientMode(StrEnum):
+    35→    """
+    36→    AsyncNadoClientMode is an enumeration representing the operational modes.
+    37→
+    38→    Attributes:
+    39→        MAINNET: For operating in Nado's mainnet environment deployed on Ink.
+    40→        DEVNET: For local development.
+    41→        TESTING: For running tests.
+    42→        TESTNET: For testnet environment.
+    43→    """
+    44→
+    45→    # dev
+    46→    DEVNET = "devnet"
+    47→    TESTING = "testing"
+    48→
+    49→    # testnet
+    50→    TESTNET = "testnet"  # Ink Sepolia
+    51→
+    52→    # mainnet
+    53→    MAINNET = "mainnet"  # Ink Mainnet
+    54→
+    55→
+    56→class AsyncNadoClient:
+    57→    """
+    58→    The primary async client interface for interacting with Nado Protocol.
+    59→
+    60→    This client consolidates the functionality of various aspects of Nado such as
+    61→    spot, market, subaccount, and perpetual (perp) operations.
+    62→
+    63→    To initialize an instance of this client, use the `create_async_nado_client` utility.
+    64→
+    65→    Attributes:
+    66→        context: The async client context containing configuration.
+    67→        market: Sub-client for executing and querying market operations.
+    68→        subaccount: Sub-client for executing and querying subaccount operations.
+    69→        spot: Sub-client for executing and querying spot operations.
+    70→        perp: Sub-client for executing and querying perpetual operations.
+    71→    """
+    72→
+    73→    context: AsyncNadoClientContext
+    74→    market: AsyncMarketAPI
+    75→    subaccount: AsyncSubaccountAPI
+    76→    spot: AsyncSpotAPI
+    77→    perp: AsyncPerpAPI
+    78→
+    79→    def __init__(self, context: AsyncNadoClientContext):
+    80→        """
+    81→        Initialize a new instance of the AsyncNadoClient.
+    82→
+    83→        This constructor should not be called directly. Instead, use the
+    84→        `create_async_nado_client` utility.
+    85→
+    86→        Args:
+    87→            context: The async client context.
+    88→        """
+    89→        self.context = context
+    90→        self.market = AsyncMarketAPI(context)
+    91→        self.subaccount = AsyncSubaccountAPI(context)
+    92→        self.spot = AsyncSpotAPI(context)
+    93→        self.perp = AsyncPerpAPI(context)
+    94→
+    95→    async def close(self):
+    96→        """Close all client connections."""
+    97→        await self.context.close()
+    98→
+    99→    async def __aenter__(self) -> "AsyncNadoClient":
+   100→        return self
+   101→
+   102→    async def __aexit__(self, exc_type, exc_val, exc_tb):
+   103→        await self.close()
+   104→
+   105→
+   106→def _client_mode_to_setup(
+   107→    client_mode: AsyncNadoClientMode,
+   108→) -> tuple[str, str, str, str]:
+   109→    """Convert client mode to endpoint URLs and network name."""
+   110→    try:
+   111→        return {
+   112→            AsyncNadoClientMode.DEVNET: (
+   113→                NadoBackendURL.DEVNET_GATEWAY.value,
+   114→                NadoBackendURL.DEVNET_INDEXER.value,
+   115→                NadoBackendURL.DEVNET_TRIGGER.value,
+   116→                NadoNetwork.HARDHAT.value,
+   117→            ),
+   118→            AsyncNadoClientMode.TESTING: (
+   119→                NadoBackendURL.DEVNET_GATEWAY.value,
+   120→                NadoBackendURL.DEVNET_INDEXER.value,
+   121→                NadoBackendURL.DEVNET_TRIGGER.value,
+   122→                NadoNetwork.TESTING.value,
+   123→            ),
+   124→            AsyncNadoClientMode.TESTNET: (
+   125→                NadoBackendURL.TESTNET_GATEWAY.value,
+   126→                NadoBackendURL.TESTNET_INDEXER.value,
+   127→                NadoBackendURL.TESTNET_TRIGGER.value,
+   128→                NadoNetwork.TESTNET.value,
+   129→            ),
+   130→            AsyncNadoClientMode.MAINNET: (
+   131→                NadoBackendURL.MAINNET_GATEWAY.value,
+   132→                NadoBackendURL.MAINNET_INDEXER.value,
+   133→                NadoBackendURL.MAINNET_TRIGGER.value,
+   134→                NadoNetwork.MAINNET.value,
+   135→            ),
+   136→        }[client_mode]
+   137→    except KeyError:
+   138→        raise Exception(f"Mode provided `{client_mode}` not supported!")
+   139→
+   140→
+   141→async def create_async_nado_client(
+   142→    mode: AsyncNadoClientMode,
+   143→    signer: Optional[Signer] = None,
+   144→    context_opts: Optional[AsyncNadoClientContextOpts] = None,
+   145→) -> AsyncNadoClient:
+   146→    """
+   147→    Create a new AsyncNadoClient based on the given mode and signer.
+   148→
+   149→    This function will create a new AsyncNadoClientContext based on the provided mode,
+   150→    and then initialize a new AsyncNadoClient with that context.
+   151→
+   152→    If `context_opts` are provided, they will be used to create the client context.
+   153→    Otherwise, default context options for the given mode will be used.
+   154→
+   155→    Args:
+   156→        mode: The mode in which to operate the client.
+   157→        signer: An instance of LocalAccount or a private key string for signing transactions.
+   158→        context_opts: Options for creating the client context.
+   159→
+   160→    Returns:
+   161→        AsyncNadoClient: The created AsyncNadoClient instance.
+   162→
+   163→    Example:
+   164→        ```python
+   165→        import asyncio
+   166→        from nado_api import create_async_nado_client, AsyncNadoClientMode
+   167→
+   168→        async def main():
+   169→            # Using context manager (recommended)
+   170→            async with await create_async_nado_client(
+   171→                mode=AsyncNadoClientMode.MAINNET,
+   172→                signer="0x..."  # your private key
+   173→            ) as client:
+   174→                # Get market price
+   175→                price = await client.market.get_latest_market_price(product_id=2)
+   176→                print(f"BTC Price: {price.mid}")
+   177→
+   178→                # Get account summary
+   179→                summary = await client.subaccount.get_engine_subaccount_summary(
+   180→                    subaccount="0x..."
+   181→                )
+   182→                print(f"Health: {summary.health}")
+   183→
+   184→        asyncio.run(main())
+   185→        ```
+   186→    """
+   187→    logging.info(f"Initializing default {mode} async context")
+   188→    (
+   189→        engine_endpoint_url,
+   190→        indexer_endpoint_url,
+   191→        trigger_endpoint_url,
+   192→        network_name,
+   193→    ) = _client_mode_to_setup(mode)
+   194→
+   195→    try:
+   196→        network = NadoNetwork(network_name)
+   197→        deployment = load_deployment(network)
+   198→        rpc_node_url = deployment.node_url
+   199→        contracts_context = NadoContractsContext(
+   200→            network=network,
+   201→            endpoint_addr=deployment.endpoint_addr,
+   202→            querier_addr=deployment.querier_addr,
+   203→            perp_engine_addr=deployment.perp_engine_addr,
+   204→            spot_engine_addr=deployment.spot_engine_addr,
+   205→            clearinghouse_addr=deployment.clearinghouse_addr,
+   206→            airdrop_addr=deployment.airdrop_addr,
+   207→            staking_addr=deployment.staking_addr,
+   208→            foundation_rewards_airdrop_addr=deployment.foundation_rewards_airdrop_addr,
+   209→        )
+   210→    except Exception as e:
+   211→        logging.warning(
+   212→            f"Failed to load contracts for mode {mode} with error: {e}, using provided defaults."
+   213→        )
+   214→        assert context_opts is not None and context_opts.rpc_node_url is not None
+   215→        assert context_opts is not None and context_opts.contracts_context is not None
+   216→
+   217→        rpc_node_url = str(context_opts.rpc_node_url)
+   218→        contracts_context = context_opts.contracts_context
+   219→
+   220→    if context_opts:
+   221→        parsed_context_opts = AsyncNadoClientContextOpts.model_validate(context_opts if isinstance(context_opts, dict) else context_opts.model_dump())
+   222→        engine_endpoint_url = str(
+   223→            parsed_context_opts.engine_endpoint_url or engine_endpoint_url
+   224→        )
+   225→        indexer_endpoint_url = str(
+   226→            parsed_context_opts.indexer_endpoint_url or indexer_endpoint_url
+   227→        )
+   228→        trigger_endpoint_url = str(
+   229→            parsed_context_opts.trigger_endpoint_url or trigger_endpoint_url
+   230→        )
+   231→        rpc_node_url = str(parsed_context_opts.rpc_node_url or rpc_node_url)
+   232→        contracts_context = parsed_context_opts.contracts_context or contracts_context
+   233→
+   234→    # Use TypeAdapter for pydantic v2, or direct validation for v1
+   235→    if TypeAdapter is not None:
+   236→        url_adapter = TypeAdapter(AnyUrl)
+   237→        context = await create_async_nado_client_context(
+   238→            AsyncNadoClientContextOpts(
+   239→                rpc_node_url=url_adapter.validate_python(rpc_node_url),
+   240→                engine_endpoint_url=url_adapter.validate_python(engine_endpoint_url),
+   241→                indexer_endpoint_url=url_adapter.validate_python(indexer_endpoint_url),
+   242→                trigger_endpoint_url=url_adapter.validate_python(trigger_endpoint_url),
+   243→                contracts_context=contracts_context,
+   244→            ),
+   245→            signer,
+   246→        )
+   247→    else:
+   248→        # pydantic v1 fallback
+   249→        from pydantic import parse_obj_as
+   250→        context = await create_async_nado_client_context(
+   251→            AsyncNadoClientContextOpts(
+   252→                rpc_node_url=parse_obj_as(AnyUrl, rpc_node_url),
+   253→                engine_endpoint_url=parse_obj_as(AnyUrl, engine_endpoint_url),
+   254→                indexer_endpoint_url=parse_obj_as(AnyUrl, indexer_endpoint_url),
+   255→                trigger_endpoint_url=parse_obj_as(AnyUrl, trigger_endpoint_url),
+   256→                contracts_context=contracts_context,
+   257→            ),
+   258→            signer,
+   259→        )
+   260→    return AsyncNadoClient(context)
+   261→
+   262→
+   263→__all__ = [
+   264→    "AsyncNadoClient",
+   265→    "AsyncNadoClientMode",
+   266→    "create_async_nado_client",
+   267→]
+   268→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

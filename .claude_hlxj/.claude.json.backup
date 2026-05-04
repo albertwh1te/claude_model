@@ -1,0 +1,623 @@
+{
+  "numStartups": 205,
+  "installMethod": "global",
+  "tipsHistory": {
+    "new-user-warmup": 7,
+    "plan-mode-for-complex-tasks": 204,
+    "memory-command": 203,
+    "theme-command": 191,
+    "status-line": 205,
+    "stickers-command": 151,
+    "prompt-queue": 21,
+    "enter-to-steer-in-relatime": 195,
+    "todo-list": 195,
+    "ide-upsell-external-terminal": 204,
+    "install-github-app": 197,
+    "install-slack-app": 199,
+    "drag-and-drop-images": 200,
+    "shift-enter": 197,
+    "paste-images-mac": 204,
+    "double-esc-code-restore": 196,
+    "continue": 196,
+    "shift-tab": 196,
+    "image-paste": 195,
+    "config-thinking-mode": 57,
+    "ultrathink-keyword": 147,
+    "btw-side-question": 53,
+    "custom-agents": 201,
+    "desktop-app": 201,
+    "web-app": 201,
+    "mobile-app": 203,
+    "permissions": 199,
+    "rename-conversation": 191,
+    "custom-commands": 192,
+    "git-worktrees": 196
+  },
+  "promptQueueUseCount": 19,
+  "showExpandedTodos": true,
+  "cachedStatsigGates": {
+    "tengu_prompt_suggestion": true,
+    "tengu_year_end_2025_campaign_promo": false,
+    "tengu_disable_bypass_permissions_mode": false,
+    "tengu_streaming_tool_execution2": false,
+    "tengu_session_memory": false
+  },
+  "cachedDynamicConfigs": {
+    "tengu_1p_event_batch_config": {
+      "scheduledDelayMillis": 5000,
+      "maxExportBatchSize": 200,
+      "maxQueueSize": 8192
+    },
+    "tengu-top-of-feed-tip": {
+      "tip": "",
+      "color": ""
+    }
+  },
+  "cachedGrowthBookFeatures": {
+    "tengu_mcp_tool_search": false,
+    "tengu_disable_bypass_permissions_mode": false,
+    "strawberry_granite_flag": "N/A",
+    "persimmon_marble_flag": "N/A",
+    "tengu_tool_pear": false,
+    "tengu_thinkback": false,
+    "tengu_sumi": false,
+    "tengu_c4w_usage_limit_notifications_enabled": true,
+    "tengu_react_vulnerability_warning": false,
+    "tengu_ant_attribution_header_new": true,
+    "tengu_pid_based_version_locking": true,
+    "tengu_tool_search_unsupported_models": [
+      "haiku"
+    ],
+    "tengu_tool_result_persistence": false,
+    "tengu_accept_with_feedback": true,
+    "tengu_1p_event_batch_config": {
+      "scheduledDelayMillis": 5000,
+      "maxExportBatchSize": 200,
+      "maxQueueSize": 8192
+    },
+    "tengu_scratch": false,
+    "tengu_brass_pebble": false,
+    "tengu_event_sampling_config": {},
+    "tengu_log_segment_events": false,
+    "tengu_log_datadog_events": true,
+    "tengu_keybinding_customization": false,
+    "tengu-top-of-feed-tip": {
+      "tip": "",
+      "color": ""
+    },
+    "tengu_code_diff_cli": true,
+    "tengu_post_compact_survey": false,
+    "tengu_claudeai_mcp_connectors": false,
+    "tengu_attribution_header": false,
+    "enhanced_telemetry_beta": false,
+    "tengu_streaming_tool_execution2": false,
+    "tengu_session_memory": false,
+    "tengu_bash_haiku_prefetch": true,
+    "tengu_plank_river_frost": "user_intent",
+    "tengu_sm_compact": false,
+    "tengu_compact_streaming_retry": false
+  },
+  "userID": "61bd06e1ca34b1dc205257bf06c73231d5d61ec2d3ee4955a20242f97a748e04",
+  "firstStartTime": "2026-01-03T09:15:28.976Z",
+  "sonnet45MigrationComplete": true,
+  "opus45MigrationComplete": true,
+  "thinkingMigrationComplete": true,
+  "githubRepoPaths": {
+    "albertwh1te/claude_model": [
+      "/Users/matianjun/Dropbox/code/claude_model/commands",
+      "/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/plugins",
+      "/Users/matianjun/Dropbox/code/claude_model"
+    ],
+    "albertwh1te/hyperliquid_analyse": [
+      "/Users/matianjun/Dropbox/code/hyperliquid_analyse"
+    ],
+    "nadohq/nado-python-sdk": [
+      "/Users/matianjun/Dropbox/code/nado-python-sdk"
+    ],
+    "albertwh1te/prediction_fun": [
+      "/Users/matianjun/Dropbox/code/prediction_fun"
+    ],
+    "albertwh1te/obsidian_zettelkasten": [
+      "/Users/matianjun/Dropbox/obsidian_zettelkasten/.codex",
+      "/Users/matianjun/Dropbox/obsidian_zettelkasten"
+    ],
+    "albertwh1te/quant_dash_board": [
+      "/Users/matianjun/Dropbox/code/quant_dash_board"
+    ],
+    "albertwh1te/senis": [
+      "/Users/matianjun/Dropbox/code/senis"
+    ],
+    "kepano/obsidian-skills": [
+      "/Users/matianjun/Dropbox/code/obsidian-skills/skills/obsidian-cli"
+    ]
+  },
+  "changelogLastFetched": 1769182122444,
+  "iterm2SetupInProgress": false,
+  "iterm2BackupPath": "/Users/matianjun/Library/Preferences/com.googlecode.iterm2.plist.bak",
+  "shiftEnterKeyBindingInstalled": true,
+  "hasCompletedOnboarding": true,
+  "lastOnboardingVersion": "2.0.76",
+  "bypassPermissionsModeAccepted": true,
+  "lastReleaseNotesSeen": "2.1.17",
+  "projects": {
+    "/Users/matianjun/Dropbox/code/hyperliquid_analyse": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "mcpServers": {},
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": false,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false,
+      "exampleFiles": [
+        "main.py",
+        "ranker_online.py",
+        "online_commands.py",
+        "ranker_train_v2.py",
+        "position_manager.py"
+      ],
+      "reactVulnerabilityCache": {
+        "detected": false,
+        "package": null,
+        "packageName": null,
+        "version": null,
+        "packageManager": null
+      },
+      "exampleFilesGeneratedAt": 1770460172530,
+      "hasCompletedProjectOnboarding": true,
+      "lastCost": 0.009413999999999999,
+      "lastAPIDuration": 6339,
+      "lastAPIDurationWithoutRetries": 6335,
+      "lastToolDuration": 0,
+      "lastDuration": 10588,
+      "lastLinesAdded": 0,
+      "lastLinesRemoved": 0,
+      "lastTotalInputTokens": 9119,
+      "lastTotalOutputTokens": 59,
+      "lastTotalCacheCreationInputTokens": 0,
+      "lastTotalCacheReadInputTokens": 0,
+      "lastTotalWebSearchRequests": 0,
+      "lastModelUsage": {
+        "claude-haiku-4-5-20251001": {
+          "inputTokens": 9119,
+          "outputTokens": 59,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 0.009413999999999999
+        }
+      },
+      "lastSessionId": "265121af-6e43-45bd-b8b5-9e6d87298428"
+    },
+    "/Users/matianjun/Dropbox/code/nado-python-sdk": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "mcpServers": {},
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": false,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false,
+      "exampleFiles": [
+        "engine_client.py",
+        "indexer_client.py",
+        "trigger_client.py",
+        "backend.py",
+        "query.py"
+      ],
+      "reactVulnerabilityCache": {
+        "detected": false,
+        "package": null,
+        "packageName": null,
+        "version": null,
+        "packageManager": null
+      },
+      "exampleFilesGeneratedAt": 1767434203271,
+      "lastCost": 1.7420002499999998,
+      "lastAPIDuration": 378312,
+      "lastAPIDurationWithoutRetries": 378288,
+      "lastToolDuration": 1634,
+      "lastDuration": 808863,
+      "lastLinesAdded": 536,
+      "lastLinesRemoved": 17,
+      "lastTotalInputTokens": 3640,
+      "lastTotalOutputTokens": 17470,
+      "lastTotalCacheCreationInputTokens": 78087,
+      "lastTotalCacheReadInputTokens": 1626597,
+      "lastTotalWebSearchRequests": 0,
+      "lastModelUsage": {
+        "claude-haiku-4-5-20251001": {
+          "inputTokens": 2353,
+          "outputTokens": 244,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 0.003573
+        },
+        "claude-opus-4-5-20251101": {
+          "inputTokens": 1287,
+          "outputTokens": 17226,
+          "cacheReadInputTokens": 1626597,
+          "cacheCreationInputTokens": 78087,
+          "webSearchRequests": 0,
+          "costUSD": 1.73842725
+        }
+      },
+      "lastSessionId": "18192017-7d1a-4cc6-8960-f47c0a08a095"
+    },
+    "/Users/matianjun/Dropbox/code/prediction_fun": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "mcpServers": {},
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": false,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false,
+      "exampleFiles": [
+        "main.py",
+        "engine.py",
+        "quote_engine.py",
+        "hedger.py",
+        "detector.py"
+      ],
+      "reactVulnerabilityCache": {
+        "detected": false,
+        "package": null,
+        "packageName": null,
+        "version": null,
+        "packageManager": null
+      },
+      "exampleFilesGeneratedAt": 1767437776343,
+      "lastCost": 0.0526885,
+      "lastAPIDuration": 15243,
+      "lastAPIDurationWithoutRetries": 15225,
+      "lastToolDuration": 0,
+      "lastDuration": 10572,
+      "lastLinesAdded": 0,
+      "lastLinesRemoved": 0,
+      "lastTotalInputTokens": 374,
+      "lastTotalOutputTokens": 256,
+      "lastTotalCacheCreationInputTokens": 13366,
+      "lastTotalCacheReadInputTokens": 0,
+      "lastTotalWebSearchRequests": 0,
+      "lastModelUsage": {
+        "claude-haiku-4-5-20251001": {
+          "inputTokens": 371,
+          "outputTokens": 227,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 6619,
+          "webSearchRequests": 0,
+          "costUSD": 0.00977975
+        },
+        "claude-opus-4-5-20251101": {
+          "inputTokens": 3,
+          "outputTokens": 29,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 6747,
+          "webSearchRequests": 0,
+          "costUSD": 0.04290875
+        }
+      },
+      "lastSessionId": "725d667e-783c-483e-8308-e0832b800cef"
+    },
+    "/Users/matianjun/Dropbox/code/claude_model": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "mcpServers": {},
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": false,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false,
+      "exampleFiles": [],
+      "reactVulnerabilityCache": {
+        "detected": false,
+        "package": null,
+        "packageName": null,
+        "version": null,
+        "packageManager": null
+      },
+      "lastCost": 0,
+      "lastAPIDuration": 4633,
+      "lastAPIDurationWithoutRetries": 4633,
+      "lastToolDuration": 0,
+      "lastDuration": 9067,
+      "lastLinesAdded": 0,
+      "lastLinesRemoved": 0,
+      "lastTotalInputTokens": 0,
+      "lastTotalOutputTokens": 0,
+      "lastTotalCacheCreationInputTokens": 0,
+      "lastTotalCacheReadInputTokens": 0,
+      "lastTotalWebSearchRequests": 0,
+      "lastModelUsage": {},
+      "lastSessionId": "86bc76e4-6d52-4e01-91b0-9254cd0eae66"
+    },
+    "/Users/matianjun/Dropbox/obsidian_zettelkasten": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "mcpServers": {},
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": false,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false,
+      "exampleFiles": [
+        "rss.md",
+        "rust.md",
+        "Arbitrage.md",
+        "Audit_Security_Index_Page.md",
+        "mermaid.md"
+      ],
+      "exampleFilesGeneratedAt": 1770894069395,
+      "reactVulnerabilityCache": {
+        "detected": false,
+        "package": null,
+        "packageName": null,
+        "version": null,
+        "packageManager": null
+      },
+      "lastCost": 0.000595,
+      "lastAPIDuration": 1548,
+      "lastAPIDurationWithoutRetries": 1547,
+      "lastToolDuration": 0,
+      "lastDuration": 6542,
+      "lastLinesAdded": 0,
+      "lastLinesRemoved": 0,
+      "lastTotalInputTokens": 425,
+      "lastTotalOutputTokens": 34,
+      "lastTotalCacheCreationInputTokens": 0,
+      "lastTotalCacheReadInputTokens": 0,
+      "lastTotalWebSearchRequests": 0,
+      "lastModelUsage": {
+        "claude-haiku-4-5-20251001": {
+          "inputTokens": 425,
+          "outputTokens": 34,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 0.000595
+        }
+      },
+      "lastSessionId": "93a67238-cd12-4d2d-9963-a495993bf39a",
+      "hasCompletedProjectOnboarding": true
+    },
+    "/Users/matianjun/Dropbox/code/quant_dash_board": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "mcpServers": {},
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": false,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false,
+      "exampleFiles": [
+        "db_util.py",
+        "page.tsx",
+        "equity-chart.tsx",
+        "main.py",
+        "AGENTS.md"
+      ],
+      "reactVulnerabilityCache": {
+        "detected": false,
+        "package": null,
+        "packageName": null,
+        "version": null,
+        "packageManager": null
+      },
+      "exampleFilesGeneratedAt": 1768208414007,
+      "lastCost": 0,
+      "lastAPIDuration": 3674,
+      "lastAPIDurationWithoutRetries": 3669,
+      "lastToolDuration": 0,
+      "lastDuration": 7913,
+      "lastLinesAdded": 0,
+      "lastLinesRemoved": 0,
+      "lastTotalInputTokens": 0,
+      "lastTotalOutputTokens": 0,
+      "lastTotalCacheCreationInputTokens": 0,
+      "lastTotalCacheReadInputTokens": 0,
+      "lastTotalWebSearchRequests": 0,
+      "lastModelUsage": {},
+      "lastSessionId": "7b7480d8-da71-463e-8ca5-8d5685c1c72d",
+      "hasCompletedProjectOnboarding": true
+    },
+    "/Users/matianjun/Dropbox/code": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "mcpServers": {},
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": false,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false,
+      "exampleFiles": [],
+      "reactVulnerabilityCache": {
+        "detected": false,
+        "package": null,
+        "packageName": null,
+        "version": null,
+        "packageManager": null
+      },
+      "lastCost": 0.0698275,
+      "lastAPIDuration": 11628,
+      "lastAPIDurationWithoutRetries": 11626,
+      "lastToolDuration": 0,
+      "lastDuration": 14792,
+      "lastLinesAdded": 0,
+      "lastLinesRemoved": 0,
+      "lastTotalInputTokens": 137,
+      "lastTotalOutputTokens": 191,
+      "lastTotalCacheCreationInputTokens": 8166,
+      "lastTotalCacheReadInputTokens": 28612,
+      "lastTotalWebSearchRequests": 0,
+      "lastModelUsage": {
+        "claude-haiku-4-5-20251001": {
+          "inputTokens": 119,
+          "outputTokens": 25,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 0.00024400000000000002
+        },
+        "claude-opus-4-5-20251101": {
+          "inputTokens": 18,
+          "outputTokens": 166,
+          "cacheReadInputTokens": 28612,
+          "cacheCreationInputTokens": 8166,
+          "webSearchRequests": 0,
+          "costUSD": 0.0695835
+        }
+      },
+      "lastSessionId": "c6b06eae-1264-4c87-a055-c38d17fe8996"
+    },
+    "/Users/matianjun/Dropbox/code/senis": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "mcpServers": {},
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": false,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false,
+      "exampleFiles": [
+        "page.js",
+        "web_main.py",
+        "scripts.py",
+        "bot.py",
+        "main.py"
+      ],
+      "reactVulnerabilityCache": {
+        "detected": false,
+        "package": null,
+        "packageName": null,
+        "version": null,
+        "packageManager": null
+      },
+      "exampleFilesGeneratedAt": 1768808816881,
+      "lastCost": 1.7471907499999995,
+      "lastAPIDuration": 346642,
+      "lastAPIDurationWithoutRetries": 346627,
+      "lastToolDuration": 78,
+      "lastDuration": 2220449,
+      "lastLinesAdded": 91,
+      "lastLinesRemoved": 21,
+      "lastTotalInputTokens": 923,
+      "lastTotalOutputTokens": 13869,
+      "lastTotalCacheCreationInputTokens": 136241,
+      "lastTotalCacheReadInputTokens": 1227699,
+      "lastTotalWebSearchRequests": 0,
+      "lastModelUsage": {
+        "claude-haiku-4-5-20251001": {
+          "inputTokens": 660,
+          "outputTokens": 357,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 11945,
+          "webSearchRequests": 0,
+          "costUSD": 0.017376249999999996
+        },
+        "claude-opus-4-5-20251101": {
+          "inputTokens": 263,
+          "outputTokens": 13512,
+          "cacheReadInputTokens": 1227699,
+          "cacheCreationInputTokens": 124296,
+          "webSearchRequests": 0,
+          "costUSD": 1.7298144999999996
+        }
+      },
+      "lastSessionId": "1d22926a-0a65-40cf-bd6c-c31ad04b00bd",
+      "hasCompletedProjectOnboarding": true
+    },
+    "/Users/matianjun/Dropbox/code/obsidian-skills": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "mcpServers": {},
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": false,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false,
+      "exampleFiles": [],
+      "reactVulnerabilityCache": {
+        "detected": false,
+        "package": null,
+        "packageName": null,
+        "version": null,
+        "packageManager": null
+      },
+      "lastCost": 0,
+      "lastAPIDuration": 1225,
+      "lastAPIDurationWithoutRetries": 1223,
+      "lastToolDuration": 0,
+      "lastDuration": 5637,
+      "lastLinesAdded": 0,
+      "lastLinesRemoved": 0,
+      "lastTotalInputTokens": 0,
+      "lastTotalOutputTokens": 0,
+      "lastTotalCacheCreationInputTokens": 0,
+      "lastTotalCacheReadInputTokens": 0,
+      "lastTotalWebSearchRequests": 0,
+      "lastModelUsage": {},
+      "lastSessionId": "e451d430-9acd-46a6-8749-ea471edf4e3c"
+    },
+    "/Users/matianjun/.codex": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "mcpServers": {},
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": false,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false,
+      "exampleFiles": [],
+      "reactVulnerabilityCache": {
+        "detected": false,
+        "package": null,
+        "packageName": null,
+        "version": null,
+        "packageManager": null
+      },
+      "lastCost": 0,
+      "lastAPIDuration": 0,
+      "lastAPIDurationWithoutRetries": 0,
+      "lastToolDuration": 0,
+      "lastDuration": 5980,
+      "lastLinesAdded": 0,
+      "lastLinesRemoved": 0,
+      "lastTotalInputTokens": 0,
+      "lastTotalOutputTokens": 0,
+      "lastTotalCacheCreationInputTokens": 0,
+      "lastTotalCacheReadInputTokens": 0,
+      "lastTotalWebSearchRequests": 0,
+      "lastModelUsage": {},
+      "lastSessionId": "e28dd057-f080-4513-a4ee-4b36b3e81350"
+    }
+  },
+  "officialMarketplaceAutoInstallAttempted": true,
+  "officialMarketplaceAutoInstalled": true,
+  "hasIdeOnboardingBeenShown": {
+    "iTerm.app": true
+  },
+  "skillUsage": {
+    "init": {
+      "usageCount": 2,
+      "lastUsedAt": 1768811043825
+    },
+    "planning-with-files": {
+      "usageCount": 17,
+      "lastUsedAt": 1769091787388
+    }
+  },
+  "opusProMigrationComplete": true,
+  "cachedChromeExtensionInstalled": false
+}

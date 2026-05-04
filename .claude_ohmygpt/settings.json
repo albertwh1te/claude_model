@@ -1,0 +1,6 @@
+{
+  "model": "opus",
+  "enabledPlugins": {
+    "planning-with-files@planning-with-files": true
+  }
+}

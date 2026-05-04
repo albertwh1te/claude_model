@@ -1,0 +1,168 @@
+2026-01-19T06:20:12.463Z [DEBUG] Watching for changes in setting files /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt...
+2026-01-19T06:20:12.497Z [DEBUG] [init] configureGlobalMTLS starting
+2026-01-19T06:20:12.497Z [DEBUG] [init] configureGlobalMTLS complete
+2026-01-19T06:20:12.497Z [DEBUG] [init] configureGlobalAgents starting
+2026-01-19T06:20:12.497Z [DEBUG] [init] configureGlobalAgents complete
+2026-01-19T06:20:12.506Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-01-19T06:20:12.506Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-01-19T06:20:12.506Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-01-19T06:20:12.508Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-01-19T06:20:12.523Z [DEBUG] Loading plugin planning-with-files from source: "./"
+2026-01-19T06:20:12.524Z [DEBUG] Using manifest version for planning-with-files@planning-with-files: 2.1.2
+2026-01-19T06:20:12.525Z [DEBUG] Plugin planning-with-files@planning-with-files version 2.1.2 already cached at /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/plugins/cache/planning-with-files/planning-with-files/2.1.2
+2026-01-19T06:20:12.525Z [DEBUG] Copied local plugin planning-with-files to versioned cache: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/plugins/cache/planning-with-files/planning-with-files/2.1.2
+2026-01-19T06:20:12.526Z [DEBUG] Found 1 plugins (1 enabled, 0 disabled)
+2026-01-19T06:20:12.526Z [DEBUG] [STARTUP] MCP configs loaded in 18ms
+2026-01-19T06:20:12.527Z [DEBUG] [STARTUP] Running setup()...
+2026-01-19T06:20:12.529Z [DEBUG] Stats cache stale (2026-01-16), processing 2026-01-17 to 2026-01-18 in background
+2026-01-19T06:20:12.537Z [DEBUG] Loading skills from: managed=/Library/Application Support/ClaudeCode/.claude/skills, user=/Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/skills, project=[/Users/matianjun/Dropbox/code/hyperliquid_analyse/.claude/skills]
+2026-01-19T06:20:12.639Z [DEBUG] Loaded 1 installed plugins from /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/plugins/installed_plugins.json
+2026-01-19T06:20:12.660Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/todos/9d000265-f501-47a7-a159-b36a8457d3b6-agent-9d000265-f501-47a7-a159-b36a8457d3b6.json.tmp.19435.1768803612660
+2026-01-19T06:20:12.661Z [DEBUG] Temp file written successfully, size: 2 bytes
+2026-01-19T06:20:12.661Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/todos/9d000265-f501-47a7-a159-b36a8457d3b6-agent-9d000265-f501-47a7-a159-b36a8457d3b6.json.tmp.19435.1768803612660 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/todos/9d000265-f501-47a7-a159-b36a8457d3b6-agent-9d000265-f501-47a7-a159-b36a8457d3b6.json
+2026-01-19T06:20:12.661Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/todos/9d000265-f501-47a7-a159-b36a8457d3b6-agent-9d000265-f501-47a7-a159-b36a8457d3b6.json written atomically
+2026-01-19T06:20:12.667Z [DEBUG] getPluginSkills: Processing 1 enabled plugins
+2026-01-19T06:20:12.667Z [DEBUG] Checking plugin planning-with-files: skillsPath=exists, skillsPaths=0 paths
+2026-01-19T06:20:12.667Z [DEBUG] Attempting to load skills from plugin planning-with-files default skillsPath: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/plugins/cache/planning-with-files/planning-with-files/2.1.2/skills
+2026-01-19T06:20:12.670Z [DEBUG] Total plugin commands loaded: 0
+2026-01-19T06:20:12.670Z [DEBUG] Registered 0 hooks from 1 plugins
+2026-01-19T06:20:12.671Z [DEBUG] [STARTUP] setup() completed in 144ms
+2026-01-19T06:20:12.671Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-01-19T06:20:12.672Z [DEBUG] Loaded 1 skills from plugin planning-with-files default directory
+2026-01-19T06:20:12.672Z [DEBUG] Total plugin skills loaded: 1
+2026-01-19T06:20:12.675Z [DEBUG] Total plugin agents loaded: 0
+2026-01-19T06:20:12.675Z [DEBUG] Loaded 2 unique skills (managed: 0, user: 1, project: 1, legacy commands: 0)
+2026-01-19T06:20:12.675Z [DEBUG] getSkills returning: 2 skill dir commands, 1 plugin skills
+2026-01-19T06:20:12.676Z [DEBUG] [STARTUP] Commands and agents loaded in 5ms
+2026-01-19T06:20:12.676Z [DEBUG] [STARTUP] Running showSetupScreens()...
+2026-01-19T06:20:12.678Z [DEBUG] [STARTUP] showSetupScreens() completed in 2ms
+2026-01-19T06:20:12.685Z [DEBUG] All plugins already exist, skipping migration
+2026-01-19T06:20:12.694Z [DEBUG] Initialized versioned plugins system with 1 plugins
+2026-01-19T06:20:12.698Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.19435.1768803612698
+2026-01-19T06:20:12.698Z [DEBUG] Preserving file permissions: 100600
+2026-01-19T06:20:12.698Z [DEBUG] Temp file written successfully, size: 12600 bytes
+2026-01-19T06:20:12.698Z [DEBUG] Applied original permissions to temp file
+2026-01-19T06:20:12.698Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.19435.1768803612698 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-01-19T06:20:12.699Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-01-19T06:20:12.701Z [DEBUG] Getting matching hook commands for SessionStart with query: startup
+2026-01-19T06:20:12.701Z [DEBUG] Found 0 hook matchers in settings
+2026-01-19T06:20:12.701Z [DEBUG] Matched 0 unique hooks for query "startup" (0 before deduplication)
+2026-01-19T06:20:12.702Z [DEBUG] [render] initYoga starting
+2026-01-19T06:20:12.707Z [DEBUG] Total LSP servers loaded: 0
+2026-01-19T06:20:12.707Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 0 server(s)
+2026-01-19T06:20:12.707Z [DEBUG] LSP manager initialized with 0 servers
+2026-01-19T06:20:12.707Z [DEBUG] LSP server manager initialized successfully
+2026-01-19T06:20:12.707Z [DEBUG] LSP notification handlers registered successfully for all 0 server(s)
+2026-01-19T06:20:12.716Z [DEBUG] Git remote URL: git@github.com:albertwh1te/hyperliquid_analyse.git
+2026-01-19T06:20:12.716Z [DEBUG] Parsed repository: albertwh1te/hyperliquid_analyse from git@github.com:albertwh1te/hyperliquid_analyse.git
+2026-01-19T06:20:12.716Z [DEBUG] Parsed repository: albertwh1te/hyperliquid_analyse from URL: git@github.com:albertwh1te/hyperliquid_analyse.git
+2026-01-19T06:20:12.716Z [DEBUG] Path /Users/matianjun/Dropbox/code/hyperliquid_analyse already tracked for repo albertwh1te/hyperliquid_analyse
+2026-01-19T06:20:12.721Z [DEBUG] Creating shell snapshot for zsh (/bin/zsh)
+2026-01-19T06:20:12.721Z [DEBUG] Looking for shell config file: /Users/matianjun/.zshrc
+2026-01-19T06:20:12.721Z [DEBUG] Snapshots directory: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/shell-snapshots
+2026-01-19T06:20:12.722Z [DEBUG] Creating snapshot at: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/shell-snapshots/snapshot-zsh-1768803612721-t4eydr.sh
+2026-01-19T06:20:12.722Z [DEBUG] Shell binary exists: true
+2026-01-19T06:20:12.722Z [DEBUG] Execution timeout: 10000ms
+2026-01-19T06:20:12.728Z [DEBUG] Watching for changes in skill directories: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/skills, /Users/matianjun/Dropbox/code/hyperliquid_analyse/.claude/skills...
+2026-01-19T06:20:12.731Z [DEBUG] [render] initYoga complete
+2026-01-19T06:20:12.771Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.19435.1768803612771
+2026-01-19T06:20:12.771Z [DEBUG] Preserving file permissions: 100600
+2026-01-19T06:20:12.771Z [DEBUG] Temp file written successfully, size: 12527 bytes
+2026-01-19T06:20:12.771Z [DEBUG] Applied original permissions to temp file
+2026-01-19T06:20:12.771Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.19435.1768803612771 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-01-19T06:20:12.771Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-01-19T06:20:12.774Z [DEBUG] [REPL:mount] REPL mounted, disabled=false
+2026-01-19T06:20:12.775Z [DEBUG] Official marketplace auto-install skipped: already_attempted
+2026-01-19T06:20:12.775Z [DEBUG] performStartupChecks called
+2026-01-19T06:20:12.776Z [DEBUG] Starting background plugin installations
+2026-01-19T06:20:12.776Z [DEBUG] performBackgroundPluginInstallations called
+2026-01-19T06:20:12.782Z [DEBUG] Found 1 enabled plugins
+2026-01-19T06:20:12.783Z [DEBUG] All plugins already exist, skipping migration
+2026-01-19T06:20:12.783Z [DEBUG] Found 1 installed plugins (V2 format)
+2026-01-19T06:20:12.783Z [DEBUG] Loaded plugins - Enabled: 1, Disabled: 0, Commands: 0, Agents: 0, Errors: 0
+2026-01-19T06:20:12.783Z [DEBUG] Found 0 missing plugins (not installed):
+2026-01-19T06:20:12.783Z [DEBUG] Setting installation status: 0 marketplaces, 0 installable plugins, 0 uninstallable plugins
+2026-01-19T06:20:12.789Z [DEBUG] Getting matching hook commands for SubagentStart with query: Explore
+2026-01-19T06:20:12.789Z [DEBUG] Found 0 hook matchers in settings
+2026-01-19T06:20:12.789Z [DEBUG] Matched 0 unique hooks for query "Explore" (0 before deduplication)
+2026-01-19T06:20:12.789Z [DEBUG] Getting matching hook commands for SubagentStart with query: Plan
+2026-01-19T06:20:12.789Z [DEBUG] Found 0 hook matchers in settings
+2026-01-19T06:20:12.789Z [DEBUG] Matched 0 unique hooks for query "Plan" (0 before deduplication)
+2026-01-19T06:20:12.789Z [DEBUG] Getting matching hook commands for SubagentStart with query: Bash
+2026-01-19T06:20:12.789Z [DEBUG] Found 0 hook matchers in settings
+2026-01-19T06:20:12.789Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-01-19T06:20:12.796Z [DEBUG] Ripgrep first use test: PASSED (mode=builtin, path=/Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/arm64-darwin/rg)
+2026-01-19T06:20:12.811Z [DEBUG] Stats cache saved successfully (lastComputedDate: 2026-01-18)
+2026-01-19T06:20:12.811Z [DEBUG] Stats cache updated with 1 new sessions
+2026-01-19T06:20:12.812Z [DEBUG] Summarizing all 12 messages (~0 tokens)
+2026-01-19T06:20:12.832Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.19435.1768803612832
+2026-01-19T06:20:12.832Z [DEBUG] Preserving file permissions: 100600
+2026-01-19T06:20:12.832Z [DEBUG] Temp file written successfully, size: 12527 bytes
+2026-01-19T06:20:12.834Z [DEBUG] Applied original permissions to temp file
+2026-01-19T06:20:12.834Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.19435.1768803612832 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-01-19T06:20:12.834Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-01-19T06:20:12.843Z [DEBUG] Skill prompt: showing "planning-with-files:planning-with-files" (userFacingName="planning-with-files")
+2026-01-19T06:20:12.843Z [DEBUG] Skills and commands included in Skill tool: jelly-gemini, planning-with-files, planning-with-files
+2026-01-19T06:20:12.843Z [DEBUG] Skill prompt: showing "planning-with-files:planning-with-files" (userFacingName="planning-with-files")
+2026-01-19T06:20:12.845Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-01-19T06:20:12.845Z [DEBUG] [API:auth] OAuth token check starting
+2026-01-19T06:20:12.878Z [DEBUG] [API:auth] OAuth token check complete
+2026-01-19T06:20:12.953Z [DEBUG] AutoUpdaterWrapper: Installation type: unknown
+2026-01-19T06:20:13.948Z [ERROR] Error: Error: 401 {"error":"Invalid request token"}
+    at Y9.generate (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:492:33618)
+    at BP.makeStatusError (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:928:2195)
+    at BP.makeRequest (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:928:5420)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1662:3866
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1562:2223
+    at async Xn8 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1561:364)
+    at async mrB (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1562:2156)
+    at async _kA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:2679:3177)
+    at async jkA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:2679:3872)
+2026-01-19T06:20:13.948Z [DEBUG] countTokensWithFallback: API returned null, trying haiku fallback (17 tools)
+2026-01-19T06:20:13.948Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-01-19T06:20:13.948Z [DEBUG] [API:auth] OAuth token check starting
+2026-01-19T06:20:13.948Z [DEBUG] [API:auth] OAuth token check complete
+2026-01-19T06:20:14.030Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.19435.1768803614030
+2026-01-19T06:20:14.031Z [DEBUG] Preserving file permissions: 100600
+2026-01-19T06:20:14.031Z [DEBUG] Temp file written successfully, size: 12527 bytes
+2026-01-19T06:20:14.031Z [DEBUG] Applied original permissions to temp file
+2026-01-19T06:20:14.031Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.19435.1768803614030 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-01-19T06:20:14.031Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-01-19T06:20:14.032Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.19435.1768803614032
+2026-01-19T06:20:14.032Z [DEBUG] Preserving file permissions: 100600
+2026-01-19T06:20:14.032Z [DEBUG] Temp file written successfully, size: 12600 bytes
+2026-01-19T06:20:14.032Z [DEBUG] Applied original permissions to temp file
+2026-01-19T06:20:14.032Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.19435.1768803614032 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-01-19T06:20:14.033Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-01-19T06:20:14.033Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-01-19T06:20:14.033Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-01-19T06:20:14.033Z [DEBUG] Tool search disabled: MCPSearchTool is not available (may have been disallowed via disallowedTools).
+2026-01-19T06:20:14.033Z [DEBUG] Tool search disabled: MCPSearchTool is not available (may have been disallowed via disallowedTools).
+2026-01-19T06:20:14.037Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-01-19T06:20:14.037Z [DEBUG] [API:auth] OAuth token check starting
+2026-01-19T06:20:14.039Z [DEBUG] [API:auth] OAuth token check complete
+2026-01-19T06:20:14.040Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-01-19T06:20:14.040Z [DEBUG] [API:auth] OAuth token check starting
+2026-01-19T06:20:14.043Z [DEBUG] [API:auth] OAuth token check complete
+2026-01-19T06:20:14.050Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-01-19T06:20:14.050Z [DEBUG] [API:auth] OAuth token check starting
+2026-01-19T06:20:14.050Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-01-19T06:20:14.050Z [DEBUG] [API:auth] OAuth token check starting
+2026-01-19T06:20:14.051Z [DEBUG] [API:auth] OAuth token check complete
+2026-01-19T06:20:14.051Z [DEBUG] [API:auth] OAuth token check complete
+2026-01-19T06:20:14.124Z [DEBUG] Shell snapshot created successfully (175832 bytes)
+2026-01-19T06:20:14.393Z [DEBUG] Getting matching hook commands for SessionEnd with query: prompt_input_exit
+2026-01-19T06:20:14.393Z [DEBUG] Found 0 hook matchers in settings
+2026-01-19T06:20:14.393Z [DEBUG] Matched 0 unique hooks for query "prompt_input_exit" (0 before deduplication)
+2026-01-19T06:20:14.404Z [DEBUG] Cleaned up session snapshot: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/shell-snapshots/snapshot-zsh-1768803612721-t4eydr.sh
+2026-01-19T06:20:14.404Z [DEBUG] LSP server manager shut down successfully
+2026-01-19T06:20:14.405Z [DEBUG] Metrics opt-out check failed: No API key available
+2026-01-19T06:20:14.405Z [DEBUG] Metrics check failed, defaulting to disabled
+2026-01-19T06:20:14.405Z [DEBUG] Metrics export disabled by organization setting
+2026-01-19T06:20:14.405Z [DEBUG] BigQuery metrics exporter flush complete
+2026-01-19T06:20:14.405Z [DEBUG] BigQuery metrics exporter flush complete
+2026-01-19T06:20:14.405Z [DEBUG] BigQuery metrics exporter shutdown complete
+2026-01-19T06:20:14.840Z [DEBUG] Stream started - received first chunk
+2026-01-19T06:20:15.323Z [DEBUG] AutoUpdater: Detected installation type: unknown
+2026-01-19T06:20:15.323Z [DEBUG] AutoUpdater: Unknown installation type, falling back to config

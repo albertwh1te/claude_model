@@ -1,0 +1,8 @@
+On branch master
+Your branch is ahead of 'origin/master' by 2 commits.
+  (use "git push" to publish your local commits)
+
+nothing to commit, working tree clean
+7b004ec fix: Align 4H pipeline file names for consistency
+8f08b8a feat: Add 4H prediction pipeline commands to ml_commands.py
+a6dee79 feat: Enhance weight analysis with new metrics and BTC direction analysis

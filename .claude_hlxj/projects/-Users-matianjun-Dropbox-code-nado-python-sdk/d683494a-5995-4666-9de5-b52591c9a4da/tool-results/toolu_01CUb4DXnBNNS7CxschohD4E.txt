@@ -1,0 +1,400 @@
+     1→import requests
+     2→from functools import singledispatchmethod
+     3→
+     4→from typing import Optional, Union
+     5→from nado_protocol.engine_client.query import EngineQueryClient
+     6→from nado_protocol.engine_client.types import (
+     7→    EngineClientOpts,
+     8→)
+     9→from nado_protocol.engine_client.types.execute import (
+    10→    BurnNlpParams,
+    11→    CancelAndPlaceParams,
+    12→    CancelOrdersParams,
+    13→    CancelProductOrdersParams,
+    14→    ExecuteParams,
+    15→    ExecuteRequest,
+    16→    ExecuteResponse,
+    17→    LinkSignerParams,
+    18→    LiquidateSubaccountParams,
+    19→    MintNlpParams,
+    20→    OrderParams,
+    21→    PlaceMarketOrderParams,
+    22→    PlaceOrderParams,
+    23→    WithdrawCollateralParams,
+    24→    to_execute_request,
+    25→)
+    26→from nado_protocol.contracts.types import NadoExecuteType
+    27→from nado_protocol.engine_client.types.models import MarketLiquidity
+    28→from nado_protocol.utils.bytes32 import subaccount_to_hex
+    29→
+    30→from nado_protocol.utils.exceptions import (
+    31→    BadStatusCodeException,
+    32→    ExecuteFailedException,
+    33→)
+    34→from nado_protocol.utils.expiration import OrderType, get_expiration_timestamp
+    35→from nado_protocol.utils.math import mul_x18, round_x18, to_x18
+    36→from nado_protocol.utils.model import NadoBaseModel, is_instance_of_union
+    37→from nado_protocol.utils.subaccount import Subaccount, SubaccountParams
+    38→from nado_protocol.utils.execute import NadoBaseExecute
+    39→from nado_protocol.utils.order import build_appendix
+    40→
+    41→
+    42→class EngineExecuteClient(NadoBaseExecute):
+    43→    """
+    44→    Client class for executing operations against the off-chain engine.
+    45→    """
+    46→
+    47→    def __init__(
+    48→        self, opts: EngineClientOpts, querier: Optional[EngineQueryClient] = None
+    49→    ):
+    50→        """
+    51→        Initialize the EngineExecuteClient with provided options.
+    52→
+    53→        Args:
+    54→            opts (EngineClientOpts): Options for the client.
+    55→
+    56→            querier (EngineQueryClient, optional): An EngineQueryClient instance. If not provided, a new one is created.
+    57→        """
+    58→        super().__init__(opts)
+    59→        self._querier = querier or EngineQueryClient(opts)
+    60→        self._opts: EngineClientOpts = EngineClientOpts.parse_obj(opts)
+    61→        self.url: str = self._opts.url
+    62→        self.session = requests.Session()
+    63→
+    64→    def tx_nonce(self, sender: str) -> int:
+    65→        """
+    66→        Get the transaction nonce. Used to perform executes such as `withdraw_collateral`.
+    67→
+    68→        Returns:
+    69→            int: The transaction nonce.
+    70→        """
+    71→        return int(self._querier.get_nonces(sender[:42]).tx_nonce)
+    72→
+    73→    @singledispatchmethod
+    74→    def execute(self, params: Union[ExecuteParams, ExecuteRequest]) -> ExecuteResponse:
+    75→        """
+    76→        Executes the operation defined by the provided parameters.
+    77→
+    78→        Args:
+    79→            params (ExecuteParams): The parameters for the operation to execute. This can represent a variety of operations, such as placing orders, cancelling orders, and more.
+    80→
+    81→        Returns:
+    82→            ExecuteResponse: The response from the executed operation.
+    83→        """
+    84→        req: ExecuteRequest = (
+    85→            params if is_instance_of_union(params, ExecuteRequest) else to_execute_request(params)  # type: ignore
+    86→        )
+    87→        return self._execute(req)
+    88→
+    89→    @execute.register
+    90→    def _(self, req: dict) -> ExecuteResponse:
+    91→        """
+    92→        Overloaded method to execute the operation defined by the provided request.
+    93→
+    94→        Args:
+    95→            req (dict): The request data for the operation to execute. Can be a dictionary or an instance of ExecuteRequest.
+    96→
+    97→        Returns:
+    98→            ExecuteResponse: The response from the executed operation.
+    99→        """
+   100→        parsed_req: ExecuteRequest = NadoBaseModel.parse_obj(req)  # type: ignore
+   101→        return self._execute(parsed_req)
+   102→
+   103→    def _execute(self, req: ExecuteRequest) -> ExecuteResponse:
+   104→        """
+   105→        Internal method to execute the operation. Sends request to the server.
+   106→
+   107→        Args:
+   108→            req (ExecuteRequest): The request data for the operation to execute.
+   109→
+   110→        Returns:
+   111→            ExecuteResponse: The response from the executed operation.
+   112→
+   113→        Raises:
+   114→            BadStatusCodeException: If the server response status code is not 200.
+   115→            ExecuteFailedException: If there's an error in the execution or the response status is not "success".
+   116→        """
+   117→        res = self.session.post(f"{self.url}/execute", json=req.dict())
+   118→        if res.status_code != 200:
+   119→            raise BadStatusCodeException(res.text)
+   120→        try:
+   121→            execute_res = ExecuteResponse(**res.json(), req=req.dict())
+   122→        except Exception:
+   123→            raise ExecuteFailedException(res.text)
+   124→        if execute_res.status != "success":
+   125→            raise ExecuteFailedException(res.text)
+   126→        return execute_res
+   127→
+   128→    def _assert_book_not_empty(
+   129→        self, bids: list[MarketLiquidity], asks: list[MarketLiquidity], is_bid: bool
+   130→    ):
+   131→        book_is_empty = (is_bid and len(bids) == 0) or (not is_bid and len(asks) == 0)
+   132→        if book_is_empty:
+   133→            raise Exception("Orderbook is empty.")
+   134→
+   135→    def place_order(self, params: PlaceOrderParams) -> ExecuteResponse:
+   136→        """
+   137→        Execute a place order operation.
+   138→
+   139→        Args:
+   140→            params (PlaceOrderParams): Parameters required for placing an order.
+   141→            The parameters include the order details and the product_id.
+   142→
+   143→        Returns:
+   144→            ExecuteResponse: Response of the execution, including status and potential error message.
+   145→        """
+   146→        params = PlaceOrderParams.parse_obj(params)
+   147→        params.order = self.prepare_execute_params(params.order, True)
+   148→        params.signature = params.signature or self._sign(
+   149→            NadoExecuteType.PLACE_ORDER, params.order.dict(), params.product_id
+   150→        )
+   151→        return self.execute(params)
+   152→
+   153→    def place_market_order(self, params: PlaceMarketOrderParams) -> ExecuteResponse:
+   154→        """
+   155→        Places an FOK order using top of the book price with provided slippage.
+   156→
+   157→        Args:
+   158→            params (PlaceMarketOrderParams): Parameters required for placing a market order.
+   159→
+   160→        Returns:
+   161→            ExecuteResponse: Response of the execution, including status and potential error message.
+   162→        """
+   163→        orderbook = self._querier.get_market_liquidity(params.product_id, 1)
+   164→        is_bid = int(params.market_order.amount) > 0
+   165→        self._assert_book_not_empty(orderbook.bids, orderbook.asks, is_bid)
+   166→        slippage = to_x18(params.slippage or 0.005)  # defaults to 0.5%
+   167→        market_price_x18 = (
+   168→            mul_x18(orderbook.bids[0][0], to_x18(1) + slippage)
+   169→            if is_bid
+   170→            else mul_x18(orderbook.asks[0][0], to_x18(1) - slippage)
+   171→        )
+   172→        price_increment_x18 = self._querier._get_subaccount_product_position(
+   173→            subaccount_to_hex(params.market_order.sender), params.product_id
+   174→        ).product.book_info.price_increment_x18
+   175→        order = OrderParams(
+   176→            sender=params.market_order.sender,
+   177→            amount=params.market_order.amount,
+   178→            nonce=params.market_order.nonce,
+   179→            priceX18=round_x18(market_price_x18, price_increment_x18),
+   180→            expiration=get_expiration_timestamp(1000),
+   181→            appendix=build_appendix(
+   182→                OrderType.FOK, reduce_only=bool(params.reduce_only)
+   183→            ),
+   184→        )
+   185→        return self.place_order(
+   186→            PlaceOrderParams(  # type: ignore
+   187→                product_id=params.product_id,
+   188→                order=order,
+   189→                spot_leverage=params.spot_leverage,
+   190→                signature=params.signature,
+   191→            )
+   192→        )
+   193→
+   194→    def cancel_orders(self, params: CancelOrdersParams) -> ExecuteResponse:
+   195→        """
+   196→        Execute a cancel orders operation.
+   197→
+   198→        Args:
+   199→            params (CancelOrdersParams): Parameters required for canceling orders.
+   200→            The parameters include the order digests to be cancelled.
+   201→
+   202→        Returns:
+   203→            ExecuteResponse: Response of the execution, including status and potential error message.
+   204→        """
+   205→        params = self.prepare_execute_params(CancelOrdersParams.parse_obj(params), True)
+   206→        params.signature = params.signature or self._sign(
+   207→            NadoExecuteType.CANCEL_ORDERS, params.dict()
+   208→        )
+   209→        return self.execute(params)
+   210→
+   211→    def cancel_product_orders(
+   212→        self, params: CancelProductOrdersParams
+   213→    ) -> ExecuteResponse:
+   214→        """
+   215→        Execute a cancel product orders operation.
+   216→
+   217→        Args:
+   218→            params (CancelProductOrdersParams): Parameters required for bulk canceling orders of specific products.
+   219→            The parameters include a list of product ids to bulk cancel orders for.
+   220→
+   221→        Returns:
+   222→            ExecuteResponse: Response of the execution, including status and potential error message.
+   223→        """
+   224→        params = self.prepare_execute_params(
+   225→            CancelProductOrdersParams.parse_obj(params), True
+   226→        )
+   227→        params.signature = params.signature or self._sign(
+   228→            NadoExecuteType.CANCEL_PRODUCT_ORDERS, params.dict()
+   229→        )
+   230→        return self.execute(params)
+   231→
+   232→    def cancel_and_place(self, params: CancelAndPlaceParams) -> ExecuteResponse:
+   233→        """
+   234→        Execute a cancel and place operation.
+   235→
+   236→        Args:
+   237→            params (CancelAndPlaceParams): Parameters required for cancel and place.
+   238→
+   239→        Returns:
+   240→            ExecuteResponse: Response of the execution, including status and potential error message.
+   241→        """
+   242→        cancel_orders: CancelOrdersParams = self.prepare_execute_params(
+   243→            CancelOrdersParams.parse_obj(params.cancel_orders), True
+   244→        )
+   245→        cancel_orders.signature = cancel_orders.signature or self._sign(
+   246→            NadoExecuteType.CANCEL_ORDERS, cancel_orders.dict()
+   247→        )
+   248→        place_order: PlaceOrderParams = PlaceOrderParams.parse_obj(params.place_order)
+   249→        place_order.order = self.prepare_execute_params(place_order.order, True)
+   250→        place_order.signature = place_order.signature or self._sign(
+   251→            NadoExecuteType.PLACE_ORDER,
+   252→            place_order.order.dict(),
+   253→            place_order.product_id,
+   254→        )
+   255→        return self.execute(
+   256→            CancelAndPlaceParams(cancel_orders=cancel_orders, place_order=place_order)
+   257→        )
+   258→
+   259→    def withdraw_collateral(self, params: WithdrawCollateralParams) -> ExecuteResponse:
+   260→        """
+   261→        Execute a withdraw collateral operation.
+   262→
+   263→        Args:
+   264→            params (WithdrawCollateralParams): Parameters required for withdrawing collateral.
+   265→            The parameters include the collateral details.
+   266→
+   267→        Returns:
+   268→            ExecuteResponse: Response of the execution, including status and potential error message.
+   269→        """
+   270→        params = self.prepare_execute_params(
+   271→            WithdrawCollateralParams.parse_obj(params), False
+   272→        )
+   273→        params.signature = params.signature or self._sign(
+   274→            NadoExecuteType.WITHDRAW_COLLATERAL, params.dict()
+   275→        )
+   276→        return self.execute(params)
+   277→
+   278→    def liquidate_subaccount(
+   279→        self, params: LiquidateSubaccountParams
+   280→    ) -> ExecuteResponse:
+   281→        """
+   282→        Execute a liquidate subaccount operation.
+   283→
+   284→        Args:
+   285→            params (LiquidateSubaccountParams): Parameters required for liquidating a subaccount.
+   286→            The parameters include the liquidatee details.
+   287→
+   288→        Returns:
+   289→            ExecuteResponse: Response of the execution, including status and potential error message.
+   290→        """
+   291→        params = self.prepare_execute_params(
+   292→            LiquidateSubaccountParams.parse_obj(params), False
+   293→        )
+   294→        params.signature = params.signature or self._sign(
+   295→            NadoExecuteType.LIQUIDATE_SUBACCOUNT,
+   296→            params.dict(),
+   297→        )
+   298→        return self.execute(params)
+   299→
+   300→    def mint_nlp(self, params: MintNlpParams) -> ExecuteResponse:
+   301→        """
+   302→        Execute a mint NLP tokens operation.
+   303→
+   304→        Args:
+   305→            params (MintNlpParams): Parameters required for minting NLP tokens.
+   306→            The parameters include the LP details.
+   307→
+   308→        Returns:
+   309→            ExecuteResponse: Response of the execution, including status and potential error message.
+   310→        """
+   311→        params = self.prepare_execute_params(MintNlpParams.parse_obj(params), False)
+   312→        params.signature = params.signature or self._sign(
+   313→            NadoExecuteType.MINT_NLP,
+   314→            params.dict(),
+   315→        )
+   316→        return self.execute(params)
+   317→
+   318→    def burn_nlp(self, params: BurnNlpParams) -> ExecuteResponse:
+   319→        """
+   320→        Execute a burn NLP tokens operation.
+   321→
+   322→        Args:
+   323→            params (BurnNlpParams): Parameters required for burning LP tokens.
+   324→            The parameters include the LP details.
+   325→
+   326→        Returns:
+   327→            ExecuteResponse: Response of the execution, including status and potential error message.
+   328→        """
+   329→        params = self.prepare_execute_params(BurnNlpParams.parse_obj(params), False)
+   330→        params.signature = params.signature or self._sign(
+   331→            NadoExecuteType.BURN_NLP,
+   332→            params.dict(),
+   333→        )
+   334→        return self.execute(params)
+   335→
+   336→    def link_signer(self, params: LinkSignerParams) -> ExecuteResponse:
+   337→        """
+   338→        Execute a link signer operation.
+   339→
+   340→        Args:
+   341→            params (LinkSignerParams): Parameters required for linking a signer.
+   342→            The parameters include the signer details.
+   343→
+   344→        Returns:
+   345→            ExecuteResponse: Response of the execution, including status and potential error message.
+   346→        """
+   347→        params = self.prepare_execute_params(LinkSignerParams.parse_obj(params), False)
+   348→        params.signature = params.signature or self._sign(
+   349→            NadoExecuteType.LINK_SIGNER,
+   350→            params.dict(),
+   351→        )
+   352→        return self.execute(params)
+   353→
+   354→    def close_position(
+   355→        self, subaccount: Subaccount, product_id: int
+   356→    ) -> ExecuteResponse:
+   357→        """
+   358→        Execute a place order operation to close a position for the provided `product_id`.
+   359→
+   360→        Attributes:
+   361→            subaccount (Subaccount): The subaccount to close position for.
+   362→            product_id (int): The ID of the product to close position for.
+   363→
+   364→        Returns:
+   365→            ExecuteResponse: Response of the execution, including status and potential error message.
+   366→        """
+   367→        subaccount = subaccount_to_hex(subaccount)
+   368→        position = self._querier._get_subaccount_product_position(
+   369→            subaccount, product_id
+   370→        )
+   371→        balance, product = position.balance, position.product
+   372→        closing_spread_x18 = to_x18(0.005)
+   373→        closing_price_x18 = (
+   374→            mul_x18(product.oracle_price_x18, to_x18(1) - closing_spread_x18)
+   375→            if int(balance.balance.amount) > 0
+   376→            else mul_x18(product.oracle_price_x18, to_x18(1) + closing_spread_x18)
+   377→        )
+   378→        return self.place_order(
+   379→            PlaceOrderParams(  # type: ignore
+   380→                product_id=product_id,
+   381→                order=OrderParams(  # type: ignore
+   382→                    sender=subaccount,
+   383→                    amount=-round_x18(
+   384→                        balance.balance.amount,
+   385→                        product.book_info.size_increment,
+   386→                    ),
+   387→                    priceX18=round_x18(
+   388→                        closing_price_x18,
+   389→                        product.book_info.price_increment_x18,
+   390→                    ),
+   391→                    expiration=get_expiration_timestamp(1000),
+   392→                    appendix=build_appendix(OrderType.FOK, reduce_only=True),
+   393→                ),
+   394→            )
+   395→        )
+   396→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

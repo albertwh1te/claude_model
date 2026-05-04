@@ -1,0 +1,3 @@
+this program is running on mac_book_pro
+{'seed': 42, 'objective': 'multiclass', 'metric': 'multi_logloss', 'num_class': 10, 'boosting_type': 'gbdt', 'verbose': 1, 'learning_rate': 0.01, 'num_leaves': 99, 'max_depth': 11, 'min_child_samples': 2431, 'lambda_l1': 52.65971377244673, 'lambda_l2': 0.013150634806031378, 'feature_fraction': 0.9, 'bagging_fraction': 0.6, 'bagging_freq': 4}
+Import OK

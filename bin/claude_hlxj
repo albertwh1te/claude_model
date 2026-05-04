@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Wrapper for Claude Code CLI using OhmyGPT API
+
+# 指向我们刚刚安装的 claude 可执行文件
+CLAUDE_BIN="$HOME/Dropbox/code/claude_model/node_modules/.bin/claude"
+
+# --- 核心配置区 ---
+# Set these in your shell (e.g., ~/.bashrc, ~/.zshrc)
+export ANTHROPIC_BASE_URL="https://relay.nf.video"
+export ANTHROPIC_AUTH_TOKEN="sk-ant-sid01--942e538430ba851d3be8fd34c05e0067aef4e8e75a61087d481ad18d84b083d3"
+export ANTHROPIC_API_KEY="" # Important: Must be explicitly empty
+
+
+# export ANTHROPIC_AUTH_TOKEN="sk-9I4Pd46efb89E3bFbB15T3BLbkFJa6e66de523e84fcD867F"
+# export ANTHROPIC_BASE_URL="https://apic1.ohmycdn.com"
+
+# 指定使用的模型名称
+# export ANTHROPIC_MODEL="claude-haiku-4-5"
+
+# 设置超长超时时间 (防止生成长代码时断开，单位毫秒)
+export API_TIMEOUT_MS=3000000
+
+# 指定配置文件目录 (避免与官方配置冲突)
+export CLAUDE_CONFIG_DIR="$HOME/Dropbox/code/claude_model/.claude_hlxj"
+
+# --- 启动 ---
+exec "$CLAUDE_BIN" "$@"

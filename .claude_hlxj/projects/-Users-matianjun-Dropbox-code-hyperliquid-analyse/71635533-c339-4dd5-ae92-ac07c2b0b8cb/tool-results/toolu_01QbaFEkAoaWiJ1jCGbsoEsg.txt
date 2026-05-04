@@ -1,0 +1,260 @@
+     1→"""Tests for async engine client."""
+     2→
+     3→import pytest
+     4→from unittest.mock import AsyncMock, patch, MagicMock
+     5→
+     6→from nado_api.engine import AsyncEngineClient, AsyncEngineQueryClient, EngineClientOpts
+     7→from nado_api.types import (
+     8→    PlaceOrderParams,
+     9→    OrderParams,
+    10→    CancelOrdersParams,
+    11→    QueryResponse,
+    12→    ResponseStatus,
+    13→    BadStatusCodeException,
+    14→    QueryFailedException,
+    15→)
+    16→
+    17→
+    18→class TestAsyncEngineQueryClient:
+    19→    """Tests for AsyncEngineQueryClient."""
+    20→
+    21→    @pytest.fixture
+    22→    def mock_http(self):
+    23→        """Create a mock HTTP client."""
+    24→        with patch("nado_api.engine.query.AsyncHttpClient") as MockClass:
+    25→            mock_instance = MagicMock()
+    26→            mock_instance.post = AsyncMock()
+    27→            mock_instance.get = AsyncMock()
+    28→            mock_instance.close = AsyncMock()
+    29→            MockClass.return_value = mock_instance
+    30→            yield mock_instance
+    31→
+    32→    @pytest.fixture
+    33→    def client(self, mock_http, url: str) -> AsyncEngineQueryClient:
+    34→        """Create an AsyncEngineQueryClient with mocked HTTP."""
+    35→        return AsyncEngineQueryClient(opts=EngineClientOpts(url=url))
+    36→
+    37→    @pytest.mark.asyncio
+    38→    async def test_get_status_success(self, client: AsyncEngineQueryClient, mock_http):
+    39→        """Test successful status query."""
+    40→        mock_http.post.return_value = (
+    41→            200,
+    42→            {
+    43→                "status": "success",
+    44→                "data": {"epoch": "test", "last_event_timestamp": "123"},
+    45→            },
+    46→        )
+    47→
+    48→        result = await client.get_status()
+    49→        assert result.epoch == "test"
+    50→
+    51→    @pytest.mark.asyncio
+    52→    async def test_get_status_bad_status_code(
+    53→        self, client: AsyncEngineQueryClient, mock_http
+    54→    ):
+    55→        """Test handling of non-200 status code."""
+    56→        mock_http.post.return_value = (500, "Internal Server Error")
+    57→
+    58→        with pytest.raises(BadStatusCodeException):
+    59→            await client.get_status()
+    60→
+    61→    @pytest.mark.asyncio
+    62→    async def test_get_status_query_failed(
+    63→        self, client: AsyncEngineQueryClient, mock_http
+    64→    ):
+    65→        """Test handling of failed query status."""
+    66→        mock_http.post.return_value = (
+    67→            200,
+    68→            {"status": "failure", "error": "Something went wrong"},
+    69→        )
+    70→
+    71→        with pytest.raises(QueryFailedException):
+    72→            await client.get_status()
+    73→
+    74→    @pytest.mark.asyncio
+    75→    async def test_get_contracts(self, client: AsyncEngineQueryClient, mock_http):
+    76→        """Test getting contract addresses."""
+    77→        mock_http.post.return_value = (
+    78→            200,
+    79→            {
+    80→                "status": "success",
+    81→                "data": {
+    82→                    "endpoint_addr": "0x123",
+    83→                    "chain_id": "1337",
+    84→                },
+    85→            },
+    86→        )
+    87→
+    88→        result = await client.get_contracts()
+    89→        assert result.endpoint_addr == "0x123"
+    90→        assert result.chain_id == "1337"
+    91→
+    92→    @pytest.mark.asyncio
+    93→    async def test_get_market_price(self, client: AsyncEngineQueryClient, mock_http):
+    94→        """Test getting market price."""
+    95→        mock_http.post.return_value = (
+    96→            200,
+    97→            {
+    98→                "status": "success",
+    99→                "data": {
+   100→                    "bid": "28000000000000000000000",
+   101→                    "ask": "28100000000000000000000",
+   102→                },
+   103→            },
+   104→        )
+   105→
+   106→        result = await client.get_market_price(product_id=2)
+   107→        assert result.bid == "28000000000000000000000"
+   108→        assert result.ask == "28100000000000000000000"
+   109→
+   110→    @pytest.mark.asyncio
+   111→    async def test_get_subaccount_info(
+   112→        self, client: AsyncEngineQueryClient, mock_http, senders: list[str]
+   113→    ):
+   114→        """Test getting subaccount info."""
+   115→        mock_http.post.return_value = (
+   116→            200,
+   117→            {
+   118→                "status": "success",
+   119→                "data": {
+   120→                    "health": {
+   121→                        "assets": "1000000000000000000000",
+   122→                        "liabilities": "500000000000000000000",
+   123→                        "health": "2000000000000000000",
+   124→                    },
+   125→                    "spot_balances": [],
+   126→                    "perp_balances": [],
+   127→                    "spot_products": [],
+   128→                    "perp_products": [],
+   129→                },
+   130→            },
+   131→        )
+   132→
+   133→        result = await client.get_subaccount_info(subaccount=senders[0])
+   134→        assert result.health is not None
+   135→
+   136→    @pytest.mark.asyncio
+   137→    async def test_get_product_symbols(
+   138→        self, client: AsyncEngineQueryClient, mock_http
+   139→    ):
+   140→        """Test getting product symbols."""
+   141→        mock_http.get.return_value = (
+   142→            200,
+   143→            [
+   144→                {"product_id": 0, "symbol": "USDC"},
+   145→                {"product_id": 2, "symbol": "BTC-PERP"},
+   146→            ],
+   147→        )
+   148→
+   149→        result = await client.get_product_symbols()
+   150→        assert len(result) == 2
+   151→        assert result[0]["symbol"] == "USDC"
+   152→
+   153→    @pytest.mark.asyncio
+   154→    async def test_close(self, client: AsyncEngineQueryClient, mock_http):
+   155→        """Test closing the client."""
+   156→        await client.close()
+   157→        mock_http.close.assert_called_once()
+   158→
+   159→
+   160→class TestAsyncEngineExecuteClient:
+   161→    """Tests for AsyncEngineClient execute operations."""
+   162→
+   163→    @pytest.fixture
+   164→    def mock_http(self):
+   165→        """Create a mock HTTP client."""
+   166→        with patch("nado_api.engine.query.AsyncHttpClient") as MockQueryHttp, patch(
+   167→            "nado_api.engine.execute.AsyncHttpClient"
+   168→        ) as MockExecHttp:
+   169→            query_instance = MagicMock()
+   170→            query_instance.post = AsyncMock()
+   171→            query_instance.get = AsyncMock()
+   172→            query_instance.close = AsyncMock()
+   173→            MockQueryHttp.return_value = query_instance
+   174→
+   175→            exec_instance = MagicMock()
+   176→            exec_instance.post = AsyncMock()
+   177→            exec_instance.get = AsyncMock()
+   178→            exec_instance.close = AsyncMock()
+   179→            MockExecHttp.return_value = exec_instance
+   180→
+   181→            yield {"query": query_instance, "execute": exec_instance}
+   182→
+   183→    @pytest.fixture
+   184→    def client(
+   185→        self,
+   186→        mock_http,
+   187→        url: str,
+   188→        chain_id: int,
+   189→        endpoint_addr: str,
+   190→        private_keys: list[str],
+   191→    ) -> AsyncEngineClient:
+   192→        """Create an AsyncEngineClient with mocked HTTP."""
+   193→        from eth_account import Account
+   194→
+   195→        return AsyncEngineClient(
+   196→            opts=EngineClientOpts(
+   197→                url=url,
+   198→                chain_id=chain_id,
+   199→                endpoint_addr=endpoint_addr,
+   200→                signer=Account.from_key(private_keys[0]),
+   201→            )
+   202→        )
+   203→
+   204→    @pytest.mark.asyncio
+   205→    async def test_place_order_success(
+   206→        self, client: AsyncEngineClient, mock_http, order_params: dict
+   207→    ):
+   208→        """Test successful order placement."""
+   209→        mock_http["execute"].post.return_value = (
+   210→            200,
+   211→            {
+   212→                "status": "success",
+   213→                "data": {"digest": "0x123abc"},
+   214→            },
+   215→        )
+   216→
+   217→        result = await client.place_order(
+   218→            PlaceOrderParams(
+   219→                product_id=2,
+   220→                order=OrderParams(**order_params),
+   221→            )
+   222→        )
+   223→        assert result.status == "success"
+   224→        assert result.data.digest == "0x123abc"
+   225→
+   226→    @pytest.mark.asyncio
+   227→    async def test_cancel_orders_success(
+   228→        self, client: AsyncEngineClient, mock_http, cancellation_params: dict
+   229→    ):
+   230→        """Test successful order cancellation."""
+   231→        mock_http["execute"].post.return_value = (
+   232→            200,
+   233→            {
+   234→                "status": "success",
+   235→                "data": {"cancelled_orders": []},
+   236→            },
+   237→        )
+   238→
+   239→        result = await client.cancel_orders(CancelOrdersParams(**cancellation_params))
+   240→        assert result.status == "success"
+   241→
+   242→    @pytest.mark.asyncio
+   243→    async def test_execute_bad_status_code(
+   244→        self, client: AsyncEngineClient, mock_http, order_params: dict
+   245→    ):
+   246→        """Test handling of non-200 status code on execute."""
+   247→        mock_http["execute"].post.return_value = (500, "Internal Server Error")
+   248→
+   249→        with pytest.raises(BadStatusCodeException):
+   250→            await client.place_order(
+   251→                PlaceOrderParams(
+   252→                    product_id=2,
+   253→                    order=OrderParams(**order_params),
+   254→                )
+   255→            )
+   256→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

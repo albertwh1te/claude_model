@@ -1,0 +1,541 @@
+     1→"""
+     2→Ranker Process (Process A)
+     3→
+     4→Producer in the Producer-Consumer architecture.
+     5→Responsible for:
+     6→1. WebSocket connection to Binance for real-time kline data
+     7→2. Feature calculation and model prediction
+     8→3. Portfolio optimization to generate target weights
+     9→4. Publishing target weights to Redis for Executor to consume
+    10→
+    11→Communication Protocol:
+    12→- Storage: Redis SET `strategy:target_weights:{account_id}` with JSON payload
+    13→- Signal: Redis PUBLISH `signal:rebalance:{account_id}` with 'update' message
+    14→"""
+    15→
+    16→import asyncio
+    17→import json
+    18→import websockets
+    19→from datetime import datetime, timezone
+    20→from typing import List, Dict, Optional
+    21→from dataclasses import dataclass, asdict
+    22→import pandas as pd
+    23→import joblib
+    24→
+    25→from config.config import ONLINE_MODEL_PATH
+    26→from logger import online_logger as logger
+    27→from online.online_position import OnlinePositionManager
+    28→from ranker_model.ranker_feature import RankerFeature, key_windows
+    29→from data.data_model import sqlite_local
+    30→from ranker_model.regression_portfolio_optimizer import RegressionPortfolioOptimizer
+    31→from utils.redis_util import get_redis
+    32→
+    33→
+    34→@dataclass
+    35→class TargetWeightsPayload:
+    36→    """
+    37→    Data contract for communication between Ranker and Executor.
+    38→
+    39→    Attributes:
+    40→        model_token_size: Target position sizes (positive=long, negative=short)
+    41→        current_kline: Current prices for each ymbol
+    42→        timestamp: ISO format timestamp of when the signal was generated
+    43→        account_id: Account identifier for multi-account support
+    44→    """
+    45→
+    46→    model_token_size: Dict[str, float]
+    47→    current_kline: Dict[str, float]
+    48→    timestamp: str
+    49→    account_id: int
+    50→
+    51→    def to_json(self) -> str:
+    52→        """Serialize payload to JSON string."""
+    53→        return json.dumps(asdict(self))
+    54→
+    55→    @classmethod
+    56→    def from_json(cls, json_str: str) -> "TargetWeightsPayload":
+    57→        """Deserialize payload from JSON string."""
+    58→        data = json.loads(json_str)
+    59→        return cls(**data)
+    60→
+    61→
+    62→def get_raw_data_from_db_by_symbol_and_time(
+    63→    symbol: str, start_time: pd.Timestamp, end_time: pd.Timestamp
+    64→) -> pd.DataFrame:
+    65→    """Fetch historical kline data from database."""
+    66→    start_time_str = start_time.strftime("%Y-%m-%d %H:%M:%S")
+    67→    end_time_str = end_time.strftime("%Y-%m-%d %H:%M:%S")
+    68→
+    69→    sql = (
+    70→        f"SELECT * FROM binanceklinev2 "
+    71→        f"WHERE time >= '{start_time_str}' AND time <= '{end_time_str}' AND LEVEL = '{15}'"
+    72→        f"AND symbol = '{symbol}'"
+    73→    )
+    74→    cursor = sqlite_local.execute_sql(sql)
+    75→    df = pd.DataFrame(cursor.fetchall(), columns=[col[0] for col in cursor.description])
+    76→    df["time"] = pd.to_datetime(df["time"])
+    77→    df.sort_values("time", ascending=True, inplace=True)
+    78→    return df
+    79→
+    80→
+    81→class RankerProcess:
+    82→    """
+    83→    Ranker Process (Process A) - The Producer.
+    84→
+    85→    Handles:
+    86→    - Real-time kline data collection via WebSocket
+    87→    - Feature engineering and model prediction
+    88→    - Portfolio optimization
+    89→    - Publishing signals to Redis for Executor consumption
+    90→    """
+    91→
+    92→    BINANCE_WS_URL = "wss://fstream.binance.com/ws"
+    93→    REDIS_KEY_PREFIX = "strategy:target_weights"
+    94→    REDIS_CHANNEL_PREFIX = "signal:rebalance"
+    95→
+    96→    def __init__(self, account_id: int):
+    97→        self.account_id = account_id
+    98→        self.last_kline: Dict[str, dict] = {}  # Store latest kline data (even unclosed)
+    99→        self.symbols: List[str] = self._get_current_symbols()
+   100→        self.data = self._get_previous_data_for_symbol()
+   101→        self.kline_closed = {symbol: False for symbol in self.symbols}
+   102→        # New: Track if each symbol has received data in current cycle
+   103→        self.kline_updated = {symbol: False for symbol in self.symbols}
+   104→        # New: Prevent duplicate prediction triggers within same cycle
+   105→        self.prediction_triggered_this_cycle = False
+   106→        # New: Track if last_kline data has been appended to self.data
+   107→        self.data_appended_this_cycle = {symbol: False for symbol in self.symbols}
+   108→
+   109→        self.feature_maker = RankerFeature(
+   110→            symbols=self.symbols, minute_level=15, target=False
+   111→        )
+   112→        self.model = joblib.load(ONLINE_MODEL_PATH)
+   113→        self.feature_names = self.model.feature_name()
+   114→
+   115→        self.position_manager = OnlinePositionManager(
+   116→            start_money=10000.0, account_id=account_id
+   117→        )
+   118→
+   119→        if self.account_id:
+   120→            self.position_manager.load_state_from_redis()
+   121→
+   122→        logger.info(f"RankerProcess initialized for account_id={self.account_id}")
+   123→
+   124→    @property
+   125→    def redis_key(self) -> str:
+   126→        """Redis key for storing target weights."""
+   127→        return f"{self.REDIS_KEY_PREFIX}:{self.account_id}"
+   128→
+   129→    @property
+   130→    def redis_channel(self) -> str:
+   131→        """Redis channel for publishing rebalance signals."""
+   132→        return f"{self.REDIS_CHANNEL_PREFIX}:{self.account_id}"
+   133→
+   134→    def _get_current_symbols(self) -> List[str]:
+   135→        """Fetch current trading symbols from Redis."""
+   136→        try:
+   137→            redis = get_redis(async_mode=False)
+   138→            all_token_list_json = redis.get("daily_kline:all_token_list")
+   139→            if all_token_list_json is None:
+   140→                return []
+   141→            return json.loads(all_token_list_json)
+   142→        except Exception as e:
+   143→            logger.error(f"Failed to get symbols from Redis: {e}")
+   144→            return []
+   145→
+   146→    def reset_kline_closed(self):
+   147→        """Reset all kline closed flags."""
+   148→        self.kline_closed = {symbol: False for symbol in self.symbols}
+   149→
+   150→    def reset_cycle_flags(self):
+   151→        """Reset all cycle-related flags for a new 15-minute cycle."""
+   152→        self.kline_updated = {symbol: False for symbol in self.symbols}
+   153→        self.prediction_triggered_this_cycle = False
+   154→        self.data_appended_this_cycle = {symbol: False for symbol in self.symbols}
+   155→
+   156→    @property
+   157→    def all_symbol_updated(self) -> bool:
+   158→        """Check if all symbols have received data in current cycle."""
+   159→        return all(self.kline_updated.values())
+   160→
+   161→    def _get_previous_data_for_symbol(self) -> Dict[str, pd.DataFrame]:
+   162→        """Load historical kline data for feature calculation."""
+   163→        logger.info("Start to get previous data for symbols")
+   164→        now = datetime.now(tz=timezone.utc)
+   165→        start_time = pd.Timestamp(
+   166→            now - pd.Timedelta(hours=max(key_windows.values()) / 4 + 1)
+   167→        )
+   168→        end_time = pd.Timestamp(now)
+   169→
+   170→        previous_data = {}
+   171→        for symbol in self.symbols:
+   172→            previous_data[symbol] = get_raw_data_from_db_by_symbol_and_time(
+   173→                symbol=symbol, start_time=start_time, end_time=end_time
+   174→            )
+   175→            if not previous_data[symbol].empty:
+   176→                last_time = previous_data[symbol]["time"].max()
+   177→
+   178→        logger.info(f"Finished getting previous data for symbols")
+   179→        return previous_data
+   180→
+   181→    @property
+   182→    def all_symbol_data_ready(self) -> bool:
+   183→        """Check if all symbols have received closed kline data."""
+   184→        return all(self.kline_closed.values())
+   185→
+   186→    async def _publish_target_weights(
+   187→        self,
+   188→        model_token_size: Dict[str, float],
+   189→        current_kline: pd.Series,
+   190→    ) -> bool:
+   191→        """
+   192→        Publish target weights to Redis using Last Value Cache + Signal pattern.
+   193→
+   194→        Step 1: SET the payload to Redis (persistent storage)
+   195→        Step 2: PUBLISH signal to notify Executor
+   196→
+   197→        Returns:
+   198→            bool: True if successful, False otherwise
+   199→        """
+   200→        try:
+   201→            redis = get_redis(async_mode=True)
+   202→
+   203→            # Prepare payload
+   204→            payload = TargetWeightsPayload(
+   205→                model_token_size=model_token_size,
+   206→                current_kline=current_kline.to_dict(),
+   207→                timestamp=datetime.now(timezone.utc).isoformat(),
+   208→                account_id=self.account_id,
+   209→            )
+   210→
+   211→            # Step 1: SET - Store the target weights (Last Value Cache)
+   212→            await redis.set(self.redis_key, payload.to_json())
+   213→            logger.info(f"SET {self.redis_key} with {len(model_token_size)} positions")
+   214→
+   215→            # Step 2: PUBLISH - Send signal to Executor
+   216→            subscribers = await redis.publish(self.redis_channel, "update")
+   217→            logger.info(
+   218→                f"PUBLISH {self.redis_channel} 'update' -> {subscribers} subscribers"
+   219→            )
+   220→
+   221→            return True
+   222→
+   223→        except Exception as e:
+   224→            logger.error(f"Failed to publish target weights to Redis: {e}")
+   225→            return False
+   226→
+   227→    async def _process_weights(
+   228→        self, expected_next_time: pd.Timestamp
+   229→    ) -> Optional[Dict[str, float]]:
+   230→        """
+   231→        Core logic: Calculate features, predict, and optimize portfolio.
+   232→
+   233→        Returns:
+   234→            Optional[Dict[str, float]]: model_token_size dict or None if failed
+   235→        """
+   236→        try:
+   237→            # Feature calculation
+   238→            feature = self.feature_maker.full_feature_with_data_online(
+   239→                symbols_data=self.data,
+   240→                last_batch_time=expected_next_time,
+   241→            )
+   242→
+   243→            # Filter to last batch only
+   244→            last_batch_features = feature[
+   245→                feature.index.get_level_values(0) == expected_next_time
+   246→            ]
+   247→
+   248→            # Model prediction (Z-Score)
+   249→            predicted_zscore = self.model.predict(
+   250→                last_batch_features[self.feature_names]
+   251→            )
+   252→
+   253→            logger.info(f"Predicted zscore for time {expected_next_time}")
+   254→
+   255→            # Construct Series: Index=Symbol, Value=Z-Score
+   256→            mu_raw = pd.Series(
+   257→                data=predicted_zscore,
+   258→                index=last_batch_features.index.get_level_values("symbol"),
+   259→            )
+   260→
+   261→            # Load historical returns for covariance calculation
+   262→            all_stock_returns = pd.read_feather("history_stock_returns.feather")
+   263→
+   264→            # Top-N filtering
+   265→            n_select = 60
+   266→            if len(mu_raw) > n_select:
+   267→                top_symbols = mu_raw.abs().nlargest(n_select).index
+   268→                mu_final = mu_raw.loc[top_symbols]
+   269→            else:
+   270→                mu_final = mu_raw
+   271→
+   272→            # Blacklist filter
+   273→            black_list_symbols = []
+   274→            mu_final = mu_final[~mu_final.index.isin(black_list_symbols)]
+   275→
+   276→            logger.info(f"mu_final prepared with {len(mu_final)} symbols")
+   277→
+   278→            history_subset = all_stock_returns.loc[:, mu_final.index]
+   279→
+   280→            optimizer = RegressionPortfolioOptimizer(historical_returns=pd.DataFrame())
+   281→            optimizer.historical_returns = history_subset
+   282→
+   283→            try:
+   284→                weights_dict, _ = optimizer.calculate_optimal_weights(
+   285→                    expected_returns=mu_final,
+   286→                    target_risk=0.005,
+   287→                    weight_bounds=(-2, 2),
+   288→                )
+   289→            except Exception as e:
+   290→                logger.error(f"Optimization failed: {e}")
+   291→                return None
+   292→
+   293→            logger.info(f"Finished weights optimization: {len(weights_dict)} positions")
+   294→            return weights_dict
+   295→
+   296→        except Exception as e:
+   297→            logger.error(f"Failed to process weights: {e}")
+   298→            return None
+   299→
+   300→    async def start_websocket(self):
+   301→        """
+   302→        Main WebSocket loop for receiving kline data and generating signals.
+   303→        """
+   304→        BATCH_SIZE = 100
+   305→
+   306→        while True:
+   307→            try:
+   308→                async with websockets.connect(self.BINANCE_WS_URL) as websocket:
+   309→                    logger.info(
+   310→                        f"Connecting to Binance WS for {len(self.symbols)} symbols"
+   311→                    )
+   312→                    streams = [f"{symbol.lower()}@kline_15m" for symbol in self.symbols]
+   313→
+   314→                    # Subscribe in batches
+   315→                    for i in range(0, len(streams), BATCH_SIZE):
+   316→                        batch_streams = streams[i : i + BATCH_SIZE]
+   317→                        subscribe_message = {
+   318→                            "method": "SUBSCRIBE",
+   319→                            "params": batch_streams,
+   320→                            "id": 1,
+   321→                        }
+   322→                        await websocket.send(json.dumps(subscribe_message))
+   323→                        logger.info(
+   324→                            f"Subscribed batch {i // BATCH_SIZE + 1}: {len(batch_streams)} symbols"
+   325→                        )
+   326→                        await asyncio.sleep(0.05)
+   327→
+   328→                    logger.info(
+   329→                        f"Subscription complete for {len(self.symbols)} symbols"
+   330→                    )
+   331→
+   332→                    # Main message loop
+   333→                    while True:
+   334→                        r = await asyncio.wait_for(websocket.recv(), timeout=60 * 10)
+   335→                        data = json.loads(r)
+   336→
+   337→                        if data.get("e") == "kline":
+   338→                            kline = data["k"]
+   339→                            symbol = kline["s"]
+   340→                            kline_start_time_ms = kline["t"]
+   341→                            kline_close_flag = kline["x"]
+   342→                            current_time = pd.to_datetime(data["E"], unit="ms")
+   343→                            kline_time = pd.to_datetime(kline_start_time_ms, unit="ms")
+   344→
+   345→                            # Build kline data dict
+   346→                            new_kline_data = {
+   347→                                "id": None,
+   348→                                "open": float(kline["o"]),
+   349→                                "close": float(kline["c"]),
+   350→                                "high": float(kline["h"]),
+   351→                                "low": float(kline["l"]),
+   352→                                "volume": float(kline["v"]),
+   353→                                "level": 15,
+   354→                                "time": kline_time,
+   355→                                "symbol": symbol,
+   356→                            }
+   357→
+   358→                            # Always update last_kline with latest data (even unclosed)
+   359→                            self.last_kline[symbol] = new_kline_data
+   360→                            self.kline_updated[symbol] = True
+   361→
+   362→                            # Reset cycle flags at the start of new 15-minute cycle (0/15/30/45 min)
+   363→                            if (
+   364→                                current_time.minute % 15 == 0
+   365→                                and current_time.second <= 10
+   366→                            ):
+   367→                                self.reset_cycle_flags()
+   368→                                self.reset_kline_closed()
+   369→
+   370→                            # Trigger prediction at 14/29/44/59 min (1 minute before kline closes)
+   371→                            if (
+   372→                                current_time.minute % 15 == 14
+   373→                                and not self.prediction_triggered_this_cycle
+   374→                                and self.all_symbol_updated
+   375→                            ):
+   376→                                logger.info(
+   377→                                    f"Early prediction trigger at {current_time} (1 min before close)"
+   378→                                )
+   379→
+   380→                                # Append last_kline data to self.data for prediction
+   381→                                for sym in self.symbols:
+   382→                                    if sym not in self.last_kline:
+   383→                                        continue
+   384→                                    if self.data_appended_this_cycle.get(sym, False):
+   385→                                        continue
+   386→
+   387→                                    sym_kline = self.last_kline[sym]
+   388→                                    new_df = pd.DataFrame([sym_kline])
+   389→                                    current_df = self.data[sym]
+   390→
+   391→                                    if not current_df.empty:
+   392→                                        if "time" not in current_df.columns:
+   393→                                            current_df["time"] = current_df.index.tolist()
+   394→
+   395→                                        last_kline_time = current_df.iloc[-1]["time"]
+   396→                                        expected_next_time = last_kline_time + pd.Timedelta(
+   397→                                            minutes=15
+   398→                                        )
+   399→
+   400→                                        # Only append if time matches expected
+   401→                                        if new_df.iloc[0]["time"] == expected_next_time:
+   402→                                            combined_df = pd.concat(
+   403→                                                [current_df, new_df], ignore_index=True
+   404→                                            )
+   405→                                            self.data[sym] = combined_df
+   406→                                            self.data_appended_this_cycle[sym] = True
+   407→
+   408→                                # Calculate expected_next_time from first symbol
+   409→                                first_sym = self.symbols[0]
+   410→                                current_df = self.data[first_sym]
+   411→                                if "time" not in current_df.columns:
+   412→                                    current_df["time"] = current_df.index.tolist()
+   413→                                expected_next_time = current_df.iloc[-1]["time"]
+   414→
+   415→                                # Calculate weights
+   416→                                weights_dict = await self._process_weights(
+   417→                                    expected_next_time
+   418→                                )
+   419→
+   420→                                if weights_dict is None or not weights_dict:
+   421→                                    logger.warning(
+   422→                                        "No valid weights generated, skipping this cycle"
+   423→                                    )
+   424→                                    self.prediction_triggered_this_cycle = True
+   425→                                    continue
+   426→
+   427→                                # Build current kline Series from last_kline
+   428→                                current_kline = pd.Series(
+   429→                                    {sym: self.last_kline[sym]["close"]
+   430→                                     for sym in self.symbols if sym in self.last_kline}
+   431→                                )
+   432→
+   433→                                # Update position manager
+   434→                                self.position_manager.update_position_price(
+   435→                                    current_kline=current_kline
+   436→                                )
+   437→                                old_volume = (
+   438→                                    self.position_manager.current_trading_volume
+   439→                                )
+   440→
+   441→                                self.position_manager.update_position_with_prediction_weights(
+   442→                                    weights=weights_dict,
+   443→                                    current_kline=current_kline,
+   444→                                    current_time=expected_next_time,
+   445→                                )
+   446→                                await self.position_manager.save_state_to_redis()
+   447→
+   448→                                new_volume = (
+   449→                                    self.position_manager.current_trading_volume
+   450→                                )
+   451→                                increased_volume = new_volume - old_volume
+   452→
+   453→                                self.position_manager.insert_equity_record(
+   454→                                    increased_volume=increased_volume
+   455→                                )
+   456→
+   457→                                # Generate model_token_size
+   458→                                model_token_size = (
+   459→                                    self.position_manager.to_token_size_dict(
+   460→                                        scale=0.1
+   461→                                    )
+   462→                                )
+   463→
+   464→                                # *** KEY: Publish to Redis ***
+   465→                                success = await self._publish_target_weights(
+   466→                                    model_token_size=model_token_size,
+   467→                                    current_kline=current_kline,
+   468→                                )
+   469→
+   470→                                if success:
+   471→                                    logger.info(
+   472→                                        f"Successfully published weights for {expected_next_time}, "
+   473→                                        f"account_id={self.account_id}"
+   474→                                    )
+   475→                                else:
+   476→                                    logger.error(
+   477→                                        "Failed to publish weights to Redis"
+   478→                                    )
+   479→
+   480→                                self.prediction_triggered_this_cycle = True
+   481→
+   482→                                logger.info(
+   483→                                    f"Finished early processing for {expected_next_time}"
+   484→                                )
+   485→
+   486→                            # When kline closes, update self.data if not already appended
+   487→                            if kline_close_flag:
+   488→                                new_df = pd.DataFrame([new_kline_data])
+   489→                                current_df = self.data[symbol]
+   490→
+   491→                                if not current_df.empty:
+   492→                                    if "time" not in current_df.columns:
+   493→                                        current_df["time"] = current_df.index.tolist()
+   494→
+   495→                                    last_kline_time = current_df.iloc[-1]["time"]
+   496→                                    expected_next_time = last_kline_time + pd.Timedelta(
+   497→                                        minutes=15
+   498→                                    )
+   499→
+   500→                                    # Check if data was already appended during early prediction
+   501→                                    if self.data_appended_this_cycle.get(symbol, False):
+   502→                                        # Update the last row with final closed kline data
+   503→                                        last_idx = len(self.data[symbol]) - 1
+   504→                                        for col in ["open", "close", "high", "low", "volume"]:
+   505→                                            self.data[symbol].loc[last_idx, col] = new_kline_data[col]
+   506→                                        logger.debug(
+   507→                                            f"Updated existing kline for {symbol} at {kline_time}"
+   508→                                        )
+   509→                                    elif new_df.iloc[0]["time"] == expected_next_time:
+   510→                                        # Append new kline data
+   511→                                        combined_df = pd.concat(
+   512→                                            [current_df, new_df], ignore_index=True
+   513→                                        )
+   514→                                        self.data[symbol] = combined_df
+   515→                                    else:
+   516→                                        logger.error(
+   517→                                            f"Data gap detected for {symbol}! "
+   518→                                            f"Last: {last_kline_time}, New: {new_df.iloc[0]['time']}"
+   519→                                        )
+   520→
+   521→                                self.kline_closed[symbol] = True
+   522→
+   523→            except asyncio.TimeoutError:
+   524→                logger.info("No message received in 30 minutes, continuing...")
+   525→                continue
+   526→            except json.JSONDecodeError as e:
+   527→                logger.error(f"Failed to decode JSON: {e}")
+   528→            except Exception as e:
+   529→                logger.error(f"WebSocket error: {e}", exc_info=True)
+   530→                await asyncio.sleep(1)
+   531→
+   532→
+   533→async def run_ranker(account_id: int):
+   534→    """Entry point to run the Ranker process."""
+   535→    ranker = RankerProcess(account_id=account_id)
+   536→    await ranker.start_websocket()
+   537→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

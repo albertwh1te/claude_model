@@ -1,0 +1,210 @@
+diff --git a/commands/ml_commands.py b/commands/ml_commands.py
+index 1d6bf78..4f87d45 100644
+--- a/commands/ml_commands.py
++++ b/commands/ml_commands.py
+@@ -222,70 +222,70 @@ def train_online():
+     ).train_online(best_iteration=final_iteration)
+ 
+ 
+-@app.command("feature_4h")
+-def feature_4h():
+-    """生成4H特征数据 (使用 RankerFeature4H)"""
++@app.command("feature")
++def feature():
++
++    # symbol_set_name = "bn_lighter_local"
+     symbol_set_name = "full"
+ 
+     symbol_list = get_symbols_by_name(f"{symbol_set_name}")
+ 
+     start_time = pd.Timestamp("2024-05-01 00:00:00")
+ 
+-    end_time = pd.Timestamp(datetime.now().date()) - pd.Timedelta(days=1)
++    # end_time = pd.Timestamp("2025-12-08 00:00:00")
+ 
+-    logger.info(f"[4H] Generating feature data. from {start_time} to {end_time}")
++    end_time = pd.Timestamp(datetime.now().date()) - pd.Timedelta(days=1)
++    logger.info(f"Generating feature data. from {start_time} to {end_time}")
+ 
+-    # 使用 RankerFeature4H
+-    feature = RankerFeature4H(
++    feature = RankerFeature(
+         symbols=symbol_list,
+         start_time=start_time,
+         end_time=end_time,
+         minute_level=15,
+     )
+     feature = feature.create_feature(save_token_feature=False)
+-    feature_path = f"tmp_feature_4h_{symbol_set_name}.csv"
++    feature_path = f"tmp_feature_{symbol_set_name}.csv"
+     feature.to_csv(feature_path)
++    feature.to_csv(TEMP_FEATURE)
+ 
+-    logger.info(f"[4H] Feature saved to {feature_path}")
+     # @info show feature names after generate feature
+     show_feature_names()
+ 
+ 
+-@app.command("feature")
+-def feature():
++# ==============================================================================
++# 4H 相关命令 (4-Hour Prediction Pipeline)
++# ==============================================================================
+ 
+-    # symbol_set_name = "bn_lighter_local"
++
++@app.command("feature_4h")
++def feature_4h():
++    """生成4H特征数据 (使用 RankerFeature4H)"""
+     symbol_set_name = "full"
+ 
+     symbol_list = get_symbols_by_name(f"{symbol_set_name}")
+ 
+     start_time = pd.Timestamp("2024-05-01 00:00:00")
+ 
+-    # end_time = pd.Timestamp("2025-12-08 00:00:00")
+-
+     end_time = pd.Timestamp(datetime.now().date()) - pd.Timedelta(days=1)
+-    logger.info(f"Generating feature data. from {start_time} to {end_time}")
+ 
+-    feature = RankerFeature(
++    logger.info(f"[4H] Generating feature data. from {start_time} to {end_time}")
++
++    # 使用 RankerFeature4H
++    feature = RankerFeature4H(
+         symbols=symbol_list,
+         start_time=start_time,
+         end_time=end_time,
+         minute_level=15,
+     )
+     feature = feature.create_feature(save_token_feature=False)
+-    feature_path = f"tmp_feature_{symbol_set_name}.csv"
++    feature_path = f"tmp_feature_4h_{symbol_set_name}.csv"
+     feature.to_csv(feature_path)
+-    feature.to_csv(TEMP_FEATURE)
+ 
++    logger.info(f"[4H] Feature saved to {feature_path}")
+     # @info show feature names after generate feature
+     show_feature_names()
+ 
+ 
+-# ==============================================================================
+-# 4H 相关命令 (4-Hour Prediction Pipeline)
+-# ==============================================================================
+-
+-
+ @app.command("tune_regression_predict_4h")
+ @notify_me_command("finished 4H tune and train")
+ def tune_regression_predict_4h(times: int = 500):
+@@ -301,9 +301,7 @@ def tune_regression_predict_4h(times: int = 500):
+     """
+     symbol_list_name = "full"
+     symbol_list = get_symbols_by_name(f"{symbol_list_name}")
+-    logger.info(
+-        f"[4H] Symbol list: {symbol_list_name}, total: {len(symbol_list)}"
+-    )
++    logger.info(f"[4H] Symbol list: {symbol_list_name}, total: {len(symbol_list)}")
+ 
+     # 4H 版本使用 target_4hour_zscore
+     target_column = "target_4hour_zscore"
+@@ -328,16 +326,20 @@ def tune_regression_predict_4h(times: int = 500):
+     hyper_parameters.update(final_params)
+     logger.info(f"[4H] Final hyper parameters: {hyper_parameters}")
+ 
++    save_path = "ranker_model_4h_predictions.feather"
++    pkl_path = "regression_model_4h.pkl"
+     RegressionModelTrain(
+         hyper_parameters=hyper_parameters,
+         target_column=target_column,
+         feature_file_name=feature_file_name,
+-    ).train(symbol_list=symbol_list)
++    ).train(symbol_list=symbol_list, pkl_path=pkl_path, save_path=save_path)
++
++    logger.info(f"[4H] Finished training final model, saved to {pkl_path}")
+ 
+ 
+ @app.command("generate_weights_4h")
+ def generate_weights_4h(
+-    prediction_file: str = "regression_model_predictions.feather",
++    prediction_file: str = "ranker_model_4h_predictions.feather",
+     output_file: str = "ranker_weight_4h.feather",
+ ):
+     """
+@@ -360,7 +362,9 @@ def generate_weights_4h(
+     # 使用 4H 版本的权重生成器
+     weight_generator = RegressionPortfolioOptimizerGenerator4H()
+ 
+-    logger.info(f"[4H] Generating weights using RegressionPortfolioOptimizerGenerator4H")
++    logger.info(
++        f"[4H] Generating weights using RegressionPortfolioOptimizerGenerator4H"
++    )
+ 
+     ranker_weight = weight_generator.generate_weights(
+         ranker_probability=ranker_probability,
+@@ -446,7 +450,9 @@ def pipeline_4h(
+ 
+     # Step 2: 调优并训练模型
+     if not skip_tune:
+-        logger.info(f"[4H Pipeline] Step 2/4: Tuning and training (trials={tune_trials})...")
++        logger.info(
++            f"[4H Pipeline] Step 2/4: Tuning and training (trials={tune_trials})..."
++        )
+         tune_regression_predict_4h(times=tune_trials)
+     else:
+         logger.info("[4H Pipeline] Step 2/4: Skipping tuning, using default params")
+@@ -454,12 +460,14 @@ def pipeline_4h(
+         symbol_list = get_symbols_by_name("full")
+         feature_file_name = "tmp_feature_4h_full.csv"
+         target_column = "target_4hour_zscore"
++        pkl_path = "regression_model_4h.pkl"
++        save_path = "ranker_model_4h_predictions.feather"
+ 
+         RegressionModelTrain(
+             hyper_parameters=RANKER_REGRESSION_BASE_PARAMETERS,
+             target_column=target_column,
+             feature_file_name=feature_file_name,
+-        ).train(symbol_list=symbol_list)
++        ).train(symbol_list=symbol_list, pkl_path=pkl_path, save_path=save_path)
+ 
+     # Step 3: 生成权重
+     logger.info("[4H Pipeline] Step 3/4: Generating weights...")
+@@ -474,4 +482,4 @@ def pipeline_4h(
+     logger.info(f"[4H Pipeline] Final metrics: {metrics}")
+     logger.info("=" * 60)
+ 
+-    return metrics
+\ No newline at end of file
++    return metrics
+diff --git a/ranker_model/regression_train.py b/ranker_model/regression_train.py
+index 4e0a71d..74511df 100644
+--- a/ranker_model/regression_train.py
++++ b/ranker_model/regression_train.py
+@@ -35,7 +35,12 @@ class RegressionModelTrain:
+                 f"load feature from {feature_file_name} full feature start time: {df['time'].min()} end time: {df['time'].max()} "
+             )
+ 
+-    def train(self, symbol_list: Optional[List[str]] = None):
++    def train(
++        self,
++        symbol_list: Optional[List[str]] = None,
++        pkl_path: Optional[str] = "regression_model_1h.pkl",
++        save_path: Optional[str] = "ranker_model_1h_predictions.feather",
++    ):
+ 
+         # --- 2. 稳健的时间序列数据划分 (Train / Validation / Test) ---
+         logger.info("Splitting data into train, validation, and test sets...")
+@@ -118,7 +123,6 @@ class RegressionModelTrain:
+             ],
+         )
+ 
+-        pkl_path = "regression_model_1h.pkl"
+         joblib.dump(model, pkl_path)
+         logger.info(f"Final model saved to {pkl_path}")
+ 
+@@ -136,7 +140,6 @@ class RegressionModelTrain:
+         logger.info(
+             f"predicted_probability info :{test_df['predicted_probability'].describe()}"
+         )
+-        save_path = "ranker_model_1h_predictions.feather"
+         test_df.to_feather(save_path)
+         logger.info(f"Predictions saved to {save_path}")

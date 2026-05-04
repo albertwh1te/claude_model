@@ -1,0 +1,802 @@
+     1→# Ranker-Executor 分布式架构文档
+     2→
+     3→本文档描述了 `OnlineTradingV3` 的 **生产者-消费者 (Producer-Consumer)** 架构重构，将原有的单体逻辑拆分为两个独立进程，实现计算与执行的物理分离。
+     4→
+     5→## 目录
+     6→
+     7→- [架构概览](#架构概览)
+     8→- [设计动机](#设计动机)
+     9→- [通信协议](#通信协议)
+    10→- [数据契约](#数据契约)
+    11→- [模块详解](#模块详解)
+    12→- [使用指南](#使用指南)
+    13→- [故障恢复](#故障恢复)
+    14→- [测试验证](#测试验证)
+    15→
+    16→---
+    17→
+    18→## 架构概览
+    19→
+    20→### 系统架构图
+    21→
+    22→```
+    23→┌─────────────────────────────────────────────────────────────────────────────┐
+    24→│                           Ranker-Executor 架构                               │
+    25→└─────────────────────────────────────────────────────────────────────────────┘
+    26→
+    27→     ┌─────────────────────┐                      ┌─────────────────────┐
+    28→     │   RankerProcess     │                      │   ExecutorProcess   │
+    29→     │   (Process A)       │                      │   (Process B)       │
+    30→     │   计算进程           │                      │   执行进程           │
+    31→     ├─────────────────────┤                      ├─────────────────────┤
+    32→     │                     │                      │                     │
+    33→     │ ┌─────────────────┐ │                      │ ┌─────────────────┐ │
+    34→     │ │ Binance WS      │ │                      │ │ Pull-on-Start   │ │
+    35→     │ │ K线数据接收      │ │                      │ │ 启动即拉取       │ │
+    36→     │ └────────┬────────┘ │                      │ └────────┬────────┘ │
+    37→     │          ▼          │                      │          │          │
+    38→     │ ┌─────────────────┐ │                      │          │          │
+    39→     │ │ Feature Engine  │ │                      │          ▼          │
+    40→     │ │ 特征工程计算     │ │      Redis           │ ┌─────────────────┐ │
+    41→     │ └────────┬────────┘ │   ┌──────────┐       │ │ Subscribe Loop  │ │
+    42→     │          ▼          │   │          │       │ │ 信号订阅循环     │ │
+    43→     │ ┌─────────────────┐ │   │  ① SET   │       │ └────────┬────────┘ │
+    44→     │ │ ML Prediction   │ │   │          │       │          │          │
+    45→     │ │ 模型预测        │ │───│──────────│──────▶│          │          │
+    46→     │ └────────┬────────┘ │   │          │       │          ▼          │
+    47→     │          ▼          │   │ ② PUBLISH│       │ ┌─────────────────┐ │
+    48→     │ ┌─────────────────┐ │   │          │       │ │    ③ GET        │ │
+    49→     │ │ Portfolio Opt   │ │   └──────────┘       │ │   获取权重数据   │ │
+    50→     │ │ 组合优化        │ │                      │ └────────┬────────┘ │
+    51→     │ └────────┬────────┘ │                      │          │          │
+    52→     │          ▼          │                      │          ▼          │
+    53→     │ ┌─────────────────┐ │                      │ ┌─────────────────┐ │
+    54→     │ │ Publish Weights │ │                      │ │ OrderExecutor   │ │
+    55→     │ │ 发布目标权重     │ │                      │ │ 订单执行器       │ │
+    56→     │ └─────────────────┘ │                      │ └─────────────────┘ │
+    57→     │                     │                      │                     │
+    58→     └─────────────────────┘                      └─────────────────────┘
+    59→```
+    60→
+    61→### 数据流向
+    62→
+    63→```
+    64→Binance WebSocket
+    65→       │
+    66→       ▼
+    67→  ┌─────────┐     ┌─────────┐     ┌─────────┐     ┌─────────┐
+    68→  │  Kline  │────▶│ Feature │────▶│  Model  │────▶│ Weights │
+    69→  │  Data   │     │  Engine │     │ Predict │     │  Dict   │
+    70→  └─────────┘     └─────────┘     └─────────┘     └────┬────┘
+    71→                                                       │
+    72→                         ┌─────────────────────────────┘
+    73→                         ▼
+    74→                  ┌─────────────┐
+    75→                  │    Redis    │
+    76→                  │ ┌─────────┐ │
+    77→                  │ │   SET   │ │◀──── strategy:target_weights:{account_id}
+    78→                  │ └─────────┘ │
+    79→                  │ ┌─────────┐ │
+    80→                  │ │ PUBLISH │ │◀──── signal:rebalance:{account_id}
+    81→                  │ └─────────┘ │
+    82→                  └──────┬──────┘
+    83→                         │
+    84→                         ▼
+    85→                  ┌─────────────┐
+    86→                  │  Executor   │
+    87→                  │ ┌─────────┐ │
+    88→                  │ │   GET   │ │────▶ 获取最新权重
+    89→                  │ └─────────┘ │
+    90→                  │ ┌─────────┐ │
+    91→                  │ │ Execute │ │────▶ Binance API
+    92→                  │ └─────────┘ │
+    93→                  └─────────────┘
+    94→```
+    95→
+    96→---
+    97→
+    98→## 设计动机
+    99→
+   100→### 原有架构的问题
+   101→
+   102→原 `OnlineTradingV3` 是一个单体架构，存在以下问题：
+   103→
+   104→| 问题 | 描述 | 影响 |
+   105→|------|------|------|
+   106→| **耦合度高** | 计算和执行逻辑在同一进程 | 难以独立扩展和部署 |
+   107→| **单点故障** | 任一环节失败导致整体失败 | 系统可用性低 |
+   108→| **重启丢失** | 进程重启后丢失当前周期的目标 | 踏空交易机会 |
+   109→| **难以测试** | 计算和执行逻辑混合 | 单元测试复杂 |
+   110→
+   111→### 新架构的优势
+   112→
+   113→| 优势 | 描述 |
+   114→|------|------|
+   115→| **物理分离** | Ranker 和 Executor 可独立部署在不同服务器 |
+   116→| **故障隔离** | Executor 崩溃不影响 Ranker 计算 |
+   117→| **状态恢复** | Pull-on-Start 机制确保重启后不丢失信号 |
+   118→| **水平扩展** | 可部署多个 Executor 对应不同交易所 |
+   119→| **易于测试** | 通过 Mock Redis 即可完整测试通信流程 |
+   120→
+   121→---
+   122→
+   123→## 通信协议
+   124→
+   125→### Last Value Cache + Signal 模式
+   126→
+   127→我们采用 **"Redis SET 存状态 + Redis PUBLISH 发信号"** 的模式，而非单纯的 Pub/Sub 数据传输。
+   128→
+   129→#### 为什么不用纯 Pub/Sub？
+   130→
+   131→| 方案 | 问题 |
+   132→|------|------|
+   133→| 纯 Pub/Sub | 如果 Executor 在 PUBLISH 时未订阅，消息丢失 |
+   134→| 纯 Polling | 频繁轮询造成资源浪费 |
+   135→| **Last Value Cache + Signal** | 数据持久化 + 实时通知，兼顾可靠性和实时性 |
+   136→
+   137→### Redis 操作序列
+   138→
+   139→#### Ranker (生产者) 操作顺序
+   140→
+   141→```python
+   142→# ⚠️ 顺序至关重要：必须先 SET 后 PUBLISH
+   143→# Step 1: SET - 存储目标权重 (Last Value Cache)
+   144→await redis.set(f"strategy:target_weights:{account_id}", payload.to_json())
+   145→
+   146→# Step 2: PUBLISH - 发送信号通知 Executor
+   147→await redis.publish(f"signal:rebalance:{account_id}", "update")
+   148→```
+   149→
+   150→#### Executor (消费者) 操作
+   151→
+   152→```python
+   153→# 启动阶段 (Pull-on-Start)
+   154→data = await redis.get(f"strategy:target_weights:{account_id}")
+   155→if data:
+   156→    execute_rebalance(data)
+   157→
+   158→# 运行阶段 (Subscribe Loop)
+   159→async for message in pubsub.listen():
+   160→    if message["data"] == "update":
+   161→        data = await redis.get(f"strategy:target_weights:{account_id}")
+   162→        execute_rebalance(data)
+   163→```
+   164→
+   165→### Redis Key 规范
+   166→
+   167→| 类型 | Key 格式 | 示例 |
+   168→|------|----------|------|
+   169→| 存储键 | `strategy:target_weights:{account_id}` | `strategy:target_weights:1` |
+   170→| 信号频道 | `signal:rebalance:{account_id}` | `signal:rebalance:1` |
+   171→| 信号消息 | `"update"` | 固定字符串 |
+   172→
+   173→---
+   174→
+   175→## 数据契约
+   176→
+   177→### TargetWeightsPayload 结构
+   178→
+   179→```python
+   180→@dataclass
+   181→class TargetWeightsPayload:
+   182→    model_token_size: Dict[str, float]  # 目标仓位大小 (正=多, 负=空)
+   183→    current_kline: Dict[str, float]      # 当前价格
+   184→    timestamp: str                        # ISO 格式时间戳
+   185→    account_id: int                       # 账户 ID
+   186→```
+   187→
+   188→### JSON 示例
+   189→
+   190→```json
+   191→{
+   192→    "model_token_size": {
+   193→        "BTCUSDT": 0.5,
+   194→        "ETHUSDT": -0.2,
+   195→        "SOLUSDT": 0.15
+   196→    },
+   197→    "current_kline": {
+   198→        "BTCUSDT": 45000.0,
+   199→        "ETHUSDT": 3000.0,
+   200→        "SOLUSDT": 120.0
+   201→    },
+   202→    "timestamp": "2024-12-25T08:00:00+00:00",
+   203→    "account_id": 1
+   204→}
+   205→```
+   206→
+   207→### 字段说明
+   208→
+   209→| 字段 | 类型 | 说明 |
+   210→|------|------|------|
+   211→| `model_token_size` | `Dict[str, float]` | 目标持仓数量，正数=多头，负数=空头 |
+   212→| `current_kline` | `Dict[str, float]` | 当前收盘价，用于计算订单价格 |
+   213→| `timestamp` | `str` | 信号生成时间 (ISO 8601 格式) |
+   214→| `account_id` | `int` | 账户标识，支持多账户 |
+   215→
+   216→---
+   217→
+   218→## 模块详解
+   219→
+   220→### RankerProcess (online/ranker_process.py)
+   221→
+   222→**职责**：接收市场数据、计算特征、模型预测、发布目标权重
+   223→
+   224→#### 提前触发预测机制
+   225→
+   226→Ranker 采用**提前 1 分钟触发**策略，在 K 线关闭前就开始预测和数据处理，以减少延迟。
+   227→
+   228→##### 触发时间
+   229→
+   230→| K线周期 | K线关闭时间 | 预测触发时间 | 提前量 |
+   231→|---------|-------------|--------------|--------|
+   232→| 00:00-00:15 | 00:15:00 | **00:14:xx** | 1 分钟 |
+   233→| 00:15-00:30 | 00:30:00 | **00:29:xx** | 1 分钟 |
+   234→| 00:30-00:45 | 00:45:00 | **00:44:xx** | 1 分钟 |
+   235→| 00:45-01:00 | 01:00:00 | **00:59:xx** | 1 分钟 |
+   236→
+   237→##### 触发条件
+   238→
+   239→```python
+   240→if (
+   241→    current_time.minute % 15 == 14           # 条件1: 14/29/44/59 分
+   242→    and not self.prediction_triggered_this_cycle  # 条件2: 本周期未触发过
+   243→    and self.all_symbol_updated              # 条件3: 所有symbol都更新了
+   244→):
+   245→```
+   246→
+   247→| 条件 | 说明 |
+   248→|------|------|
+   249→| `minute % 15 == 14` | 分钟数对 15 取余等于 14，即 14/29/44/59 分 |
+   250→| `prediction_triggered_this_cycle` | 防止同一分钟内重复触发 |
+   251→| `all_symbol_updated` | 确保所有交易对都收到了当前周期的数据 |
+   252→
+   253→##### 周期状态管理
+   254→
+   255→```
+   256→00:00:05 → reset_cycle_flags() 重置所有标志
+   257→           - kline_updated = {sym: False, ...}
+   258→           - prediction_triggered_this_cycle = False
+   259→           - data_appended_this_cycle = {sym: False, ...}
+   260→
+   261→00:01~13 → 收到各 symbol 的 K线更新
+   262→           - last_kline[symbol] = 最新数据
+   263→           - kline_updated[symbol] = True
+   264→
+   265→00:14:01 → 触发条件满足，开始预测
+   266→           - 将 last_kline 追加到 self.data
+   267→           - 调用 _process_weights()
+   268→           - 发布到 Redis
+   269→           - prediction_triggered_this_cycle = True
+   270→
+   271→00:15:00 → K线关闭
+   272→           - 更新 self.data 中的数据（非追加）
+   273→           - kline_closed[symbol] = True
+   274→
+   275→00:15:05 → 进入新周期，重置标志
+   276→```
+   277→
+   278→##### 数据同步逻辑
+   279→
+   280→由于预测在 K 线关闭前触发，需要处理数据的追加和更新：
+   281→
+   282→```python
+   283→# 提前预测时：追加 last_kline 到 self.data
+   284→if not self.data_appended_this_cycle.get(sym, False):
+   285→    self.data[sym] = pd.concat([current_df, new_df], ignore_index=True)
+   286→    self.data_appended_this_cycle[sym] = True
+   287→
+   288→# K线关闭时：更新已追加的数据（最终价格可能有变化）
+   289→if self.data_appended_this_cycle.get(symbol, False):
+   290→    # 更新最后一行
+   291→    last_idx = len(self.data[symbol]) - 1
+   292→    for col in ["open", "close", "high", "low", "volume"]:
+   293→        self.data[symbol].loc[last_idx, col] = new_kline_data[col]
+   294→else:
+   295→    # 正常追加
+   296→    self.data[symbol] = pd.concat([current_df, new_df], ignore_index=True)
+   297→```
+   298→
+   299→#### 核心流程
+   300→
+   301→```
+   302→start_websocket()
+   303→    │
+   304→    ├──► 连接 Binance WebSocket
+   305→    │
+   306→    ├──► 接收 15m K线数据
+   307→    │       │
+   308→    │       ├──► 更新 last_kline[symbol]
+   309→    │       └──► 标记 kline_updated[symbol] = True
+   310→    │
+   311→    ├──► 在 14/29/44/59 分 (提前1分钟触发):
+   312→    │       │
+   313→    │       ├──► 将 last_kline 追加到 self.data
+   314→    │       │
+   315→    │       ├──► _process_weights()
+   316→    │       │       ├── 特征工程 (RankerFeature)
+   317→    │       │       ├── 模型预测 (LightGBM)
+   318→    │       │       └── 组合优化 (RegressionPortfolioOptimizer)
+   319→    │       │
+   320→    │       └──► _publish_target_weights()
+   321→    │               ├── SET redis_key payload
+   322→    │               └── PUBLISH redis_channel "update"
+   323→    │
+   324→    ├──► K线关闭时: 更新 self.data 中的最终数据
+   325→    │
+   326→    └──► 新周期开始 (0/15/30/45分): 重置状态
+   327→```
+   328→
+   329→#### 关键代码位置
+   330→
+   331→| 功能 | 文件:行号 |
+   332→|------|----------|
+   333→| 初始化周期状态 | `ranker_process.py:102-107` |
+   334→| 重置周期标志 | `ranker_process.py:150-154` |
+   335→| all_symbol_updated 属性 | `ranker_process.py:156-159` |
+   336→| 提前触发条件判断 | `ranker_process.py:370-374` |
+   337→| 发布权重 | `ranker_process.py:185-208` |
+   338→| WebSocket 主循环 | `ranker_process.py:299-525` |
+   339→
+   340→### ExecutorProcess (online/executor_process.py)
+   341→
+   342→**职责**：订阅信号、获取目标权重、执行交易
+   343→
+   344→#### 核心流程
+   345→
+   346→```
+   347→start()
+   348→    │
+   349→    ├──► _pull_on_start()  # 启动即拉取
+   350→    │       └── GET redis_key
+   351→    │           └── _execute_rebalance() if data exists
+   352→    │
+   353→    └──► _subscribe_loop()  # 信号订阅循环
+   354→            │
+   355→            └──► for message in pubsub.listen():
+   356→                    │
+   357→                    └── if message == "update":
+   358→                            ├── GET redis_key
+   359→                            └── _execute_rebalance()
+   360→```
+   361→
+   362→#### 关键特性
+   363→
+   364→| 特性 | 说明 |
+   365→|------|------|
+   366→| **Pull-on-Start** | 启动时主动拉取，防止重启踏空 |
+   367→| **去重机制** | 基于 timestamp 去重，避免重复执行 |
+   368→| **优雅降级** | Redis 连接失败时自动重试 |
+   369→
+   370→---
+   371→
+   372→## 使用指南
+   373→
+   374→### CLI 命令概览
+   375→
+   376→新增的 CLI 命令已集成到 `main.py online` 子命令中：
+   377→
+   378→```bash
+   379→# 查看所有 online 子命令
+   380→python main.py online --help
+   381→
+   382→# 查看特定命令的帮助
+   383→python main.py online ranker --help
+   384→python main.py online executor --help
+   385→python main.py online distributed --help
+   386→```
+   387→
+   388→---
+   389→
+   390→### 命令详解
+   391→
+   392→#### 1. `online ranker` - 启动 Ranker 进程
+   393→
+   394→启动计算进程 (Process A)，负责接收市场数据、计算特征、模型预测、发布权重。
+   395→
+   396→**语法：**
+   397→```bash
+   398→python main.py online ranker <account_id>
+   399→```
+   400→
+   401→**参数：**
+   402→| 参数 | 类型 | 必填 | 说明 |
+   403→|------|------|------|------|
+   404→| `account_id` | int | 是 | 账户 ID，用于区分不同策略实例 |
+   405→
+   406→**示例：**
+   407→```bash
+   408→# 启动账户 1 的 Ranker
+   409→python main.py online ranker 1
+   410→
+   411→# 启动账户 2 的 Ranker
+   412→python main.py online ranker 2
+   413→```
+   414→
+   415→**输出日志：**
+   416→```
+   417→INFO - Starting Ranker process for account_id=1
+   418→INFO - Redis communication protocol:
+   419→INFO -   - Storage Key: strategy:target_weights:1
+   420→INFO -   - Signal Channel: signal:rebalance:1
+   421→INFO - RankerProcess initialized for account_id=1
+   422→```
+   423→
+   424→---
+   425→
+   426→#### 2. `online executor` - 启动 Executor 进程
+   427→
+   428→启动执行进程 (Process B)，负责订阅信号、获取权重、执行交易。
+   429→
+   430→**语法：**
+   431→```bash
+   432→python main.py online executor <account_id> [OPTIONS]
+   433→```
+   434→
+   435→**参数：**
+   436→| 参数 | 类型 | 必填 | 默认值 | 说明 |
+   437→|------|------|------|--------|------|
+   438→| `account_id` | int | 是 | - | 账户 ID |
+   439→| `--exchange`, `-e` | str | 否 | `main` | 交易所账户名称 |
+   440→
+   441→**示例：**
+   442→```bash
+   443→# 使用默认交易所账户 (main)
+   444→python main.py online executor 1
+   445→
+   446→# 指定交易所子账户
+   447→python main.py online executor 1 --exchange sub_account
+   448→python main.py online executor 1 -e sub_account
+   449→
+   450→# 多个账户使用不同交易所账户
+   451→python main.py online executor 1 -e main
+   452→python main.py online executor 2 -e hedge_account
+   453→```
+   454→
+   455→**输出日志：**
+   456→```
+   457→INFO - Starting Executor process for account_id=1
+   458→INFO - Exchange account: main
+   459→INFO - Redis communication protocol:
+   460→INFO -   - Storage Key: strategy:target_weights:1
+   461→INFO -   - Signal Channel: signal:rebalance:1
+   462→INFO - Pull-on-Start enabled: Will fetch pending weights on startup
+   463→INFO - ExecutorProcess initialized for account_id=1
+   464→```
+   465→
+   466→---
+   467→
+   468→#### 3. `online distributed` - 统一分布式启动命令
+   469→
+   470→提供统一入口，支持多种启动模式。
+   471→
+   472→**语法：**
+   473→```bash
+   474→python main.py online distributed <account_id> [OPTIONS]
+   475→```
+   476→
+   477→**参数：**
+   478→| 参数 | 类型 | 必填 | 默认值 | 说明 |
+   479→|------|------|------|--------|------|
+   480→| `account_id` | int | 是 | - | 账户 ID |
+   481→| `--mode`, `-m` | str | 否 | `both` | 启动模式: `ranker`, `executor`, `both` |
+   482→| `--exchange`, `-e` | str | 否 | `main` | 交易所账户名称 (仅 executor 模式) |
+   483→
+   484→**示例：**
+   485→```bash
+   486→# 仅启动 Ranker
+   487→python main.py online distributed 1 --mode ranker
+   488→python main.py online distributed 1 -m ranker
+   489→
+   490→# 仅启动 Executor
+   491→python main.py online distributed 1 --mode executor
+   492→python main.py online distributed 1 -m executor --exchange sub_account
+   493→
+   494→# 同时启动两者 (仅用于本地测试，生产环境请分开启动)
+   495→python main.py online distributed 1 --mode both
+   496→```
+   497→
+   498→---
+   499→
+   500→### CLI 命令速查表
+   501→
+   502→| 命令 | 用途 | 示例 |
+   503→|------|------|------|
+   504→| `online ranker <id>` | 启动 Ranker | `python main.py online ranker 1` |
+   505→| `online executor <id>` | 启动 Executor (默认账户) | `python main.py online executor 1` |
+   506→| `online executor <id> -e <name>` | 启动 Executor (指定账户) | `python main.py online executor 1 -e sub` |
+   507→| `online distributed <id> -m ranker` | 分布式启动 Ranker | `python main.py online distributed 1 -m ranker` |
+   508→| `online distributed <id> -m executor` | 分布式启动 Executor | `python main.py online distributed 1 -m executor` |
+   509→| `online distributed <id> -m both` | 本地测试 (同时启动) | `python main.py online distributed 1 -m both` |
+   510→
+   511→---
+   512→
+   513→### 生产环境部署
+   514→
+   515→#### 单账户部署
+   516→
+   517→```bash
+   518→# Terminal 1: 启动 Ranker
+   519→python main.py online ranker 1
+   520→
+   521→# Terminal 2: 启动 Executor
+   522→python main.py online executor 1
+   523→```
+   524→
+   525→#### 多账户部署
+   526→
+   527→```bash
+   528→# 账户 1 - 主策略
+   529→Terminal 1: python main.py online ranker 1
+   530→Terminal 2: python main.py online executor 1 -e main
+   531→
+   532→# 账户 2 - 对冲策略
+   533→Terminal 3: python main.py online ranker 2
+   534→Terminal 4: python main.py online executor 2 -e hedge_account
+   535→```
+   536→
+   537→#### 使用 nohup 后台运行
+   538→
+   539→```bash
+   540→# 后台启动 Ranker
+   541→nohup python main.py online ranker 1 > logs/ranker_1.log 2>&1 &
+   542→
+   543→# 后台启动 Executor
+   544→nohup python main.py online executor 1 > logs/executor_1.log 2>&1 &
+   545→
+   546→# 查看进程
+   547→ps aux | grep "online ranker\|online executor"
+   548→```
+   549→
+   550→#### 使用 Screen/Tmux
+   551→
+   552→```bash
+   553→# 创建 Ranker session
+   554→screen -S ranker_1
+   555→python main.py online ranker 1
+   556→# Ctrl+A, D 退出
+   557→
+   558→# 创建 Executor session
+   559→screen -S executor_1
+   560→python main.py online executor 1
+   561→# Ctrl+A, D 退出
+   562→
+   563→# 重新连接
+   564→screen -r ranker_1
+   565→screen -r executor_1
+   566→```
+   567→
+   568→---
+   569→
+   570→### Systemd 服务配置 (推荐生产环境)
+   571→
+   572→#### Ranker 服务模板
+   573→
+   574→```ini
+   575→# /etc/systemd/system/trading-ranker@.service
+   576→[Unit]
+   577→Description=Trading Ranker Process for Account %i
+   578→After=network.target redis.service
+   579→Wants=redis.service
+   580→
+   581→[Service]
+   582→Type=simple
+   583→User=trading
+   584→Group=trading
+   585→WorkingDirectory=/opt/hyperliquid_analyse
+   586→Environment="PATH=/opt/hyperliquid_analyse/venv/bin"
+   587→ExecStart=/opt/hyperliquid_analyse/venv/bin/python main.py online ranker %i
+   588→Restart=always
+   589→RestartSec=10
+   590→StandardOutput=append:/var/log/trading/ranker_%i.log
+   591→StandardError=append:/var/log/trading/ranker_%i.error.log
+   592→
+   593→[Install]
+   594→WantedBy=multi-user.target
+   595→```
+   596→
+   597→#### Executor 服务模板
+   598→
+   599→```ini
+   600→# /etc/systemd/system/trading-executor@.service
+   601→[Unit]
+   602→Description=Trading Executor Process for Account %i
+   603→After=network.target redis.service trading-ranker@%i.service
+   604→Wants=redis.service
+   605→
+   606→[Service]
+   607→Type=simple
+   608→User=trading
+   609→Group=trading
+   610→WorkingDirectory=/opt/hyperliquid_analyse
+   611→Environment="PATH=/opt/hyperliquid_analyse/venv/bin"
+   612→ExecStart=/opt/hyperliquid_analyse/venv/bin/python main.py online executor %i
+   613→Restart=always
+   614→RestartSec=10
+   615→StandardOutput=append:/var/log/trading/executor_%i.log
+   616→StandardError=append:/var/log/trading/executor_%i.error.log
+   617→
+   618→[Install]
+   619→WantedBy=multi-user.target
+   620→```
+   621→
+   622→#### Systemd 管理命令
+   623→
+   624→```bash
+   625→# 启动服务
+   626→sudo systemctl start trading-ranker@1
+   627→sudo systemctl start trading-executor@1
+   628→
+   629→# 停止服务
+   630→sudo systemctl stop trading-ranker@1
+   631→sudo systemctl stop trading-executor@1
+   632→
+   633→# 重启服务
+   634→sudo systemctl restart trading-ranker@1
+   635→sudo systemctl restart trading-executor@1
+   636→
+   637→# 查看状态
+   638→sudo systemctl status trading-ranker@1
+   639→sudo systemctl status trading-executor@1
+   640→
+   641→# 开机自启
+   642→sudo systemctl enable trading-ranker@1
+   643→sudo systemctl enable trading-executor@1
+   644→
+   645→# 查看日志
+   646→sudo journalctl -u trading-ranker@1 -f
+   647→sudo journalctl -u trading-executor@1 -f
+   648→```
+   649→
+   650→---
+   651→
+   652→### Supervisor 配置 (备选方案)
+   653→
+   654→```ini
+   655→# /etc/supervisor/conf.d/trading.conf
+   656→
+   657→[program:ranker_1]
+   658→command=/opt/hyperliquid_analyse/venv/bin/python main.py online ranker 1
+   659→directory=/opt/hyperliquid_analyse
+   660→user=trading
+   661→autostart=true
+   662→autorestart=true
+   663→stderr_logfile=/var/log/trading/ranker_1.err.log
+   664→stdout_logfile=/var/log/trading/ranker_1.out.log
+   665→
+   666→[program:executor_1]
+   667→command=/opt/hyperliquid_analyse/venv/bin/python main.py online executor 1
+   668→directory=/opt/hyperliquid_analyse
+   669→user=trading
+   670→autostart=true
+   671→autorestart=true
+   672→stderr_logfile=/var/log/trading/executor_1.err.log
+   673→stdout_logfile=/var/log/trading/executor_1.out.log
+   674→
+   675→[group:trading_1]
+   676→programs=ranker_1,executor_1
+   677→```
+   678→
+   679→```bash
+   680→# Supervisor 管理命令
+   681→sudo supervisorctl reread
+   682→sudo supervisorctl update
+   683→sudo supervisorctl start trading_1:*
+   684→sudo supervisorctl stop trading_1:*
+   685→sudo supervisorctl status
+   686→```
+   687→
+   688→---
+   689→
+   690→## 故障恢复
+   691→
+   692→### 场景 1: Executor 重启
+   693→
+   694→```
+   695→时间线:
+   696→  T0: Ranker 发布信号 (SET + PUBLISH)
+   697→  T1: Executor 崩溃
+   698→  T2: Executor 重启
+   699→  T3: Pull-on-Start 执行 GET
+   700→  T4: 获取 T0 的权重数据
+   701→  T5: 执行交易 ✓
+   702→```
+   703→
+   704→**结论**：不会丢失信号，因为数据存储在 Redis 中。
+   705→
+   706→### 场景 2: Ranker 重启
+   707→
+   708→```
+   709→时间线:
+   710→  T0: Ranker 崩溃
+   711→  T1: Ranker 重启
+   712→  T2: 等待下一个 15m K线周期
+   713→  T3: 正常发布新信号
+   714→```
+   715→
+   716→**结论**：最多丢失一个周期的信号。
+   717→
+   718→### 场景 3: Redis 连接失败
+   719→
+   720→```python
+   721→# RankerProcess 中的错误处理
+   722→try:
+   723→    await redis.set(self.redis_key, payload.to_json())
+   724→    await redis.publish(self.redis_channel, "update")
+   725→except Exception as e:
+   726→    logger.error(f"Failed to publish to Redis: {e}")
+   727→    return False  # 返回失败状态，不会导致进程崩溃
+   728→```
+   729→
+   730→**结论**：记录错误日志，等待下一周期重试。
+   731→
+   732→---
+   733→
+   734→## 测试验证
+   735→
+   736→### 运行测试
+   737→
+   738→```bash
+   739→# 运行所有 Ranker-Executor 测试
+   740→pytest tests/unit/test_ranker_executor.py -v
+   741→
+   742→# 运行特定测试
+   743→pytest tests/unit/test_ranker_executor.py::TestEndToEndFlow -v
+   744→```
+   745→
+   746→### 测试覆盖
+   747→
+   748→| 测试类 | 测试内容 | 验证点 |
+   749→|--------|----------|--------|
+   750→| `TestTargetWeightsPayload` | 数据契约序列化 | JSON 往返一致性 |
+   751→| `TestRankerRedisOperations` | SET 先于 PUBLISH | 通信顺序正确性 |
+   752→| `TestExecutorRedisOperations` | Pull-on-Start | 启动即 GET |
+   753→| `TestExecutorDeduplication` | 去重机制 | 相同 timestamp 不重复执行 |
+   754→| `TestEndToEndFlow` | 端到端流程 | 完整通信链路 |
+   755→
+   756→### 测试输出示例
+   757→
+   758→```
+   759→tests/unit/test_ranker_executor.py::TestTargetWeightsPayload::test_serialization_roundtrip PASSED
+   760→tests/unit/test_ranker_executor.py::TestRankerRedisOperations::test_ranker_sets_before_publishes PASSED
+   761→tests/unit/test_ranker_executor.py::TestExecutorRedisOperations::test_executor_pull_on_start_calls_get PASSED
+   762→tests/unit/test_ranker_executor.py::TestEndToEndFlow::test_full_communication_flow PASSED
+   763→============================== 12 passed in 0.04s ==============================
+   764→```
+   765→
+   766→---
+   767→
+   768→## 附录
+   769→
+   770→### 相关文件
+   771→
+   772→| 文件 | 说明 |
+   773→|------|------|
+   774→| `online/ranker_process.py` | Ranker 进程实现 |
+   775→| `online/executor_process.py` | Executor 进程实现 |
+   776→| `online/online_trading_v3.py` | 原单体实现 (参考) |
+   777→| `online/order_executor.py` | 订单执行器 |
+   778→| `utils/redis_util.py` | Redis 工具函数 |
+   779→| `tests/unit/test_ranker_executor.py` | 单元测试 |
+   780→
+   781→### 依赖版本
+   782→
+   783→| 依赖 | 版本 | 用途 |
+   784→|------|------|------|
+   785→| `redis` | 6.1.0 | Redis 客户端 |
+   786→| `websockets` | 15.0.1 | Binance WebSocket |
+   787→| `pandas` | 2.3.1 | 数据处理 |
+   788→| `joblib` | 1.5.1 | 模型加载 |
+   789→
+   790→### 监控指标建议
+   791→
+   792→| 指标 | 说明 | 告警阈值 |
+   793→|------|------|----------|
+   794→| `ranker_publish_success` | Ranker 发布成功率 | < 99% |
+   795→| `executor_get_latency` | Executor GET 延迟 | > 100ms |
+   796→| `rebalance_execution_time` | 交易执行时间 | > 30s |
+   797→| `redis_connection_errors` | Redis 连接错误数 | > 0/min |
+   798→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

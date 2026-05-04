@@ -1,0 +1,134 @@
+     1→RANKER_REGRESSION_BASE_PARAMETERS = {
+     2→    "seed": 42,
+     3→    "objective": "regression",
+     4→    "metric": "rmse",
+     5→    "boosting_type": "gbdt",
+     6→    "verbose": -1,
+     7→    "n_jobs": -1,
+     8→    "learning_rate": 0.003,
+     9→}
+    10→RANKER_REGRESSION_PARAMETERS = {
+    11→    "seed": 42,
+    12→    "objective": "regression",
+    13→    "metric": "rmse",
+    14→    "boosting_type": "gbdt",
+    15→    "verbose": -1,
+    16→    "n_jobs": -1,
+    17→    "learning_rate": 0.003,
+    18→    # --- 树结构参数 ---
+    19→    "num_leaves": 247,
+    20→    "max_depth": 9,
+    21→    "min_child_samples": 9687,
+    22→    # --- 正则化 ---
+    23→    "lambda_l1": 0.0030210818201682195,
+    24→    "lambda_l2": 0.011070759889398542,
+    25→    # --- 采样参数 ---
+    26→    "feature_fraction": 0.8992200450655662,
+    27→    "bagging_fraction": 0.8302071272603069,
+    28→    "bagging_freq": 5,
+    29→}
+    30→
+    31→RANKER_DEFAULT_PARAMETERS = {
+    32→    "seed": 42,
+    33→    # 分类
+    34→    "objective": "multiclass",  # 多分类任务
+    35→    "metric": "multi_logloss",
+    36→    "num_class": 10,  # 必填且 >1
+    37→    "boosting_type": "gbdt",
+    38→    "verbose": 1,
+    39→    # @info 最后用来train了做模型使用的learning rate 需要小一点
+    40→    "learning_rate": 0.01,
+    41→    # "num_iterations": 6000,    # 一次训完；等价于 num_boost_round
+    42→    # --- 以下为更新后的参数 ---
+    43→    "num_leaves": 99,
+    44→    "max_depth": 11,
+    45→    "min_child_samples": 2431,
+    46→    "lambda_l1": 52.65971377244673,  # 对应 reg_alpha
+    47→    "lambda_l2": 0.013150634806031378,  # 对应 reg_lambda
+    48→    "feature_fraction": 0.9,
+    49→    "bagging_fraction": 0.6,
+    50→    "bagging_freq": 4,  # 新增参数
+    51→}
+    52→
+    53→# @info need to update when add new feature
+    54→RANKER_FEATURE_NAMES = [
+    55→    "meme_factor",
+    56→    "momentum_24h",
+    57→    "realized_vol_30m",
+    58→    "kdj_j_14",
+    59→    "volatility_4h",
+    60→    "volatility_336h",
+    61→    "realized_vol_4h",
+    62→    "realized_vol_24h",
+    63→    "volume_sum_1_periods",
+    64→    "value_capture",
+    65→    "volatility_24h",
+    66→    "momentum_30m",
+    67→    "kdj_k_9",
+    68→    "volatility_72h",
+    69→    "kdj_d_21",
+    70→    "realized_vol_1h",
+    71→    "supply_utilization",
+    72→    "reversal_1h",
+    73→    "kdj_j_momentum_9",
+    74→    "volatility_15m",
+    75→    "volatility_168h",
+    76→    "kdj_k_21",
+    77→    "kdj_d_14",
+    78→    "kdj_j_9",
+    79→    "momentum_168h",
+    80→    "volume_sum_96_periods",
+    81→    "momentum_15m",
+    82→    "rsi_15m_14",
+    83→    "security_risk",
+    84→    "momentum_72h",
+    85→    "volume_sum_672_periods",
+    86→    "volatility_1h",
+    87→    "volume_sum_16_periods",
+    88→    "kdj_kd_diff_9",
+    89→    "market_cap",
+    90→    "kdj_j_momentum_14",
+    91→    "momentum_12h",
+    92→    "realized_vol_168h",
+    93→    "volatility_30m",
+    94→    "volume_sum_288_periods",
+    95→    "realized_vol_12h",
+    96→    "inter_risk_vol",
+    97→    "has_llm_data",
+    98→    "institutional_score",
+    99→    "volatility_12h",
+   100→    "kdj_d_9",
+   101→    "volume_sum_48_periods",
+   102→    "kdj_j_21",
+   103→    "volume_sum_1344_periods",
+   104→    "rsi_15m_28",
+   105→    "realized_vol_336h",
+   106→    "kdj_k_14",
+   107→    "volume_sum_2_periods",
+   108→    "volume_sum_4_periods",
+   109→    "inter_value_reversion_72h",
+   110→    "momentum_336h",
+   111→    "inter_safety_stable",
+   112→    "reversal_15m",
+   113→    "kdj_kd_diff_14",
+   114→    "momentum_4h",
+   115→    "realized_vol_72h",
+   116→    "momentum_1h",
+   117→    "inter_inst_reversal_24h",
+   118→    "inter_meme_vol_4h",
+   119→    "market_cap_rank_50",
+   120→    "market_cap_rank_10",
+   121→    "momentum_15m_mean",
+   122→    "momentum_1h_mean",
+   123→    "momentum_4h_mean",
+   124→    "momentum_24h_mean",
+   125→    "day_of_week",
+   126→    "hour_of_day",
+   127→    "is_btc",
+   128→    "is_eth",
+   129→]
+   130→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

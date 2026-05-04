@@ -1,0 +1,284 @@
+diff --git a/commands/ml_commands.py b/commands/ml_commands.py
+index 6245dfb..1d6bf78 100644
+--- a/commands/ml_commands.py
++++ b/commands/ml_commands.py
+@@ -15,10 +15,15 @@ from data.data_check import check_kline_data
+ from ranker_model.fine_tune_ranker_train import FineTuneRankerModelTrain
+ from ranker_model.fine_tune_regression_model import FineTuneRegressionModelTrain
+ from ranker_model.ranker_feature import RankerFeature
++from ranker_model.ranker_feature_4h import RankerFeature4H
+ from ranker_model.ranker_online import sync_recent_kline
+ from ranker_model.ranker_train_v3 import RankerModelTrainV3
+ from logger import main_logger as logger
+ from ranker_model.regression_train import RegressionModelTrain
++from ranker_model.regression_portfolio_optimizer_generator_4h import (
++    RegressionPortfolioOptimizerGenerator4H,
++)
++from backtest.ranker_model_backtest_v5_4h import RankerModelBacktestV5_4H
+ from utils.coin_gecko_util import CoinGeckoApi
+ from utils.db_util import (
+     get_all_binance_symbols,
+@@ -219,7 +224,7 @@ def train_online():
+ 
+ @app.command("feature_4h")
+ def feature_4h():
+-
++    """生成4H特征数据 (使用 RankerFeature4H)"""
+     symbol_set_name = "full"
+ 
+     symbol_list = get_symbols_by_name(f"{symbol_set_name}")
+@@ -228,9 +233,10 @@ def feature_4h():
+ 
+     end_time = pd.Timestamp(datetime.now().date()) - pd.Timedelta(days=1)
+ 
+-    logger.info(f"Generating feature data. from {start_time} to {end_time}")
++    logger.info(f"[4H] Generating feature data. from {start_time} to {end_time}")
+ 
+-    feature = RankerFeature(
++    # 使用 RankerFeature4H
++    feature = RankerFeature4H(
+         symbols=symbol_list,
+         start_time=start_time,
+         end_time=end_time,
+@@ -240,6 +246,7 @@ def feature_4h():
+     feature_path = f"tmp_feature_4h_{symbol_set_name}.csv"
+     feature.to_csv(feature_path)
+ 
++    logger.info(f"[4H] Feature saved to {feature_path}")
+     # @info show feature names after generate feature
+     show_feature_names()
+ 
+@@ -272,3 +279,199 @@ def feature():
+ 
+     # @info show feature names after generate feature
+     show_feature_names()
++
++
++# ==============================================================================
++# 4H 相关命令 (4-Hour Prediction Pipeline)
++# ==============================================================================
++
++
++@app.command("tune_regression_predict_4h")
++@notify_me_command("finished 4H tune and train")
++def tune_regression_predict_4h(times: int = 500):
++    """
++    4H版本：调优回归模型参数并训练最终模型
++
++    流程:
++    1. 使用 Optuna 进行超参数搜索
++    2. 使用最优参数训练最终模型
++    3. 生成预测结果
++
++    需要先运行 feature_4h 生成特征数据
++    """
++    symbol_list_name = "full"
++    symbol_list = get_symbols_by_name(f"{symbol_list_name}")
++    logger.info(
++        f"[4H] Symbol list: {symbol_list_name}, total: {len(symbol_list)}"
++    )
++
++    # 4H 版本使用 target_4hour_zscore
++    target_column = "target_4hour_zscore"
++    feature_file_name = f"tmp_feature_4h_{symbol_list_name}.csv"
++
++    logger.info(f"[4H] Start tuning regression model, target: {target_column}")
++    logger.info(f"[4H] Feature file: {feature_file_name}")
++
++    final_params = FineTuneRegressionModelTrain(
++        target_column=target_column,
++        feature_file_name=feature_file_name,
++    ).run(
++        symbol_list=symbol_list,
++        n_trials=times,
++    )
++
++    logger.info(f"[4H] Tuning finished. Final params: {final_params}")
++
++    # 训练最终模型
++    logger.info(f"[4H] Start training final model")
++    hyper_parameters = RANKER_REGRESSION_BASE_PARAMETERS.copy()
++    hyper_parameters.update(final_params)
++    logger.info(f"[4H] Final hyper parameters: {hyper_parameters}")
++
++    RegressionModelTrain(
++        hyper_parameters=hyper_parameters,
++        target_column=target_column,
++        feature_file_name=feature_file_name,
++    ).train(symbol_list=symbol_list)
++
++
++@app.command("generate_weights_4h")
++def generate_weights_4h(
++    prediction_file: str = "regression_model_predictions.feather",
++    output_file: str = "ranker_weight_4h.feather",
++):
++    """
++    4H版本：根据模型预测结果生成投资组合权重
++
++    Args:
++        prediction_file: 预测结果文件 (来自 tune_regression_predict_4h)
++        output_file: 输出的权重文件
++    """
++    logger.info(f"[4H] Loading predictions from {prediction_file}")
++
++    ranker_probability = pd.read_feather(prediction_file)
++    ranker_probability["time"] = pd.to_datetime(ranker_probability["time"])
++
++    logger.info(
++        f"[4H] Loaded {len(ranker_probability)} predictions, "
++        f"from {ranker_probability['time'].min()} to {ranker_probability['time'].max()}"
++    )
++
++    # 使用 4H 版本的权重生成器
++    weight_generator = RegressionPortfolioOptimizerGenerator4H()
++
++    logger.info(f"[4H] Generating weights using RegressionPortfolioOptimizerGenerator4H")
++
++    ranker_weight = weight_generator.generate_weights(
++        ranker_probability=ranker_probability,
++        model_file_path=None,  # 不需要模型文件
++        save_path=output_file,
++        end_time=None,
++    )
++
++    logger.info(f"[4H] Weights saved to {output_file}")
++    logger.info(f"[4H] Generated {len(ranker_weight)} weight records")
++
++    return ranker_weight
++
++
++@app.command("backtest_4h")
++def backtest_4h(
++    weight_file: str = "ranker_weight_4h.feather",
++    use_cache: bool = False,
++):
++    """
++    4H版本：根据权重运行回测
++
++    Args:
++        weight_file: 权重文件 (来自 generate_weights_4h)
++        use_cache: 是否使用K线缓存
++    """
++    logger.info(f"[4H] Loading weights from {weight_file}")
++
++    predict_df = pd.read_feather(weight_file)
++    predict_df["time"] = pd.to_datetime(predict_df["time"])
++
++    logger.info(
++        f"[4H] Loaded {len(predict_df)} weight records, "
++        f"from {predict_df['time'].min()} to {predict_df['time'].max()}"
++    )
++
++    # 使用 4H 版本的回测引擎
++    logger.info(f"[4H] Running backtest with RankerModelBacktestV5_4H")
++
++    backtest = RankerModelBacktestV5_4H(
++        predict_df=predict_df,
++        use_cache=use_cache,
++    )
++
++    metrics = backtest.run()
++
++    logger.info(f"[4H] Backtest finished. Metrics: {metrics}")
++
++    return metrics
++
++
++@app.command("pipeline_4h")
++@notify_me_command("finished 4H full pipeline")
++def pipeline_4h(
++    skip_feature: bool = False,
++    skip_tune: bool = False,
++    tune_trials: int = 100,
++):
++    """
++    4H版本：完整的一键流水线
++
++    流程:
++    1. 生成4H特征 (feature_4h)
++    2. 调优并训练模型 (tune_regression_predict_4h)
++    3. 生成权重 (generate_weights_4h)
++    4. 运行回测 (backtest_4h)
++
++    Args:
++        skip_feature: 跳过特征生成 (如果已有特征文件)
++        skip_tune: 跳过调优 (使用默认参数)
++        tune_trials: Optuna 调优次数
++    """
++    logger.info("=" * 60)
++    logger.info("[4H Pipeline] Starting full 4H prediction pipeline")
++    logger.info("=" * 60)
++
++    # Step 1: 生成特征
++    if not skip_feature:
++        logger.info("[4H Pipeline] Step 1/4: Generating features...")
++        feature_4h()
++    else:
++        logger.info("[4H Pipeline] Step 1/4: Skipping feature generation")
++
++    # Step 2: 调优并训练模型
++    if not skip_tune:
++        logger.info(f"[4H Pipeline] Step 2/4: Tuning and training (trials={tune_trials})...")
++        tune_regression_predict_4h(times=tune_trials)
++    else:
++        logger.info("[4H Pipeline] Step 2/4: Skipping tuning, using default params")
++        # 使用默认参数训练
++        symbol_list = get_symbols_by_name("full")
++        feature_file_name = "tmp_feature_4h_full.csv"
++        target_column = "target_4hour_zscore"
++
++        RegressionModelTrain(
++            hyper_parameters=RANKER_REGRESSION_BASE_PARAMETERS,
++            target_column=target_column,
++            feature_file_name=feature_file_name,
++        ).train(symbol_list=symbol_list)
++
++    # Step 3: 生成权重
++    logger.info("[4H Pipeline] Step 3/4: Generating weights...")
++    generate_weights_4h()
++
++    # Step 4: 运行回测
++    logger.info("[4H Pipeline] Step 4/4: Running backtest...")
++    metrics = backtest_4h()
++
++    logger.info("=" * 60)
++    logger.info("[4H Pipeline] Pipeline completed!")
++    logger.info(f"[4H Pipeline] Final metrics: {metrics}")
++    logger.info("=" * 60)
++
++    return metrics
+\ No newline at end of file
+diff --git a/ranker_model/fine_tune_regression_model.py b/ranker_model/fine_tune_regression_model.py
+index 188b0d7..320c866 100644
+--- a/ranker_model/fine_tune_regression_model.py
++++ b/ranker_model/fine_tune_regression_model.py
+@@ -36,15 +36,25 @@ def get_feature_names(df):
+ 
+ class FineTuneRegressionModelTrain:
+ 
+-    def __init__(self, target_column: str = "target_1hour_zscore"):
++    def __init__(
++        self,
++        target_column: str = "target_1hour_zscore",
++        feature_file_name: str = None,
++    ):
+         # 默认改为 regression 常用的 target，比如 zscore
+         self.target_column = target_column
++        self.feature_file_name = feature_file_name
+         self.feature_data = self.get_feature_data()
+         self.feature_data = self.feature_data.sort_values(by="time")
+ 
+     def get_feature_data(self):
+-        # 假设 TEMP_FEATURE 是你的 csv 路径
+-        df = pd.read_csv(TEMP_FEATURE)
++        # 如果指定了特征文件名，使用它；否则使用默认的 TEMP_FEATURE
++        if self.feature_file_name:
++            df = pd.read_csv(self.feature_file_name)
++            logger.info(f"Loading feature from {self.feature_file_name}")
++        else:
++            df = pd.read_csv(TEMP_FEATURE)
++            logger.info(f"Loading feature from default {TEMP_FEATURE}")
+         df["time"] = pd.to_datetime(df["time"])
+         self.feature_name = get_feature_names(df)
+         logger.info(f"feature name count: {len(self.feature_name)}")

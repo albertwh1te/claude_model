@@ -1,0 +1,1272 @@
+2026-05-04T03:32:40.789Z [DEBUG] [init] configureGlobalMTLS starting
+2026-05-04T03:32:40.789Z [DEBUG] [init] configureGlobalMTLS complete
+2026-05-04T03:32:40.789Z [DEBUG] [init] configureGlobalAgents starting
+2026-05-04T03:32:40.789Z [DEBUG] [init] configureGlobalAgents complete
+2026-05-04T03:32:40.803Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-05-04T03:32:40.821Z [DEBUG] Loading plugin planning-with-files from source: "./"
+2026-05-04T03:32:40.822Z [DEBUG] Using manifest version for planning-with-files@planning-with-files: 2.3.0
+2026-05-04T03:32:40.822Z [DEBUG] [ToolSearch:optimistic] mode=tst-auto, ENABLE_TOOL_SEARCH=undefined, result=true
+2026-05-04T03:32:40.822Z [DEBUG] [STARTUP] Running setup()...
+2026-05-04T03:32:40.823Z [DEBUG] Plugin planning-with-files@planning-with-files version 2.3.0 already cached at /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/cache/planning-with-files/planning-with-files/2.3.0
+2026-05-04T03:32:40.824Z [DEBUG] Copied local plugin planning-with-files to versioned cache: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/cache/planning-with-files/planning-with-files/2.3.0
+2026-05-04T03:32:40.831Z [WARN] Failed to read cached marketplace claude-plugins-official: Invalid schema: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/marketplaces/claude-plugins-official/.claude-plugin/marketplace.json plugins.0.source: Invalid input, plugins.1.source: Invalid input, plugins.5.source: Invalid input, plugins.10.source: Invalid input, plugins.11.source: Invalid input, plugins.19.source: Invalid input, plugins.21.source: Invalid input, plugins.22.source: Invalid input, plugins.23.source: Invalid input, plugins.27.source: Invalid input, plugins.51.source: Invalid input, plugins.54.source: Invalid input, plugins.55.source: Invalid input, plugins.56.source: Invalid input, plugins.61.source: Invalid input, plugins.79.source: Invalid input, plugins.89.source: Invalid input, plugins.91.source: Invalid input, plugins.92.source: Invalid input, plugins.93.source: Invalid input, plugins.99.source: Invalid input, plugins.101.source: Invalid input, plugins.103.source: Invalid input, plugins.109.source: Invalid input, plugins.123.source: Invalid input, plugins.129.source: Invalid input, plugins.136.source: Invalid input, plugins.141.source: Invalid input, plugins.144.source: Invalid input, plugins.150.source: Invalid input, plugins.156.source: Invalid input, plugins.164.source: Invalid input, plugins.165.source: Invalid input, plugins.174.source: Invalid input
+2026-05-04T03:32:40.833Z [WARN] Failed to read cached marketplace claude-plugins-official: Invalid schema: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/marketplaces/claude-plugins-official/.claude-plugin/marketplace.json plugins.0.source: Invalid input, plugins.1.source: Invalid input, plugins.5.source: Invalid input, plugins.10.source: Invalid input, plugins.11.source: Invalid input, plugins.19.source: Invalid input, plugins.21.source: Invalid input, plugins.22.source: Invalid input, plugins.23.source: Invalid input, plugins.27.source: Invalid input, plugins.51.source: Invalid input, plugins.54.source: Invalid input, plugins.55.source: Invalid input, plugins.56.source: Invalid input, plugins.61.source: Invalid input, plugins.79.source: Invalid input, plugins.89.source: Invalid input, plugins.91.source: Invalid input, plugins.92.source: Invalid input, plugins.93.source: Invalid input, plugins.99.source: Invalid input, plugins.101.source: Invalid input, plugins.103.source: Invalid input, plugins.109.source: Invalid input, plugins.123.source: Invalid input, plugins.129.source: Invalid input, plugins.136.source: Invalid input, plugins.141.source: Invalid input, plugins.144.source: Invalid input, plugins.150.source: Invalid input, plugins.156.source: Invalid input, plugins.164.source: Invalid input, plugins.165.source: Invalid input, plugins.174.source: Invalid input
+2026-05-04T03:32:40.834Z [DEBUG] Loading skills from: managed=/Library/Application Support/ClaudeCode/.claude/skills, user=/Users/matianjun/Dropbox/code/claude_model/.claude_glm/skills, project=[/Users/matianjun/Dropbox/obsidian_zettelkasten/.claude/skills]
+2026-05-04T03:32:40.843Z [DEBUG] Error log sink initialized
+2026-05-04T03:32:40.848Z [DEBUG] Found 1 plugins (1 enabled, 0 disabled)
+2026-05-04T03:32:40.849Z [DEBUG] [STARTUP] setup() completed in 27ms
+2026-05-04T03:32:40.849Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-05-04T03:32:40.849Z [DEBUG] Plugin not available for MCP: pyright-lsp@claude-plugins-official - error type: plugin-not-found
+2026-05-04T03:32:40.849Z [DEBUG] Plugin not available for MCP: context7@claude-plugins-official - error type: plugin-not-found
+2026-05-04T03:32:40.849Z [DEBUG] Plugin loading errors: Plugin pyright-lsp not found in marketplace claude-plugins-official, Plugin context7 not found in marketplace claude-plugins-official
+2026-05-04T03:32:40.849Z [DEBUG] getPluginSkills: Processing 1 enabled plugins
+2026-05-04T03:32:40.849Z [DEBUG] Checking plugin planning-with-files: skillsPath=exists, skillsPaths=0 paths
+2026-05-04T03:32:40.849Z [DEBUG] Attempting to load skills from plugin planning-with-files default skillsPath: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/cache/planning-with-files/planning-with-files/2.3.0/skills
+2026-05-04T03:32:40.852Z [DEBUG] Plugin loading errors: Plugin pyright-lsp not found in marketplace claude-plugins-official, Plugin context7 not found in marketplace claude-plugins-official
+2026-05-04T03:32:40.852Z [DEBUG] Total plugin commands loaded: 0
+2026-05-04T03:32:40.852Z [DEBUG] Loaded 1 skills from plugin planning-with-files default directory
+2026-05-04T03:32:40.852Z [DEBUG] Total plugin skills loaded: 1
+2026-05-04T03:32:40.852Z [DEBUG] Registered 0 hooks from 1 plugins
+2026-05-04T03:32:40.853Z [DEBUG] Plugin loading errors: Plugin pyright-lsp not found in marketplace claude-plugins-official, Plugin context7 not found in marketplace claude-plugins-official
+2026-05-04T03:32:40.853Z [DEBUG] Total plugin agents loaded: 0
+2026-05-04T03:32:40.853Z [DEBUG] Loaded 6 unique skills (6 unconditional, 0 conditional, managed: 0, user: 0, project: 6, additional: 0, legacy commands: 0)
+2026-05-04T03:32:40.853Z [DEBUG] getSkills returning: 6 skill dir commands, 1 plugin skills, 2 bundled skills
+2026-05-04T03:32:40.853Z [DEBUG] [STARTUP] Commands and agents loaded in 4ms
+2026-05-04T03:32:40.854Z [DEBUG] Layout engine: yoga
+2026-05-04T03:32:40.858Z [DEBUG] [Claude in Chrome] Found chrome profiles: Default, Profile 1, Profile 2, Profile 3
+2026-05-04T03:32:40.867Z [DEBUG] [STARTUP] Running showSetupScreens()...
+2026-05-04T03:32:40.885Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-05-04T03:32:40.886Z [DEBUG] [STARTUP] showSetupScreens() completed in 19ms
+2026-05-04T03:32:40.886Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-05-04T03:32:40.886Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-05-04T03:32:40.886Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-05-04T03:32:40.908Z [DEBUG] [STARTUP] MCP configs loaded in 105ms
+2026-05-04T03:32:40.920Z [DEBUG] All plugins already exist, skipping migration
+2026-05-04T03:32:40.921Z [DEBUG] [Reconnection] computeInitialTeamContext: No teammate context set (not a teammate)
+2026-05-04T03:32:40.923Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777865560923
+2026-05-04T03:32:40.923Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:32:40.923Z [DEBUG] Temp file written successfully, size: 14394 bytes
+2026-05-04T03:32:40.923Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:32:40.923Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777865560923 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:32:40.924Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:32:40.926Z [DEBUG] Getting matching hook commands for SessionStart with query: startup
+2026-05-04T03:32:40.926Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:32:40.926Z [DEBUG] Matched 0 unique hooks for query "startup" (0 before deduplication)
+2026-05-04T03:32:40.932Z [DEBUG] Loaded 3 installed plugins from /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/installed_plugins.json
+2026-05-04T03:32:40.932Z [DEBUG] Initialized versioned plugins system with 3 plugins
+2026-05-04T03:32:40.956Z [DEBUG] [keybindings] KeybindingSetup initialized with 101 bindings, 0 warnings
+2026-05-04T03:32:40.992Z [DEBUG] [REPL:mount] REPL mounted, disabled=false
+2026-05-04T03:32:40.995Z [DEBUG] Official marketplace auto-install skipped: already_attempted
+2026-05-04T03:32:40.995Z [DEBUG] performStartupChecks called
+2026-05-04T03:32:40.995Z [DEBUG] Starting background plugin installations
+2026-05-04T03:32:40.996Z [DEBUG] performBackgroundPluginInstallations called
+2026-05-04T03:32:40.997Z [DEBUG] Loaded 1 CLAUDE.md/rules files:
+  [Project] /Users/matianjun/Dropbox/obsidian_zettelkasten/CLAUDE.md (4032 chars)
+2026-05-04T03:32:41.004Z [DEBUG] Watching for changes in setting files /Users/matianjun/Dropbox/code/claude_model/.claude_glm/settings.json...
+2026-05-04T03:32:41.005Z [DEBUG] Plugin not available for MCP: pyright-lsp@claude-plugins-official - error type: plugin-not-found
+2026-05-04T03:32:41.005Z [DEBUG] Plugin not available for MCP: context7@claude-plugins-official - error type: plugin-not-found
+2026-05-04T03:32:41.005Z [DEBUG] Plugin not available for MCP: pyright-lsp@claude-plugins-official - error type: plugin-not-found
+2026-05-04T03:32:41.005Z [DEBUG] Plugin not available for MCP: context7@claude-plugins-official - error type: plugin-not-found
+2026-05-04T03:32:41.006Z [DEBUG] Found 3 enabled plugins
+2026-05-04T03:32:41.006Z [DEBUG] All plugins already exist, skipping migration
+2026-05-04T03:32:41.006Z [DEBUG] Found 3 installed plugins (V2 format)
+2026-05-04T03:32:41.006Z [DEBUG] [claudeai-mcp] Checking gate (cached)...
+2026-05-04T03:32:41.006Z [DEBUG] [claudeai-mcp] Gate returned: true
+2026-05-04T03:32:41.006Z [DEBUG] [claudeai-mcp] No access token
+2026-05-04T03:32:41.006Z [DEBUG] Loaded plugins - Enabled: 1, Disabled: 0, Commands: 0, Agents: 0, Errors: 2
+2026-05-04T03:32:41.006Z [DEBUG] Found 0 missing plugins (not installed):
+2026-05-04T03:32:41.006Z [DEBUG] Setting installation status: 0 marketplaces, 0 installable plugins, 0 uninstallable plugins
+2026-05-04T03:32:41.013Z [DEBUG] Total LSP servers loaded: 0
+2026-05-04T03:32:41.013Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 0 server(s)
+2026-05-04T03:32:41.013Z [DEBUG] LSP manager initialized with 0 servers
+2026-05-04T03:32:41.013Z [DEBUG] LSP server manager initialized successfully
+2026-05-04T03:32:41.013Z [DEBUG] LSP notification handlers registered successfully for all 0 server(s)
+2026-05-04T03:32:41.013Z [DEBUG] [keybindings] Watching for changes to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/keybindings.json
+2026-05-04T03:32:41.024Z [DEBUG] [Claude in Chrome] Found brave profiles: Default
+2026-05-04T03:32:41.025Z [DEBUG] Watching for changes in skill/command directories: /Users/matianjun/Dropbox/obsidian_zettelkasten/.claude/skills...
+2026-05-04T03:32:41.030Z [DEBUG] Git remote URL: git@github.com:albertwh1te/obsidian_zettelkasten.git
+2026-05-04T03:32:41.030Z [DEBUG] Parsed repository: albertwh1te/obsidian_zettelkasten from git@github.com:albertwh1te/obsidian_zettelkasten.git
+2026-05-04T03:32:41.030Z [DEBUG] Parsed repository: albertwh1te/obsidian_zettelkasten from URL: git@github.com:albertwh1te/obsidian_zettelkasten.git
+2026-05-04T03:32:41.030Z [DEBUG] Path /Users/matianjun/Dropbox/obsidian_zettelkasten already tracked for repo albertwh1te/obsidian_zettelkasten
+2026-05-04T03:32:41.030Z [DEBUG] [Claude in Chrome] Extension not found in any browser
+2026-05-04T03:32:41.032Z [DEBUG] Ripgrep first use test: PASSED (mode=builtin, path=/Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/arm64-darwin/rg)
+2026-05-04T03:32:41.056Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:32:41.056Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:32:41.056Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:32:41.205Z [DEBUG] AutoUpdaterWrapper: Installation type: unknown
+2026-05-04T03:32:42.668Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T03:32:42.668Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T03:32:42.668Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T03:32:42.668Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T03:32:42.670Z [DEBUG] Sending 8 skills via attachment (initial, 8 total sent)
+2026-05-04T03:32:42.670Z [DEBUG] Skill prompt: showing "planning-with-files:planning-with-files" (userFacingName="planning-with-files")
+2026-05-04T03:32:42.673Z [DEBUG] Getting matching hook commands for UserPromptSubmit with query: undefined
+2026-05-04T03:32:42.673Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:32:42.673Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-05-04T03:32:42.674Z [DEBUG] FileHistory: Added snapshot for ebeaeb5b-f3ca-402b-a19e-917f58e0bd7b, tracking 0 files
+2026-05-04T03:32:42.676Z [DEBUG] [useDeferredValue] Messages deferred by 2 (0→2)
+2026-05-04T03:32:42.703Z [DEBUG] Started caffeinate to prevent sleep
+2026-05-04T03:32:42.711Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777865562711
+2026-05-04T03:32:42.711Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:32:42.711Z [DEBUG] Temp file written successfully, size: 14394 bytes
+2026-05-04T03:32:42.711Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:32:42.711Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777865562711 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:32:42.711Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:32:42.713Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T03:32:42.714Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.e8e; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:32:42.715Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:32:42.715Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:32:42.716Z [DEBUG] Plugin loading errors: Plugin pyright-lsp not found in marketplace claude-plugins-official, Plugin context7 not found in marketplace claude-plugins-official
+2026-05-04T03:32:42.716Z [DEBUG] Total plugin output styles loaded: 0
+2026-05-04T03:32:42.716Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:32:42.722Z [DEBUG] autocompact: tokens=845 threshold=167000 effectiveWindow=180000
+2026-05-04T03:32:42.722Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T03:32:42.725Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:32:42.726Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:32:42.726Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:32:42.727Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:32:42.730Z [DEBUG] [useDeferredValue] Messages deferred by 2 (0→2)
+2026-05-04T03:32:42.736Z [DEBUG] Stats cache is up to date
+2026-05-04T03:32:42.809Z [ERROR] API error (attempt 1/11): 400 400 {"type":"error","error":{"type":"invalid_request_error","message":"invalid params"}}
+2026-05-04T03:32:42.825Z [ERROR] Error in API request: 400 {"type":"error","error":{"type":"invalid_request_error","message":"invalid params"}}
+2026-05-04T03:32:42.826Z [ERROR] Error: Error: 400 {"type":"error","error":{"type":"invalid_request_error","message":"invalid params"}}
+    at E4.generate (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:354:8788)
+    at aC.makeStatusError (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:393:2195)
+    at aC.makeRequest (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:393:5420)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-05-04T03:32:42.826Z [ERROR] SyntaxError: SyntaxError: Unexpected token 'A', "API Error:"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:54:1088
+    at K (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:8:7612)
+    at NR7 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1176:5128)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-05-04T03:32:42.934Z [DEBUG] AutoUpdater: Detected installation type: unknown
+2026-05-04T03:32:42.934Z [DEBUG] AutoUpdater: Unknown installation type, falling back to config
+2026-05-04T03:32:44.535Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777865564535
+2026-05-04T03:32:44.535Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:32:44.535Z [DEBUG] Temp file written successfully, size: 14394 bytes
+2026-05-04T03:32:44.535Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:32:44.535Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777865564535 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:32:44.536Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:32:46.045Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:32:46.218Z [ERROR] Failed to refresh marketplace claude-plugins-official: The marketplace.json file is no longer present in this repository.
+
+This marketplace may have been deprecated or moved to a new location.
+Source: anthropics/claude-plugins-official
+
+You can remove this marketplace with: claude plugin marketplace remove "claude-plugins-official"
+2026-05-04T03:32:46.218Z [WARN] Plugin autoupdate: failed to refresh marketplace claude-plugins-official: Failed to refresh marketplace 'claude-plugins-official': The marketplace.json file is no longer present in this repository.
+
+This marketplace may have been deprecated or moved to a new location.
+Source: anthropics/claude-plugins-official
+
+You can remove this marketplace with: claude plugin marketplace remove "claude-plugins-official"
+2026-05-04T03:32:46.218Z [DEBUG] Plugin autoupdate: checking installed plugins
+2026-05-04T03:32:46.221Z [WARN] Failed to read cached marketplace claude-plugins-official: Invalid schema: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/marketplaces/claude-plugins-official/.claude-plugin/marketplace.json plugins.0.source: Invalid input, plugins.1.source: Invalid input, plugins.5.source: Invalid input, plugins.10.source: Invalid input, plugins.11.source: Invalid input, plugins.19.source: Invalid input, plugins.21.source: Invalid input, plugins.22.source: Invalid input, plugins.23.source: Invalid input, plugins.27.source: Invalid input, plugins.51.source: Invalid input, plugins.54.source: Invalid input, plugins.55.source: Invalid input, plugins.56.source: Invalid input, plugins.61.source: Invalid input, plugins.79.source: Invalid input, plugins.89.source: Invalid input, plugins.91.source: Invalid input, plugins.92.source: Invalid input, plugins.93.source: Invalid input, plugins.99.source: Invalid input, plugins.101.source: Invalid input, plugins.103.source: Invalid input, plugins.109.source: Invalid input, plugins.123.source: Invalid input, plugins.129.source: Invalid input, plugins.136.source: Invalid input, plugins.141.source: Invalid input, plugins.144.source: Invalid input, plugins.150.source: Invalid input, plugins.156.source: Invalid input, plugins.164.source: Invalid input, plugins.165.source: Invalid input, plugins.174.source: Invalid input
+2026-05-04T03:32:46.223Z [WARN] Failed to read cached marketplace claude-plugins-official: Invalid schema: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/marketplaces/claude-plugins-official/.claude-plugin/marketplace.json plugins.0.source: Invalid input, plugins.1.source: Invalid input, plugins.5.source: Invalid input, plugins.10.source: Invalid input, plugins.11.source: Invalid input, plugins.19.source: Invalid input, plugins.21.source: Invalid input, plugins.22.source: Invalid input, plugins.23.source: Invalid input, plugins.27.source: Invalid input, plugins.51.source: Invalid input, plugins.54.source: Invalid input, plugins.55.source: Invalid input, plugins.56.source: Invalid input, plugins.61.source: Invalid input, plugins.79.source: Invalid input, plugins.89.source: Invalid input, plugins.91.source: Invalid input, plugins.92.source: Invalid input, plugins.93.source: Invalid input, plugins.99.source: Invalid input, plugins.101.source: Invalid input, plugins.103.source: Invalid input, plugins.109.source: Invalid input, plugins.123.source: Invalid input, plugins.129.source: Invalid input, plugins.136.source: Invalid input, plugins.141.source: Invalid input, plugins.144.source: Invalid input, plugins.150.source: Invalid input, plugins.156.source: Invalid input, plugins.164.source: Invalid input, plugins.165.source: Invalid input, plugins.174.source: Invalid input
+2026-05-04T03:32:46.225Z [WARN] Cache corrupted or missing for marketplace claude-plugins-official, re-fetching from source: Invalid schema: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/marketplaces/claude-plugins-official/.claude-plugin/marketplace.json plugins.0.source: Invalid input, plugins.1.source: Invalid input, plugins.5.source: Invalid input, plugins.10.source: Invalid input, plugins.11.source: Invalid input, plugins.19.source: Invalid input, plugins.21.source: Invalid input, plugins.22.source: Invalid input, plugins.23.source: Invalid input, plugins.27.source: Invalid input, plugins.51.source: Invalid input, plugins.54.source: Invalid input, plugins.55.source: Invalid input, plugins.56.source: Invalid input, plugins.61.source: Invalid input, plugins.79.source: Invalid input, plugins.89.source: Invalid input, plugins.91.source: Invalid input, plugins.92.source: Invalid input, plugins.93.source: Invalid input, plugins.99.source: Invalid input, plugins.101.source: Invalid input, plugins.103.source: Invalid input, plugins.109.source: Invalid input, plugins.123.source: Invalid input, plugins.129.source: Invalid input, plugins.136.source: Invalid input, plugins.141.source: Invalid input, plugins.144.source: Invalid input, plugins.150.source: Invalid input, plugins.156.source: Invalid input, plugins.164.source: Invalid input, plugins.165.source: Invalid input, plugins.174.source: Invalid input
+2026-05-04T03:32:47.388Z [DEBUG] [useDeferredValue] Messages deferred by 1 (2→3)
+2026-05-04T03:32:47.815Z [DEBUG] executePreToolHooks called for tool: Skill
+2026-05-04T03:32:47.815Z [DEBUG] Getting matching hook commands for PreToolUse with query: Skill
+2026-05-04T03:32:47.815Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:32:47.815Z [DEBUG] Matched 0 unique hooks for query "Skill" (0 before deduplication)
+2026-05-04T03:32:47.818Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777865567818
+2026-05-04T03:32:47.818Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:32:47.818Z [DEBUG] Temp file written successfully, size: 14482 bytes
+2026-05-04T03:32:47.818Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:32:47.818Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777865567818 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:32:47.818Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:32:47.819Z [DEBUG] Metadata string for gmgn-portfolio:
+2026-05-04T03:32:47.819Z [DEBUG] <command-message>gmgn-portfolio</command-message>
+<command-name>/gmgn-portfolio</command-name>
+<command-args>0x829f4b62eebe12af653b4dd4ffc480966f7d7f09</command-args>
+2026-05-04T03:32:47.819Z [DEBUG] command-message tags in metadata: 1
+2026-05-04T03:32:47.820Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T03:32:47.820Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T03:32:47.820Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T03:32:47.820Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T03:32:47.821Z [DEBUG] processPromptSlashCommand creating 3 messages for gmgn-portfolio
+2026-05-04T03:32:47.821Z [DEBUG] Message 1: <command-message>gmgn-portfolio</command-message>
+<command-name>/gmgn-portfolio</command-name>
+<command-args>0x829f4b62eebe12af653b4dd4ffc480966f7d7f09</command-args>
+2026-05-04T03:32:47.821Z [DEBUG] Message 2 [META]: [{"type":"text","text":"Base directory for this skill: /Users/matianjun/Dropbox/obsidian_zettelkasten/.claude/skills/gmgn-portfolio\n\n**IMPORTANT: Always use `gmgn-cli` commands below. Do NOT use web
+2026-05-04T03:32:47.821Z [DEBUG] Message 3: [ATTACHMENT]
+2026-05-04T03:32:47.822Z [DEBUG] SkillTool returning 2 newMessages for skill gmgn-portfolio
+2026-05-04T03:32:47.822Z [DEBUG] newMessage 1: [{"type":"text","text":"Base directory for this skill: /Users/matianjun/Dropbox/obsidian_zettelkasten/.claude/skills/gmgn-portfolio\n\n**IMPORTANT: Al...
+2026-05-04T03:32:47.823Z [DEBUG] Getting matching hook commands for PostToolUse with query: Skill
+2026-05-04T03:32:47.823Z [DEBUG] Found 5 hook matchers in settings
+2026-05-04T03:32:47.823Z [DEBUG] Matched 0 unique hooks for query "Skill" (0 before deduplication)
+2026-05-04T03:32:47.824Z [DEBUG] [useDeferredValue] Messages deferred by 1 (3→4)
+2026-05-04T03:32:47.828Z [DEBUG] [useDeferredValue] Messages deferred by 4 (3→7)
+2026-05-04T03:32:47.836Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T03:32:47.836Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T03:32:47.836Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T03:32:47.836Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T03:32:47.837Z [DEBUG] autocompact: tokens=23901 threshold=167000 effectiveWindow=180000
+2026-05-04T03:32:47.837Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T03:32:47.840Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:32:47.841Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:32:47.841Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:32:47.842Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:32:51.603Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:32:53.072Z [DEBUG] [useDeferredValue] Messages deferred by 1 (7→8)
+2026-05-04T03:32:53.075Z [DEBUG] [useDeferredValue] Messages deferred by 1 (7→8)
+2026-05-04T03:32:53.079Z [DEBUG] [useDeferredValue] Messages deferred by 1 (7→8)
+2026-05-04T03:32:53.157Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-05-04T03:32:53.157Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-05-04T03:32:53.157Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:32:53.157Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T03:32:53.161Z [DEBUG] tree-sitter: WASM files not found
+2026-05-04T03:32:53.164Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T03:32:53.165Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.91b; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:32:53.165Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:32:53.165Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:32:53.165Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:32:53.167Z [DEBUG] [useDeferredValue] Messages deferred by 1 (8→9)
+2026-05-04T03:32:53.169Z [DEBUG] [useDeferredValue] Messages deferred by 1 (8→9)
+2026-05-04T03:32:53.722Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:32:58.125Z [DEBUG] Reading marketplace from /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/marketplaces/anthropics-claude-plugins-official/.claude-plugin/marketplace.json
+2026-05-04T03:32:58.195Z [DEBUG] Could not find plugin pyright-lsp@claude-plugins-official: Invalid schema: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/marketplaces/anthropics-claude-plugins-official/.claude-plugin/marketplace.json plugins.0.source: Invalid input, plugins.1.source: Invalid input, plugins.5.source: Invalid input, plugins.10.source: Invalid input, plugins.11.source: Invalid input, plugins.19.source: Invalid input, plugins.21.source: Invalid input, plugins.22.source: Invalid input, plugins.23.source: Invalid input, plugins.27.source: Invalid input, plugins.51.source: Invalid input, plugins.54.source: Invalid input, plugins.55.source: Invalid input, plugins.56.source: Invalid input, plugins.61.source: Invalid input, plugins.79.source: Invalid input, plugins.89.source: Invalid input, plugins.91.source: Invalid input, plugins.92.source: Invalid input, plugins.93.source: Invalid input, plugins.99.source: Invalid input, plugins.101.source: Invalid input, plugins.103.source: Invalid input, plugins.109.source: Invalid input, plugins.123.source: Invalid input, plugins.129.source: Invalid input, plugins.136.source: Invalid input, plugins.141.source: Invalid input, plugins.144.source: Invalid input, plugins.150.source: Invalid input, plugins.156.source: Invalid input, plugins.164.source: Invalid input, plugins.165.source: Invalid input, plugins.174.source: Invalid input
+2026-05-04T03:32:58.195Z [DEBUG] Could not find plugin context7@claude-plugins-official: Invalid schema: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/marketplaces/anthropics-claude-plugins-official/.claude-plugin/marketplace.json plugins.0.source: Invalid input, plugins.1.source: Invalid input, plugins.5.source: Invalid input, plugins.10.source: Invalid input, plugins.11.source: Invalid input, plugins.19.source: Invalid input, plugins.21.source: Invalid input, plugins.22.source: Invalid input, plugins.23.source: Invalid input, plugins.27.source: Invalid input, plugins.51.source: Invalid input, plugins.54.source: Invalid input, plugins.55.source: Invalid input, plugins.56.source: Invalid input, plugins.61.source: Invalid input, plugins.79.source: Invalid input, plugins.89.source: Invalid input, plugins.91.source: Invalid input, plugins.92.source: Invalid input, plugins.93.source: Invalid input, plugins.99.source: Invalid input, plugins.101.source: Invalid input, plugins.103.source: Invalid input, plugins.109.source: Invalid input, plugins.123.source: Invalid input, plugins.129.source: Invalid input, plugins.136.source: Invalid input, plugins.141.source: Invalid input, plugins.144.source: Invalid input, plugins.150.source: Invalid input, plugins.156.source: Invalid input, plugins.164.source: Invalid input, plugins.165.source: Invalid input, plugins.174.source: Invalid input
+2026-05-04T03:32:58.195Z [WARN] Plugin autoupdate: failed to update pyright-lsp@claude-plugins-official: Plugin "pyright-lsp" not found
+2026-05-04T03:32:58.195Z [WARN] Plugin autoupdate: failed to update context7@claude-plugins-official: Plugin "context7" not found
+2026-05-04T03:32:59.094Z [DEBUG] Creating shell snapshot for zsh (/bin/zsh)
+2026-05-04T03:32:59.095Z [DEBUG] Looking for shell config file: /Users/matianjun/.zshrc
+2026-05-04T03:32:59.095Z [DEBUG] Snapshots directory: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/shell-snapshots
+2026-05-04T03:32:59.095Z [DEBUG] Creating snapshot at: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/shell-snapshots/snapshot-zsh-1777865579095-ckecpv.sh
+2026-05-04T03:32:59.095Z [DEBUG] Shell binary exists: true
+2026-05-04T03:32:59.095Z [DEBUG] Execution timeout: 10000ms
+2026-05-04T03:33:00.471Z [DEBUG] Shell snapshot created successfully (175971 bytes)
+2026-05-04T03:33:00.472Z [DEBUG] No session environment scripts found
+2026-05-04T03:33:00.960Z [DEBUG] Bash tool error (1872ms): Shell command failed
+2026-05-04T03:33:00.961Z [DEBUG] Getting matching hook commands for PostToolUseFailure with query: Bash
+2026-05-04T03:33:00.961Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:33:00.961Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T03:33:00.961Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T03:33:00.961Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T03:33:00.961Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T03:33:00.961Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T03:33:00.962Z [DEBUG] autocompact: tokens=24192 threshold=167000 effectiveWindow=180000
+2026-05-04T03:33:00.962Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T03:33:00.964Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:33:00.965Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:33:00.965Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:33:00.965Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:33:00.968Z [DEBUG] [useDeferredValue] Messages deferred by 1 (9→10)
+2026-05-04T03:33:04.165Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:33:04.722Z [DEBUG] [useDeferredValue] Messages deferred by 1 (10→11)
+2026-05-04T03:33:05.171Z [DEBUG] executePreToolHooks called for tool: Grep
+2026-05-04T03:33:05.171Z [DEBUG] Getting matching hook commands for PreToolUse with query: Grep
+2026-05-04T03:33:05.171Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:33:05.171Z [DEBUG] Matched 0 unique hooks for query "Grep" (0 before deduplication)
+2026-05-04T03:33:05.174Z [DEBUG] [useDeferredValue] Messages deferred by 1 (11→12)
+2026-05-04T03:33:05.179Z [DEBUG] [useDeferredValue] Messages deferred by 1 (11→12)
+2026-05-04T03:33:05.221Z [DEBUG] Getting matching hook commands for PostToolUse with query: Grep
+2026-05-04T03:33:05.221Z [DEBUG] Found 5 hook matchers in settings
+2026-05-04T03:33:05.221Z [DEBUG] Matched 1 unique hooks for query "Grep" (1 before deduplication)
+2026-05-04T03:33:05.223Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T03:33:05.223Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T03:33:05.223Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T03:33:05.223Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T03:33:05.223Z [DEBUG] autocompact: tokens=24185 threshold=167000 effectiveWindow=180000
+2026-05-04T03:33:05.223Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T03:33:05.225Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:33:05.226Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:33:05.226Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:33:05.226Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:33:05.229Z [DEBUG] [useDeferredValue] Messages deferred by 3 (12→15)
+2026-05-04T03:33:10.034Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:33:10.575Z [DEBUG] [useDeferredValue] Messages deferred by 1 (15→16)
+2026-05-04T03:33:10.995Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-05-04T03:33:10.995Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-05-04T03:33:10.995Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:33:10.995Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T03:33:10.997Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T03:33:10.997Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.91b; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:33:10.997Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:33:10.997Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:33:10.998Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:33:10.999Z [DEBUG] [useDeferredValue] Messages deferred by 1 (16→17)
+2026-05-04T03:33:11.002Z [DEBUG] [useDeferredValue] Messages deferred by 1 (16→17)
+2026-05-04T03:33:16.145Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:33:19.713Z [DEBUG] Bash tool error (261ms): Shell command failed
+2026-05-04T03:33:19.713Z [DEBUG] Getting matching hook commands for PostToolUseFailure with query: Bash
+2026-05-04T03:33:19.713Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:33:19.713Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T03:33:19.714Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T03:33:19.714Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T03:33:19.714Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T03:33:19.714Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T03:33:19.714Z [DEBUG] autocompact: tokens=24278 threshold=167000 effectiveWindow=180000
+2026-05-04T03:33:19.714Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T03:33:19.716Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:33:19.717Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:33:19.717Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:33:19.717Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:33:19.719Z [DEBUG] [useDeferredValue] Messages deferred by 1 (17→18)
+2026-05-04T03:33:30.644Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:33:31.133Z [DEBUG] [useDeferredValue] Messages deferred by 1 (18→19)
+2026-05-04T03:33:31.591Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-05-04T03:33:31.591Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-05-04T03:33:31.591Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:33:31.591Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T03:33:31.600Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T03:33:31.601Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.91b; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:33:31.601Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:33:31.601Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:33:31.601Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:33:31.602Z [DEBUG] [useDeferredValue] Messages deferred by 1 (19→20)
+2026-05-04T03:33:31.605Z [DEBUG] [useDeferredValue] Messages deferred by 1 (19→20)
+2026-05-04T03:33:31.630Z [DEBUG] High write ratio: blit=0, write=1201 (100.0% writes), screen=31x212
+2026-05-04T03:33:32.819Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:33:41.606Z [ERROR] Error: Error: console.error: [33m⚠️  [BashTool] Pre-flight check is taking longer than expected. Run with ANTHROPIC_LOG=debug to check for failed or slow API requests.[39m
+
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:910:7643
+    at OV5.K.write (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:706:12007)
+    at Console.value (node:internal/console/constructor:313:16)
+    at Console.warn (node:internal/console/constructor:437:26)
+    at Timeout._onTimeout (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:5795:1462)
+    at listOnTimeout (node:internal/timers:605:17)
+    at process.processTimers (node:internal/timers:541:7)
+2026-05-04T03:33:41.974Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T03:33:41.974Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.91b; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:33:41.975Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:33:41.975Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:33:41.975Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-05-04T03:33:41.975Z [DEBUG] Found 5 hook matchers in settings
+2026-05-04T03:33:41.975Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T03:33:41.975Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:33:41.976Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T03:33:41.976Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T03:33:41.976Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T03:33:41.976Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T03:33:41.976Z [DEBUG] autocompact: tokens=24392 threshold=167000 effectiveWindow=180000
+2026-05-04T03:33:41.977Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T03:33:41.978Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:33:41.979Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:33:41.979Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:33:41.979Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:33:41.981Z [DEBUG] [useDeferredValue] Messages deferred by 1 (20→21)
+2026-05-04T03:33:43.316Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:33:45.049Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:33:45.578Z [DEBUG] [useDeferredValue] Messages deferred by 1 (21→22)
+2026-05-04T03:33:45.978Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-05-04T03:33:45.982Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-05-04T03:33:45.982Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:33:45.982Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T03:33:45.987Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T03:33:45.988Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.91b; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:33:45.988Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:33:45.988Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:33:45.989Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:33:45.992Z [DEBUG] [useDeferredValue] Messages deferred by 1 (22→23)
+2026-05-04T03:33:45.996Z [DEBUG] High write ratio: blit=0, write=1306 (100.0% writes), screen=34x212
+2026-05-04T03:33:45.997Z [DEBUG] [useDeferredValue] Messages deferred by 1 (22→23)
+2026-05-04T03:33:45.999Z [DEBUG] [useDeferredValue] Messages deferred by 1 (22→23)
+2026-05-04T03:33:46.657Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:33:50.034Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T03:33:50.035Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.91b; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:33:50.035Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:33:50.035Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:33:50.035Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-05-04T03:33:50.035Z [DEBUG] Found 5 hook matchers in settings
+2026-05-04T03:33:50.035Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T03:33:50.035Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:33:50.036Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T03:33:50.036Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T03:33:50.037Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T03:33:50.037Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T03:33:50.038Z [DEBUG] autocompact: tokens=25623 threshold=167000 effectiveWindow=180000
+2026-05-04T03:33:50.038Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T03:33:50.041Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:33:50.041Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:33:50.041Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:33:50.042Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:33:50.047Z [DEBUG] [useDeferredValue] Messages deferred by 1 (23→24)
+2026-05-04T03:33:50.863Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:33:53.416Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:33:54.212Z [DEBUG] [useDeferredValue] Messages deferred by 1 (24→25)
+2026-05-04T03:33:54.602Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-05-04T03:33:54.603Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-05-04T03:33:54.603Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:33:54.603Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T03:33:54.609Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T03:33:54.609Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.91b; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:33:54.609Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:33:54.609Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:33:54.610Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:33:54.611Z [DEBUG] [useDeferredValue] Messages deferred by 1 (25→26)
+2026-05-04T03:33:54.634Z [DEBUG] High write ratio: blit=0, write=1560 (100.0% writes), screen=43x212
+2026-05-04T03:33:55.182Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:34:04.611Z [ERROR] Error: Error: console.error: [33m⚠️  [BashTool] Pre-flight check is taking longer than expected. Run with ANTHROPIC_LOG=debug to check for failed or slow API requests.[39m
+
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:910:7643
+    at OV5.K.write (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:706:12007)
+    at Console.value (node:internal/console/constructor:313:16)
+    at Console.warn (node:internal/console/constructor:437:26)
+    at Timeout._onTimeout (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:5795:1462)
+    at listOnTimeout (node:internal/timers:605:17)
+    at process.processTimers (node:internal/timers:541:7)
+2026-05-04T03:34:15.592Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T03:34:15.592Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.91b; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:34:15.592Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:34:15.592Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:34:15.593Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-05-04T03:34:15.593Z [DEBUG] Found 5 hook matchers in settings
+2026-05-04T03:34:15.593Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T03:34:15.593Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:34:15.594Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T03:34:15.594Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T03:34:15.594Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T03:34:15.594Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T03:34:15.594Z [DEBUG] autocompact: tokens=26513 threshold=167000 effectiveWindow=180000
+2026-05-04T03:34:15.595Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T03:34:15.596Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:34:15.597Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:34:15.597Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:34:15.597Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:34:15.599Z [DEBUG] [useDeferredValue] Messages deferred by 1 (26→27)
+2026-05-04T03:34:18.561Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:34:19.124Z [DEBUG] [useDeferredValue] Messages deferred by 1 (27→28)
+2026-05-04T03:34:19.549Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-05-04T03:34:19.550Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-05-04T03:34:19.550Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:34:19.550Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T03:34:19.556Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T03:34:19.556Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.91b; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:34:19.556Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:34:19.556Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:34:19.557Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:34:19.559Z [DEBUG] [useDeferredValue] Messages deferred by 1 (28→29)
+2026-05-04T03:34:19.564Z [DEBUG] High write ratio: blit=0, write=1642 (100.0% writes), screen=46x212
+2026-05-04T03:34:19.572Z [DEBUG] [useDeferredValue] Messages deferred by 1 (28→29)
+2026-05-04T03:34:21.137Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:34:21.306Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:34:27.472Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T03:34:27.473Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.91b; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:34:27.473Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:34:27.473Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:34:27.473Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:34:27.476Z [DEBUG] Persisted tool result to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/projects/-Users-matianjun-Dropbox-obsidian-zettelkasten/f4e38479-858b-40a4-ad04-b0faaa1327b6/tool-results/call_function_n1my42laefue_1.txt (29.4KB)
+2026-05-04T03:34:27.476Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-05-04T03:34:27.476Z [DEBUG] Found 5 hook matchers in settings
+2026-05-04T03:34:27.476Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T03:34:27.477Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T03:34:27.477Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T03:34:27.477Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T03:34:27.477Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T03:34:27.477Z [DEBUG] autocompact: tokens=27163 threshold=167000 effectiveWindow=180000
+2026-05-04T03:34:27.478Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T03:34:27.479Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:34:27.480Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:34:27.480Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:34:27.481Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:34:27.483Z [DEBUG] [useDeferredValue] Messages deferred by 1 (29→30)
+2026-05-04T03:34:30.486Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:34:31.003Z [DEBUG] [useDeferredValue] Messages deferred by 1 (30→31)
+2026-05-04T03:34:31.404Z [DEBUG] executePreToolHooks called for tool: Read
+2026-05-04T03:34:31.405Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-05-04T03:34:31.405Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:34:31.405Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-05-04T03:34:31.408Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:34:31.408Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:34:31.408Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:34:31.410Z [DEBUG] [useDeferredValue] Messages deferred by 1 (31→32)
+2026-05-04T03:34:31.413Z [DEBUG] High write ratio: blit=0, write=1835 (100.0% writes), screen=52x212
+2026-05-04T03:34:31.415Z [DEBUG] [useDeferredValue] Messages deferred by 1 (31→32)
+2026-05-04T03:34:31.758Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-05-04T03:34:31.759Z [DEBUG] Found 5 hook matchers in settings
+2026-05-04T03:34:31.759Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-05-04T03:34:31.762Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T03:34:31.762Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T03:34:31.762Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T03:34:31.762Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T03:34:31.764Z [DEBUG] autocompact: tokens=36721 threshold=167000 effectiveWindow=180000
+2026-05-04T03:34:31.765Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T03:34:31.777Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:34:31.779Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:34:31.779Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:34:31.780Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:34:31.791Z [DEBUG] [useDeferredValue] Messages deferred by 3 (32→35)
+2026-05-04T03:34:32.441Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:34:35.629Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:34:37.820Z [DEBUG] [useDeferredValue] Messages deferred by 1 (35→36)
+2026-05-04T03:34:37.823Z [DEBUG] [useDeferredValue] Messages deferred by 1 (35→36)
+2026-05-04T03:34:40.154Z [DEBUG] [useDeferredValue] Messages deferred by 1 (36→37)
+2026-05-04T03:34:40.155Z [DEBUG] [useDeferredValue] Messages deferred by 1 (36→37)
+2026-05-04T03:34:40.176Z [DEBUG] Getting matching hook commands for Stop with query: undefined
+2026-05-04T03:34:40.176Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:34:40.176Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-05-04T03:34:40.176Z [DEBUG] autocompact: tokens=42045 threshold=167000 effectiveWindow=180000
+2026-05-04T03:34:40.178Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T03:34:40.180Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:34:40.181Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:34:40.181Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:34:40.182Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:34:40.185Z [DEBUG] [useDeferredValue] Messages deferred by 2 (36→38)
+2026-05-04T03:34:40.193Z [DEBUG] Stopped caffeinate, allowing sleep
+2026-05-04T03:34:40.200Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777865680200
+2026-05-04T03:34:40.200Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:34:40.201Z [DEBUG] Temp file written successfully, size: 14482 bytes
+2026-05-04T03:34:40.201Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:34:40.201Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777865680200 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:34:40.201Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:34:40.204Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777865680204
+2026-05-04T03:34:40.204Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:34:40.204Z [DEBUG] Temp file written successfully, size: 14482 bytes
+2026-05-04T03:34:40.204Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:34:40.204Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777865680204 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:34:40.204Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:34:40.206Z [DEBUG] [useDeferredValue] Messages deferred by 2 (36→38)
+2026-05-04T03:34:43.209Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:34:45.407Z [DEBUG] Forked agent [prompt_suggestion] received message: type=assistant
+2026-05-04T03:34:45.582Z [DEBUG] Forked agent [prompt_suggestion] received message: type=assistant
+2026-05-04T03:34:45.591Z [DEBUG] Getting matching hook commands for SubagentStop with query:
+2026-05-04T03:34:45.591Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:34:45.591Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-05-04T03:34:45.591Z [DEBUG] Forked agent [prompt_suggestion] finished: 2 messages, types=[assistant, assistant], totalUsage: input=975 output=299 cacheRead=41008 cacheCreate=0
+2026-05-04T03:37:40.874Z [DEBUG] Metrics opt-out check failed: No API key available
+2026-05-04T03:37:40.874Z [DEBUG] Metrics check failed, defaulting to disabled
+2026-05-04T03:37:40.874Z [DEBUG] Metrics export disabled by organization setting
+2026-05-04T04:02:42.851Z [DEBUG] AutoUpdater: Detected installation type: unknown
+2026-05-04T04:02:42.851Z [DEBUG] AutoUpdater: Unknown installation type, falling back to config
+2026-05-04T04:02:45.062Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777867365062
+2026-05-04T04:02:45.062Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T04:02:45.063Z [DEBUG] Temp file written successfully, size: 14482 bytes
+2026-05-04T04:02:45.063Z [DEBUG] Applied original permissions to temp file
+2026-05-04T04:02:45.063Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777867365062 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T04:02:45.063Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T04:32:42.913Z [DEBUG] AutoUpdater: Detected installation type: unknown
+2026-05-04T04:32:42.913Z [DEBUG] AutoUpdater: Unknown installation type, falling back to config
+2026-05-04T04:32:45.088Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777869165088
+2026-05-04T04:32:45.088Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T04:32:45.088Z [DEBUG] Temp file written successfully, size: 14482 bytes
+2026-05-04T04:32:45.088Z [DEBUG] Applied original permissions to temp file
+2026-05-04T04:32:45.088Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777869165088 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T04:32:45.089Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T04:46:25.508Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T04:46:25.509Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T04:46:25.509Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T04:46:25.509Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T04:46:25.510Z [DEBUG] Getting matching hook commands for UserPromptSubmit with query: undefined
+2026-05-04T04:46:25.510Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T04:46:25.510Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-05-04T04:46:25.511Z [DEBUG] FileHistory: Making snapshot for message 42221d73-2d66-486c-b288-23ac644d4b5e
+2026-05-04T04:46:25.511Z [DEBUG] FileHistory: Added snapshot for 42221d73-2d66-486c-b288-23ac644d4b5e, tracking 0 files
+2026-05-04T04:46:25.511Z [DEBUG] [useDeferredValue] Messages deferred by 2 (38→40)
+2026-05-04T04:46:25.523Z [DEBUG] Started caffeinate to prevent sleep
+2026-05-04T04:46:25.527Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777869985527
+2026-05-04T04:46:25.527Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T04:46:25.527Z [DEBUG] Temp file written successfully, size: 14482 bytes
+2026-05-04T04:46:25.527Z [DEBUG] Applied original permissions to temp file
+2026-05-04T04:46:25.527Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777869985527 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T04:46:25.528Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T04:46:25.528Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T04:46:25.528Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.ef5; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:46:25.529Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:46:25.529Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:46:25.529Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:46:25.530Z [DEBUG] autocompact: tokens=41787 threshold=167000 effectiveWindow=180000
+2026-05-04T04:46:25.531Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T04:46:25.534Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:46:25.534Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:46:25.534Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:46:25.535Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:46:25.537Z [DEBUG] [useDeferredValue] Messages deferred by 2 (38→40)
+2026-05-04T04:46:25.814Z [ERROR] API error (attempt 1/11): 400 400 {"type":"error","error":{"type":"invalid_request_error","message":"invalid params"}}
+2026-05-04T04:46:25.815Z [ERROR] Error in API request: 400 {"type":"error","error":{"type":"invalid_request_error","message":"invalid params"}}
+2026-05-04T04:46:25.815Z [ERROR] Error: Error: 400 {"type":"error","error":{"type":"invalid_request_error","message":"invalid params"}}
+    at E4.generate (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:354:8788)
+    at aC.makeStatusError (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:393:2195)
+    at aC.makeRequest (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:393:5420)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-05-04T04:46:30.324Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:46:31.718Z [DEBUG] [useDeferredValue] Messages deferred by 1 (40→41)
+2026-05-04T04:46:32.150Z [DEBUG] executePreToolHooks called for tool: Skill
+2026-05-04T04:46:32.150Z [DEBUG] Getting matching hook commands for PreToolUse with query: Skill
+2026-05-04T04:46:32.150Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T04:46:32.150Z [DEBUG] Matched 0 unique hooks for query "Skill" (0 before deduplication)
+2026-05-04T04:46:32.152Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777869992152
+2026-05-04T04:46:32.152Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T04:46:32.152Z [DEBUG] Temp file written successfully, size: 14566 bytes
+2026-05-04T04:46:32.153Z [DEBUG] Applied original permissions to temp file
+2026-05-04T04:46:32.153Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777869992152 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T04:46:32.153Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T04:46:32.153Z [DEBUG] Metadata string for gmgn-track:
+2026-05-04T04:46:32.153Z [DEBUG] <command-message>gmgn-track</command-message>
+<command-name>/gmgn-track</command-name>
+<command-args>follow-wallet 0xfa576577835610ac69a48978a4fb44300c77b8b0 0x02e9c47ecb1dd9c2a9f63ce5cabd642550f24f8c
+2026-05-04T04:46:32.153Z [DEBUG] command-message tags in metadata: 1
+2026-05-04T04:46:32.154Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T04:46:32.154Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T04:46:32.154Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T04:46:32.154Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T04:46:32.154Z [DEBUG] processPromptSlashCommand creating 3 messages for gmgn-track
+2026-05-04T04:46:32.154Z [DEBUG] Message 1: <command-message>gmgn-track</command-message>
+<command-name>/gmgn-track</command-name>
+<command-args>follow-wallet 0xfa576577835610ac69a48978a4fb44300c77b8b0 0x02e9c47ecb1dd9c2a9f63ce5cabd642550f24f8c
+2026-05-04T04:46:32.154Z [DEBUG] Message 2 [META]: [{"type":"text","text":"Base directory for this skill: /Users/matianjun/Dropbox/obsidian_zettelkasten/.claude/skills/gmgn-track\n\n**IMPORTANT: Always use `gmgn-cli` commands below. Do NOT use web sea
+2026-05-04T04:46:32.154Z [DEBUG] Message 3: [ATTACHMENT]
+2026-05-04T04:46:32.154Z [DEBUG] SkillTool returning 2 newMessages for skill gmgn-track
+2026-05-04T04:46:32.154Z [DEBUG] newMessage 1: [{"type":"text","text":"Base directory for this skill: /Users/matianjun/Dropbox/obsidian_zettelkasten/.claude/skills/gmgn-track\n\n**IMPORTANT: Always...
+2026-05-04T04:46:32.155Z [DEBUG] Getting matching hook commands for PostToolUse with query: Skill
+2026-05-04T04:46:32.155Z [DEBUG] Found 5 hook matchers in settings
+2026-05-04T04:46:32.155Z [DEBUG] Matched 0 unique hooks for query "Skill" (0 before deduplication)
+2026-05-04T04:46:32.155Z [DEBUG] [useDeferredValue] Messages deferred by 1 (41→42)
+2026-05-04T04:46:32.160Z [DEBUG] High write ratio: blit=0, write=4798 (100.0% writes), screen=92x212
+2026-05-04T04:46:32.161Z [DEBUG] [useDeferredValue] Messages deferred by 4 (41→45)
+2026-05-04T04:46:32.167Z [WARN] [PROMPT CACHE BREAK] unknown cause [source=repl_main_thread, call #11, cache read: 27312 → 16, creation: 0]
+2026-05-04T04:46:32.168Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T04:46:32.168Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T04:46:32.168Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T04:46:32.168Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T04:46:32.168Z [DEBUG] autocompact: tokens=46640 threshold=167000 effectiveWindow=180000
+2026-05-04T04:46:32.168Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T04:46:32.170Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:46:32.171Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:46:32.171Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:46:32.171Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:46:35.861Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:46:36.865Z [DEBUG] [useDeferredValue] Messages deferred by 1 (45→46)
+2026-05-04T04:46:37.448Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-05-04T04:46:37.448Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-05-04T04:46:37.448Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T04:46:37.448Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T04:46:37.449Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T04:46:37.449Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.bca; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:46:37.449Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:46:37.449Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:46:37.450Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:46:37.451Z [DEBUG] [useDeferredValue] Messages deferred by 1 (46→47)
+2026-05-04T04:46:37.456Z [DEBUG] High write ratio: blit=0, write=4846 (100.0% writes), screen=95x212
+2026-05-04T04:46:37.457Z [DEBUG] [useDeferredValue] Messages deferred by 1 (46→47)
+2026-05-04T04:46:39.021Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:46:42.957Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T04:46:42.957Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.bca; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:46:42.957Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:46:42.957Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:46:42.957Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-05-04T04:46:42.957Z [DEBUG] Found 5 hook matchers in settings
+2026-05-04T04:46:42.957Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T04:46:42.958Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:46:42.958Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T04:46:42.958Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T04:46:42.959Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T04:46:42.959Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T04:46:42.959Z [DEBUG] autocompact: tokens=46986 threshold=167000 effectiveWindow=180000
+2026-05-04T04:46:42.959Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T04:46:42.961Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:46:42.961Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:46:42.961Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:46:42.961Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:46:42.964Z [DEBUG] [useDeferredValue] Messages deferred by 1 (47→48)
+2026-05-04T04:46:44.030Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:46:46.443Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:46:46.954Z [DEBUG] [useDeferredValue] Messages deferred by 1 (48→49)
+2026-05-04T04:46:47.365Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-05-04T04:46:47.365Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-05-04T04:46:47.365Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T04:46:47.365Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T04:46:47.366Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T04:46:47.366Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.85e; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:46:47.366Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:46:47.366Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:46:47.366Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:46:47.367Z [DEBUG] [useDeferredValue] Messages deferred by 1 (49→50)
+2026-05-04T04:46:47.373Z [DEBUG] High write ratio: blit=0, write=5028 (100.0% writes), screen=101x212
+2026-05-04T04:46:47.375Z [DEBUG] [useDeferredValue] Messages deferred by 1 (49→50)
+2026-05-04T04:46:48.461Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:46:53.502Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T04:46:53.502Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.85e; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:46:53.502Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:46:53.502Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:46:53.503Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-05-04T04:46:53.503Z [DEBUG] Found 5 hook matchers in settings
+2026-05-04T04:46:53.503Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T04:46:53.503Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:46:53.504Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T04:46:53.504Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T04:46:53.504Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T04:46:53.504Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T04:46:53.504Z [DEBUG] autocompact: tokens=47081 threshold=167000 effectiveWindow=180000
+2026-05-04T04:46:53.504Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T04:46:53.506Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:46:53.506Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:46:53.506Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:46:53.507Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:46:53.509Z [DEBUG] [useDeferredValue] Messages deferred by 1 (50→51)
+2026-05-04T04:46:55.075Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:46:56.963Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:46:57.531Z [DEBUG] [useDeferredValue] Messages deferred by 1 (51→52)
+2026-05-04T04:46:57.932Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-05-04T04:46:57.932Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-05-04T04:46:57.932Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T04:46:57.932Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T04:46:57.933Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T04:46:57.933Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.85e; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:46:57.933Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:46:57.933Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:46:57.933Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:46:57.934Z [DEBUG] [useDeferredValue] Messages deferred by 1 (52→53)
+2026-05-04T04:46:57.937Z [DEBUG] [useDeferredValue] Messages deferred by 1 (52→53)
+2026-05-04T04:46:57.962Z [DEBUG] High write ratio: blit=0, write=5280 (100.0% writes), screen=110x212
+2026-05-04T04:47:06.825Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:47:07.935Z [ERROR] Error: Error: console.error: [33m⚠️  [BashTool] Pre-flight check is taking longer than expected. Run with ANTHROPIC_LOG=debug to check for failed or slow API requests.[39m
+
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:910:7643
+    at OV5.K.write (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:706:12007)
+    at Console.value (node:internal/console/constructor:313:16)
+    at Console.warn (node:internal/console/constructor:437:26)
+    at Timeout._onTimeout (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:5795:1462)
+    at listOnTimeout (node:internal/timers:605:17)
+    at process.processTimers (node:internal/timers:541:7)
+2026-05-04T04:47:16.866Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T04:47:16.866Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.85e; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:47:16.866Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:47:16.866Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:47:16.867Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-05-04T04:47:16.867Z [DEBUG] Found 5 hook matchers in settings
+2026-05-04T04:47:16.867Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T04:47:16.867Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:47:16.868Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T04:47:16.868Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T04:47:16.868Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T04:47:16.868Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T04:47:16.869Z [DEBUG] autocompact: tokens=47277 threshold=167000 effectiveWindow=180000
+2026-05-04T04:47:16.869Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T04:47:16.871Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:47:16.871Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:47:16.871Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:47:16.871Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:47:16.874Z [DEBUG] [useDeferredValue] Messages deferred by 1 (53→54)
+2026-05-04T04:47:18.408Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:47:20.377Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:47:20.921Z [DEBUG] [useDeferredValue] Messages deferred by 1 (54→55)
+2026-05-04T04:47:21.362Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-05-04T04:47:21.363Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-05-04T04:47:21.363Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T04:47:21.363Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T04:47:21.367Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T04:47:21.368Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.bca; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:47:21.375Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:47:21.375Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:47:21.378Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:47:21.382Z [DEBUG] [useDeferredValue] Messages deferred by 1 (55→56)
+2026-05-04T04:47:21.391Z [DEBUG] [useDeferredValue] Messages deferred by 1 (55→56)
+2026-05-04T04:47:21.415Z [DEBUG] High write ratio: blit=0, write=5411 (100.0% writes), screen=116x212
+2026-05-04T04:47:22.263Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:47:27.514Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T04:47:27.515Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.bca; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:47:27.515Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:47:27.515Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:47:27.515Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-05-04T04:47:27.515Z [DEBUG] Found 5 hook matchers in settings
+2026-05-04T04:47:27.515Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T04:47:27.515Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:47:27.517Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T04:47:27.517Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T04:47:27.517Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T04:47:27.517Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T04:47:27.517Z [DEBUG] autocompact: tokens=47562 threshold=167000 effectiveWindow=180000
+2026-05-04T04:47:27.518Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T04:47:27.520Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:47:27.521Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:47:27.521Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:47:27.521Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:47:27.524Z [DEBUG] [useDeferredValue] Messages deferred by 1 (56→57)
+2026-05-04T04:47:28.621Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:47:30.952Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:47:31.625Z [DEBUG] [useDeferredValue] Messages deferred by 1 (57→58)
+2026-05-04T04:47:32.053Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-05-04T04:47:32.053Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-05-04T04:47:32.053Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T04:47:32.053Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T04:47:32.054Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T04:47:32.054Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.9ee; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:47:32.054Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:47:32.054Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:47:32.054Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:47:32.055Z [DEBUG] [useDeferredValue] Messages deferred by 1 (58→59)
+2026-05-04T04:47:32.059Z [DEBUG] High write ratio: blit=0, write=5546 (100.0% writes), screen=119x212
+2026-05-04T04:47:32.060Z [DEBUG] [useDeferredValue] Messages deferred by 1 (58→59)
+2026-05-04T04:47:33.094Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:47:40.931Z [DEBUG] Metrics opt-out check failed: No API key available
+2026-05-04T04:47:40.931Z [DEBUG] Metrics check failed, defaulting to disabled
+2026-05-04T04:47:40.931Z [DEBUG] Metrics export disabled by organization setting
+2026-05-04T04:47:42.054Z [ERROR] Error: Error: console.error: [33m⚠️  [BashTool] Pre-flight check is taking longer than expected. Run with ANTHROPIC_LOG=debug to check for failed or slow API requests.[39m
+
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:910:7643
+    at OV5.K.write (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:706:12007)
+    at Console.value (node:internal/console/constructor:313:16)
+    at Console.warn (node:internal/console/constructor:437:26)
+    at Timeout._onTimeout (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:5795:1462)
+    at listOnTimeout (node:internal/timers:605:17)
+    at process.processTimers (node:internal/timers:541:7)
+2026-05-04T04:47:43.949Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T04:47:43.949Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.9ee; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:47:43.949Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:47:43.949Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:47:43.949Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-05-04T04:47:43.949Z [DEBUG] Found 5 hook matchers in settings
+2026-05-04T04:47:43.950Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T04:47:43.950Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:47:43.950Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T04:47:43.950Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T04:47:43.950Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T04:47:43.950Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T04:47:43.951Z [DEBUG] autocompact: tokens=47781 threshold=167000 effectiveWindow=180000
+2026-05-04T04:47:43.951Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T04:47:43.953Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:47:43.953Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:47:43.953Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:47:43.953Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:47:43.957Z [DEBUG] [useDeferredValue] Messages deferred by 1 (59→60)
+2026-05-04T04:47:45.200Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:47:47.395Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:47:47.984Z [DEBUG] [useDeferredValue] Messages deferred by 1 (60→61)
+2026-05-04T04:47:48.424Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-05-04T04:47:48.425Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-05-04T04:47:48.425Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T04:47:48.425Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T04:47:48.433Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T04:47:48.433Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T04:47:48.433Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.5c8; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:47:48.433Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:47:48.433Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:47:48.433Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.5ad; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:47:48.434Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:47:48.434Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:47:48.434Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:47:48.434Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:47:48.435Z [DEBUG] [useDeferredValue] Messages deferred by 1 (61→62)
+2026-05-04T04:47:48.440Z [DEBUG] High write ratio: blit=0, write=5684 (100.0% writes), screen=125x212
+2026-05-04T04:47:48.441Z [DEBUG] [useDeferredValue] Messages deferred by 1 (61→62)
+2026-05-04T04:47:49.465Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:47:49.544Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:47:53.715Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T04:47:53.715Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T04:47:53.716Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.bca; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:47:53.716Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:47:53.716Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:47:53.716Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.bca; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:47:53.716Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:47:53.716Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:47:53.717Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:47:53.717Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:47:56.968Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:47:57.978Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:48:03.715Z [ERROR] Error: Error: console.error: [33m⚠️  [BashTool] Pre-flight check is taking longer than expected. Run with ANTHROPIC_LOG=debug to check for failed or slow API requests.[39m
+
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:910:7643
+    at OV5.K.write (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:706:12007)
+    at Console.value (node:internal/console/constructor:313:16)
+    at Console.warn (node:internal/console/constructor:437:26)
+    at Timeout._onTimeout (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:5795:1462)
+    at listOnTimeout (node:internal/timers:605:17)
+    at process.processTimers (node:internal/timers:541:7)
+2026-05-04T04:48:04.064Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T04:48:04.065Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.2b1; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:48:04.065Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:48:04.065Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:48:04.065Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-05-04T04:48:04.065Z [DEBUG] Found 5 hook matchers in settings
+2026-05-04T04:48:04.065Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T04:48:04.065Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:48:04.066Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T04:48:04.066Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T04:48:04.066Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T04:48:04.066Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T04:48:04.067Z [DEBUG] autocompact: tokens=47801 threshold=167000 effectiveWindow=180000
+2026-05-04T04:48:04.067Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T04:48:04.069Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:48:04.070Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:48:04.070Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:48:04.070Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:48:04.073Z [DEBUG] [useDeferredValue] Messages deferred by 1 (62→63)
+2026-05-04T04:48:05.621Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:48:07.784Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:48:08.329Z [DEBUG] [useDeferredValue] Messages deferred by 1 (63→64)
+2026-05-04T04:48:08.720Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-05-04T04:48:08.720Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-05-04T04:48:08.720Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T04:48:08.720Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T04:48:08.721Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T04:48:08.721Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T04:48:08.721Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.4a3; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:48:08.721Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:48:08.721Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:48:08.721Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.4a3; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:48:08.722Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:48:08.722Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:48:08.722Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:48:08.722Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:48:08.723Z [DEBUG] [useDeferredValue] Messages deferred by 1 (64→65)
+2026-05-04T04:48:08.730Z [DEBUG] High write ratio: blit=0, write=5834 (100.0% writes), screen=128x212
+2026-05-04T04:48:11.586Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:48:15.466Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:48:18.892Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T04:48:18.892Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.4a3; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:48:18.892Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:48:18.892Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:48:18.893Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-05-04T04:48:18.893Z [DEBUG] Found 5 hook matchers in settings
+2026-05-04T04:48:18.893Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T04:48:18.893Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:48:18.894Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T04:48:18.894Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T04:48:18.894Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T04:48:18.894Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T04:48:18.894Z [DEBUG] autocompact: tokens=48075 threshold=167000 effectiveWindow=180000
+2026-05-04T04:48:18.895Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T04:48:18.897Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:48:18.897Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:48:18.897Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:48:18.897Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:48:18.901Z [DEBUG] [useDeferredValue] Messages deferred by 1 (65→66)
+2026-05-04T04:48:20.632Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:48:22.431Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:48:23.673Z [DEBUG] [useDeferredValue] Messages deferred by 1 (66→67)
+2026-05-04T04:48:24.042Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-05-04T04:48:24.043Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-05-04T04:48:24.043Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T04:48:24.043Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T04:48:24.043Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T04:48:24.043Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.2b1; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:48:24.044Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:48:24.044Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:48:24.044Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:48:24.045Z [DEBUG] [useDeferredValue] Messages deferred by 1 (67→68)
+2026-05-04T04:48:24.047Z [DEBUG] [useDeferredValue] Messages deferred by 1 (67→68)
+2026-05-04T04:48:24.055Z [DEBUG] [useDeferredValue] Messages deferred by 1 (67→68)
+2026-05-04T04:48:24.084Z [DEBUG] High write ratio: blit=0, write=6040 (100.0% writes), screen=137x212
+2026-05-04T04:48:25.138Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:48:29.915Z [DEBUG] Bash tool error (291ms): Shell command failed
+2026-05-04T04:48:29.915Z [DEBUG] Getting matching hook commands for PostToolUseFailure with query: Bash
+2026-05-04T04:48:29.915Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T04:48:29.915Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T04:48:29.916Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T04:48:29.916Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T04:48:29.916Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T04:48:29.916Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T04:48:29.916Z [DEBUG] autocompact: tokens=48436 threshold=167000 effectiveWindow=180000
+2026-05-04T04:48:29.916Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T04:48:29.918Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:48:29.919Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:48:29.919Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:48:29.919Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:48:29.923Z [DEBUG] [useDeferredValue] Messages deferred by 1 (68→69)
+2026-05-04T04:48:33.442Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:48:34.110Z [DEBUG] [useDeferredValue] Messages deferred by 1 (69→70)
+2026-05-04T04:48:34.449Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-05-04T04:48:34.450Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-05-04T04:48:34.450Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T04:48:34.450Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T04:48:34.462Z [DEBUG] [useDeferredValue] Messages deferred by 1 (70→71)
+2026-05-04T04:48:34.488Z [DEBUG] High write ratio: blit=0, write=6312 (100.0% writes), screen=147x212
+2026-05-04T04:48:34.490Z [DEBUG] [useDeferredValue] Messages deferred by 1 (70→71)
+2026-05-04T04:48:35.529Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T04:48:35.530Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.2af; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:48:35.530Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:48:35.530Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:48:35.530Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-05-04T04:48:35.530Z [DEBUG] Found 5 hook matchers in settings
+2026-05-04T04:48:35.530Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T04:48:35.530Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:48:35.532Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T04:48:35.532Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T04:48:35.532Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T04:48:35.532Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T04:48:35.532Z [DEBUG] autocompact: tokens=48402 threshold=167000 effectiveWindow=180000
+2026-05-04T04:48:35.533Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T04:48:35.535Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:48:35.535Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:48:35.535Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:48:35.535Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:48:35.538Z [DEBUG] [useDeferredValue] Messages deferred by 2 (71→73)
+2026-05-04T04:48:36.840Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:48:39.056Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:48:39.667Z [DEBUG] [useDeferredValue] Messages deferred by 1 (73→74)
+2026-05-04T04:48:40.062Z [DEBUG] executePreToolHooks called for tool: Glob
+2026-05-04T04:48:40.064Z [DEBUG] Getting matching hook commands for PreToolUse with query: Glob
+2026-05-04T04:48:40.064Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T04:48:40.064Z [DEBUG] Matched 0 unique hooks for query "Glob" (0 before deduplication)
+2026-05-04T04:48:40.071Z [DEBUG] [useDeferredValue] Messages deferred by 1 (74→75)
+2026-05-04T04:48:40.077Z [DEBUG] High write ratio: blit=0, write=6425 (100.0% writes), screen=151x212
+2026-05-04T04:48:40.078Z [DEBUG] [useDeferredValue] Messages deferred by 1 (74→75)
+2026-05-04T04:48:40.147Z [DEBUG] Getting matching hook commands for PostToolUse with query: Glob
+2026-05-04T04:48:40.147Z [DEBUG] Found 5 hook matchers in settings
+2026-05-04T04:48:40.147Z [DEBUG] Matched 1 unique hooks for query "Glob" (1 before deduplication)
+2026-05-04T04:48:40.148Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T04:48:40.148Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T04:48:40.148Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T04:48:40.148Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T04:48:40.148Z [DEBUG] autocompact: tokens=48520 threshold=167000 effectiveWindow=180000
+2026-05-04T04:48:40.148Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T04:48:40.150Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:48:40.151Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:48:40.151Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:48:40.151Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:48:40.154Z [DEBUG] [useDeferredValue] Messages deferred by 3 (75→78)
+2026-05-04T04:48:43.376Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:48:45.323Z [DEBUG] [useDeferredValue] Messages deferred by 1 (78→79)
+2026-05-04T04:48:45.478Z [DEBUG] [useDeferredValue] Messages deferred by 1 (79→80)
+2026-05-04T04:48:45.502Z [DEBUG] Getting matching hook commands for Stop with query: undefined
+2026-05-04T04:48:45.502Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T04:48:45.502Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-05-04T04:48:45.503Z [DEBUG] autocompact: tokens=49257 threshold=167000 effectiveWindow=180000
+2026-05-04T04:48:45.504Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T04:48:45.506Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T04:48:45.507Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T04:48:45.507Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T04:48:45.507Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T04:48:45.510Z [DEBUG] [useDeferredValue] Messages deferred by 2 (79→81)
+2026-05-04T04:48:45.515Z [DEBUG] Stopped caffeinate, allowing sleep
+2026-05-04T04:48:45.517Z [DEBUG] [useDeferredValue] Messages deferred by 2 (79→81)
+2026-05-04T04:48:49.092Z [DEBUG] Stream started - received first chunk
+2026-05-04T04:48:50.830Z [DEBUG] Forked agent [prompt_suggestion] received message: type=assistant
+2026-05-04T04:48:51.047Z [DEBUG] Forked agent [prompt_suggestion] received message: type=assistant
+2026-05-04T04:48:51.051Z [DEBUG] Getting matching hook commands for SubagentStop with query:
+2026-05-04T04:48:51.051Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T04:48:51.051Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-05-04T04:48:51.051Z [DEBUG] Forked agent [prompt_suggestion] finished: 2 messages, types=[assistant, assistant], totalUsage: input=734 output=276 cacheRead=48496 cacheCreate=0
+2026-05-04T04:49:45.520Z [DEBUG] Getting matching hook commands for Notification with query: idle_prompt
+2026-05-04T04:49:45.520Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T04:49:45.520Z [DEBUG] Matched 0 unique hooks for query "idle_prompt" (0 before deduplication)
+2026-05-04T04:52:40.939Z [DEBUG] Metrics opt-out check failed: No API key available
+2026-05-04T04:52:40.940Z [DEBUG] Metrics check failed, defaulting to disabled
+2026-05-04T04:52:40.940Z [DEBUG] Metrics export disabled by organization setting
+2026-05-04T05:02:43.051Z [DEBUG] AutoUpdater: Detected installation type: unknown
+2026-05-04T05:02:43.051Z [DEBUG] AutoUpdater: Unknown installation type, falling back to config
+2026-05-04T05:02:45.420Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777870965420
+2026-05-04T05:02:45.420Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T05:02:45.421Z [DEBUG] Temp file written successfully, size: 14566 bytes
+2026-05-04T05:02:45.421Z [DEBUG] Applied original permissions to temp file
+2026-05-04T05:02:45.421Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777870965420 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T05:02:45.421Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T05:32:43.069Z [DEBUG] AutoUpdater: Detected installation type: unknown
+2026-05-04T05:32:43.069Z [DEBUG] AutoUpdater: Unknown installation type, falling back to config
+2026-05-04T05:32:45.293Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777872765293
+2026-05-04T05:32:45.293Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T05:32:45.293Z [DEBUG] Temp file written successfully, size: 14566 bytes
+2026-05-04T05:32:45.293Z [DEBUG] Applied original permissions to temp file
+2026-05-04T05:32:45.293Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777872765293 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T05:32:45.293Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T06:02:42.910Z [DEBUG] AutoUpdater: Detected installation type: unknown
+2026-05-04T06:02:42.910Z [DEBUG] AutoUpdater: Unknown installation type, falling back to config
+2026-05-04T06:02:45.195Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777874565195
+2026-05-04T06:02:45.195Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T06:02:45.196Z [DEBUG] Temp file written successfully, size: 14566 bytes
+2026-05-04T06:02:45.196Z [DEBUG] Applied original permissions to temp file
+2026-05-04T06:02:45.196Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777874565195 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T06:02:45.196Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T06:32:42.878Z [DEBUG] AutoUpdater: Detected installation type: unknown
+2026-05-04T06:32:42.879Z [DEBUG] AutoUpdater: Unknown installation type, falling back to config
+2026-05-04T06:32:44.896Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777876364896
+2026-05-04T06:32:44.896Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T06:32:44.896Z [DEBUG] Temp file written successfully, size: 14566 bytes
+2026-05-04T06:32:44.896Z [DEBUG] Applied original permissions to temp file
+2026-05-04T06:32:44.896Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777876364896 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T06:32:44.896Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T07:02:42.786Z [DEBUG] AutoUpdater: Detected installation type: unknown
+2026-05-04T07:02:42.786Z [DEBUG] AutoUpdater: Unknown installation type, falling back to config
+2026-05-04T07:02:44.794Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777878164794
+2026-05-04T07:02:44.794Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T07:02:44.794Z [DEBUG] Temp file written successfully, size: 14566 bytes
+2026-05-04T07:02:44.794Z [DEBUG] Applied original permissions to temp file
+2026-05-04T07:02:44.794Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777878164794 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T07:02:44.794Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T07:31:48.082Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T07:31:48.082Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T07:31:48.083Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T07:31:48.083Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T07:31:48.085Z [DEBUG] Getting matching hook commands for UserPromptSubmit with query: undefined
+2026-05-04T07:31:48.085Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T07:31:48.085Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-05-04T07:31:48.086Z [DEBUG] FileHistory: Making snapshot for message 101b84f6-42c1-4ee9-a603-abfb75174e92
+2026-05-04T07:31:48.086Z [DEBUG] FileHistory: Added snapshot for 101b84f6-42c1-4ee9-a603-abfb75174e92, tracking 0 files
+2026-05-04T07:31:48.086Z [DEBUG] [useDeferredValue] Messages deferred by 1 (81→82)
+2026-05-04T07:31:48.104Z [DEBUG] Started caffeinate to prevent sleep
+2026-05-04T07:31:48.108Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777879908108
+2026-05-04T07:31:48.108Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T07:31:48.108Z [DEBUG] Temp file written successfully, size: 14566 bytes
+2026-05-04T07:31:48.108Z [DEBUG] Applied original permissions to temp file
+2026-05-04T07:31:48.108Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777879908108 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T07:31:48.108Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T07:31:48.109Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T07:31:48.109Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.8c6; cc_entrypoint=cli; cch=00000;
+2026-05-04T07:31:48.110Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T07:31:48.110Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T07:31:48.110Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T07:31:48.111Z [DEBUG] autocompact: tokens=48989 threshold=167000 effectiveWindow=180000
+2026-05-04T07:31:48.113Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T07:31:48.116Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T07:31:48.117Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T07:31:48.117Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T07:31:48.117Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T07:31:48.122Z [DEBUG] [useDeferredValue] Messages deferred by 1 (81→82)
+2026-05-04T07:31:48.396Z [ERROR] API error (attempt 1/11): 400 400 {"type":"error","error":{"type":"invalid_request_error","message":"invalid params"}}
+2026-05-04T07:31:48.397Z [ERROR] Error in API request: 400 {"type":"error","error":{"type":"invalid_request_error","message":"invalid params"}}
+2026-05-04T07:31:48.397Z [ERROR] Error: Error: 400 {"type":"error","error":{"type":"invalid_request_error","message":"invalid params"}}
+    at E4.generate (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:354:8788)
+    at aC.makeStatusError (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:393:2195)
+    at aC.makeRequest (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:393:5420)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-05-04T07:31:53.675Z [DEBUG] Stream started - received first chunk
+2026-05-04T07:31:54.937Z [DEBUG] [useDeferredValue] Messages deferred by 1 (82→83)
+2026-05-04T07:31:55.365Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-05-04T07:31:55.366Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-05-04T07:31:55.366Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T07:31:55.366Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T07:31:55.370Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T07:31:55.370Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.9ee; cc_entrypoint=cli; cch=00000;
+2026-05-04T07:31:55.370Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T07:31:55.370Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T07:31:55.371Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T07:31:55.373Z [DEBUG] [useDeferredValue] Messages deferred by 1 (83→84)
+2026-05-04T07:31:55.387Z [DEBUG] High write ratio: blit=0, write=8090 (100.0% writes), screen=186x212
+2026-05-04T07:31:55.390Z [DEBUG] [useDeferredValue] Messages deferred by 1 (83→84)
+2026-05-04T07:31:55.397Z [WARN] [PROMPT CACHE BREAK] unknown cause [source=repl_main_thread, call #23, cache read: 48448 → 16, creation: 0]
+2026-05-04T07:31:56.387Z [DEBUG] Stream started - received first chunk
+2026-05-04T07:32:04.887Z [DEBUG] Bash tool error (582ms): Shell command failed
+2026-05-04T07:32:04.887Z [DEBUG] Getting matching hook commands for PostToolUseFailure with query: Bash
+2026-05-04T07:32:04.887Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T07:32:04.887Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T07:32:04.888Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T07:32:04.888Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T07:32:04.888Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T07:32:04.888Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T07:32:04.888Z [DEBUG] autocompact: tokens=49405 threshold=167000 effectiveWindow=180000
+2026-05-04T07:32:04.888Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T07:32:04.890Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T07:32:04.891Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T07:32:04.891Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T07:32:04.891Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T07:32:04.895Z [DEBUG] [useDeferredValue] Messages deferred by 1 (84→85)
+2026-05-04T07:32:08.759Z [DEBUG] Stream started - received first chunk
+2026-05-04T07:32:09.307Z [DEBUG] [useDeferredValue] Messages deferred by 1 (85→86)
+2026-05-04T07:32:09.767Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-05-04T07:32:09.768Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-05-04T07:32:09.768Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T07:32:09.768Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T07:32:09.775Z [DEBUG] [useDeferredValue] Messages deferred by 1 (86→87)
+2026-05-04T07:32:09.806Z [DEBUG] High write ratio: blit=0, write=8365 (100.0% writes), screen=190x212
+2026-05-04T07:32:09.807Z [DEBUG] [useDeferredValue] Messages deferred by 1 (86→87)
+2026-05-04T07:32:09.890Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T07:32:09.890Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.38a; cc_entrypoint=cli; cch=00000;
+2026-05-04T07:32:09.890Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T07:32:09.890Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T07:32:09.890Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-05-04T07:32:09.890Z [DEBUG] Found 5 hook matchers in settings
+2026-05-04T07:32:09.890Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T07:32:09.890Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T07:32:09.891Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T07:32:09.891Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T07:32:09.891Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T07:32:09.891Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T07:32:09.892Z [DEBUG] autocompact: tokens=49454 threshold=167000 effectiveWindow=180000
+2026-05-04T07:32:09.892Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T07:32:09.894Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T07:32:09.895Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T07:32:09.895Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T07:32:09.895Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T07:32:09.898Z [DEBUG] [useDeferredValue] Messages deferred by 1 (87→88)
+2026-05-04T07:32:11.992Z [DEBUG] Stream started - received first chunk
+2026-05-04T07:32:13.371Z [DEBUG] Stream started - received first chunk
+2026-05-04T07:32:13.824Z [DEBUG] [useDeferredValue] Messages deferred by 1 (88→89)
+2026-05-04T07:32:14.223Z [DEBUG] executePreToolHooks called for tool: Glob
+2026-05-04T07:32:14.223Z [DEBUG] Getting matching hook commands for PreToolUse with query: Glob
+2026-05-04T07:32:14.223Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T07:32:14.223Z [DEBUG] Matched 0 unique hooks for query "Glob" (0 before deduplication)
+2026-05-04T07:32:14.227Z [DEBUG] [useDeferredValue] Messages deferred by 1 (89→90)
+2026-05-04T07:32:14.231Z [DEBUG] [useDeferredValue] Messages deferred by 1 (89→90)
+2026-05-04T07:32:14.356Z [DEBUG] Getting matching hook commands for PostToolUse with query: Glob
+2026-05-04T07:32:14.356Z [DEBUG] Found 5 hook matchers in settings
+2026-05-04T07:32:14.356Z [DEBUG] Matched 1 unique hooks for query "Glob" (1 before deduplication)
+2026-05-04T07:32:14.357Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T07:32:14.357Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T07:32:14.357Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T07:32:14.357Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T07:32:14.357Z [DEBUG] autocompact: tokens=49491 threshold=167000 effectiveWindow=180000
+2026-05-04T07:32:14.357Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T07:32:14.359Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T07:32:14.360Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T07:32:14.360Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T07:32:14.360Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T07:32:14.362Z [DEBUG] [useDeferredValue] Messages deferred by 3 (90→93)
+2026-05-04T07:32:17.751Z [DEBUG] Stream started - received first chunk
+2026-05-04T07:32:18.332Z [DEBUG] [useDeferredValue] Messages deferred by 1 (93→94)
+2026-05-04T07:32:18.758Z [DEBUG] executePreToolHooks called for tool: Glob
+2026-05-04T07:32:18.758Z [DEBUG] Getting matching hook commands for PreToolUse with query: Glob
+2026-05-04T07:32:18.758Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T07:32:18.758Z [DEBUG] Matched 0 unique hooks for query "Glob" (0 before deduplication)
+2026-05-04T07:32:18.761Z [DEBUG] [useDeferredValue] Messages deferred by 1 (94→95)
+2026-05-04T07:32:18.765Z [DEBUG] [useDeferredValue] Messages deferred by 1 (94→95)
+2026-05-04T07:32:18.776Z [DEBUG] Getting matching hook commands for PostToolUse with query: Glob
+2026-05-04T07:32:18.776Z [DEBUG] Found 5 hook matchers in settings
+2026-05-04T07:32:18.776Z [DEBUG] Matched 1 unique hooks for query "Glob" (1 before deduplication)
+2026-05-04T07:32:18.776Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T07:32:18.776Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T07:32:18.776Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T07:32:18.776Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T07:32:18.777Z [DEBUG] autocompact: tokens=49531 threshold=167000 effectiveWindow=180000
+2026-05-04T07:32:18.777Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T07:32:18.780Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T07:32:18.781Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T07:32:18.781Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T07:32:18.781Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T07:32:18.786Z [DEBUG] [useDeferredValue] Messages deferred by 3 (95→98)
+2026-05-04T07:32:22.103Z [DEBUG] Stream started - received first chunk
+2026-05-04T07:32:22.750Z [DEBUG] [useDeferredValue] Messages deferred by 1 (98→99)
+2026-05-04T07:32:22.899Z [DEBUG] [useDeferredValue] Messages deferred by 1 (99→100)
+2026-05-04T07:32:22.902Z [DEBUG] [useDeferredValue] Messages deferred by 1 (99→100)
+2026-05-04T07:32:22.903Z [DEBUG] [useDeferredValue] Messages deferred by 1 (99→100)
+2026-05-04T07:32:22.918Z [DEBUG] Getting matching hook commands for Stop with query: undefined
+2026-05-04T07:32:22.918Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T07:32:22.918Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-05-04T07:32:22.919Z [DEBUG] autocompact: tokens=49937 threshold=167000 effectiveWindow=180000
+2026-05-04T07:32:22.920Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T07:32:22.923Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T07:32:22.924Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T07:32:22.924Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T07:32:22.925Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T07:32:22.928Z [DEBUG] [useDeferredValue] Messages deferred by 2 (99→101)
+2026-05-04T07:32:22.932Z [DEBUG] Stopped caffeinate, allowing sleep
+2026-05-04T07:32:26.387Z [DEBUG] Stream started - received first chunk
+2026-05-04T07:32:29.041Z [DEBUG] Forked agent [prompt_suggestion] received message: type=assistant
+2026-05-04T07:32:29.222Z [DEBUG] Forked agent [prompt_suggestion] received message: type=assistant
+2026-05-04T07:32:29.225Z [DEBUG] Getting matching hook commands for SubagentStop with query:
+2026-05-04T07:32:29.225Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T07:32:29.225Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-05-04T07:32:29.225Z [DEBUG] Forked agent [prompt_suggestion] finished: 2 messages, types=[assistant, assistant], totalUsage: input=388 output=351 cacheRead=49520 cacheCreate=0
+2026-05-04T07:32:29.226Z [DEBUG] [Speculation] enabled=false
+2026-05-04T07:32:40.932Z [DEBUG] Metrics opt-out check failed: No API key available
+2026-05-04T07:32:40.932Z [DEBUG] Metrics check failed, defaulting to disabled
+2026-05-04T07:32:40.932Z [DEBUG] Metrics export disabled by organization setting
+2026-05-04T07:32:42.873Z [DEBUG] AutoUpdater: Detected installation type: unknown
+2026-05-04T07:32:42.873Z [DEBUG] AutoUpdater: Unknown installation type, falling back to config
+2026-05-04T07:32:45.006Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777879965006
+2026-05-04T07:32:45.006Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T07:32:45.007Z [DEBUG] Temp file written successfully, size: 14566 bytes
+2026-05-04T07:32:45.007Z [DEBUG] Applied original permissions to temp file
+2026-05-04T07:32:45.007Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.89937.1777879965006 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T07:32:45.007Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T07:33:22.935Z [DEBUG] Getting matching hook commands for Notification with query: idle_prompt
+2026-05-04T07:33:22.935Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T07:33:22.935Z [DEBUG] Matched 0 unique hooks for query "idle_prompt" (0 before deduplication)
+2026-05-04T07:34:41.749Z [DEBUG] Getting matching hook commands for SessionEnd with query: prompt_input_exit
+2026-05-04T07:34:41.749Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T07:34:41.749Z [DEBUG] Matched 0 unique hooks for query "prompt_input_exit" (0 before deduplication)
+2026-05-04T07:34:41.754Z [DEBUG] Cleaned up session snapshot: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/shell-snapshots/snapshot-zsh-1777865579095-ckecpv.sh
+2026-05-04T07:34:41.754Z [DEBUG] FileHistory: Making snapshot for message 96704074-ac3d-4b53-baa4-c02daba3b44d
+2026-05-04T07:34:41.754Z [DEBUG] FileHistory: Added snapshot for 96704074-ac3d-4b53-baa4-c02daba3b44d, tracking 0 files
+2026-05-04T07:34:41.754Z [DEBUG] LSP server manager shut down successfully
+2026-05-04T07:34:41.756Z [DEBUG] Metrics opt-out check failed: No API key available
+2026-05-04T07:34:41.756Z [DEBUG] Metrics check failed, defaulting to disabled
+2026-05-04T07:34:41.756Z [DEBUG] Metrics export disabled by organization setting
+2026-05-04T07:34:41.756Z [DEBUG] BigQuery metrics exporter flush complete
+2026-05-04T07:34:41.756Z [DEBUG] BigQuery metrics exporter flush complete
+2026-05-04T07:34:41.756Z [DEBUG] BigQuery metrics exporter shutdown complete
+2026-05-04T07:34:41.756Z [DEBUG] [useDeferredValue] Messages deferred by 3 (101→104)
+2026-05-04T07:34:41.765Z [DEBUG] Started caffeinate to prevent sleep
+2026-05-04T07:34:41.768Z [DEBUG] [useDeferredValue] Messages deferred by 3 (101→104)
+2026-05-04T07:34:41.773Z [DEBUG] Stopped caffeinate, allowing sleep

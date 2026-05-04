@@ -1,0 +1,37 @@
+[
+  {
+    "content": "Create core data structures (GridLevel, BotOrder)",
+    "status": "in_progress",
+    "activeForm": "Creating core data structures"
+  },
+  {
+    "content": "Implement GridCalculator for strike-aligned geometric distribution",
+    "status": "pending",
+    "activeForm": "Implementing GridCalculator"
+  },
+  {
+    "content": "Create Nado API async client wrapper",
+    "status": "pending",
+    "activeForm": "Creating Nado API client"
+  },
+  {
+    "content": "Implement Order Diff Engine logic",
+    "status": "pending",
+    "activeForm": "Implementing Diff Engine"
+  },
+  {
+    "content": "Implement main loop and execution flow",
+    "status": "pending",
+    "activeForm": "Implementing main loop"
+  },
+  {
+    "content": "Write comprehensive tests",
+    "status": "pending",
+    "activeForm": "Writing tests"
+  },
+  {
+    "content": "Run tests and verify all pass",
+    "status": "pending",
+    "activeForm": "Running tests"
+  }
+]

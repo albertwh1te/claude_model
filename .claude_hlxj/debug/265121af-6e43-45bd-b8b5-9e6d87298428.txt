@@ -1,0 +1,620 @@
+2026-02-12T08:19:39.718Z [DEBUG] Watching for changes in setting files /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj...
+2026-02-12T08:19:39.742Z [DEBUG] [init] configureGlobalMTLS starting
+2026-02-12T08:19:39.742Z [DEBUG] [init] configureGlobalMTLS complete
+2026-02-12T08:19:39.742Z [DEBUG] [init] configureGlobalAgents starting
+2026-02-12T08:19:39.743Z [DEBUG] [init] configureGlobalAgents complete
+2026-02-12T08:19:39.750Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-02-12T08:19:39.756Z [DEBUG] Loading plugin pyright-lsp from source: "./plugins/pyright-lsp"
+2026-02-12T08:19:39.756Z [DEBUG] Using provided version for pyright-lsp@claude-plugins-official: 1.0.0
+2026-02-12T08:19:39.757Z [DEBUG] [ToolSearch:optimistic] mode=standard, ENABLE_TOOL_SEARCH=undefined, result=false
+2026-02-12T08:19:39.757Z [DEBUG] [STARTUP] Running setup()...
+2026-02-12T08:19:39.757Z [DEBUG] Plugin pyright-lsp@claude-plugins-official version 1.0.0 already cached at /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/plugins/cache/claude-plugins-official/pyright-lsp/1.0.0
+2026-02-12T08:19:39.758Z [DEBUG] Loading skills from: managed=/Library/Application Support/ClaudeCode/.claude/skills, user=/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/skills, project=[/Users/matianjun/Dropbox/code/hyperliquid_analyse/.claude/skills]
+2026-02-12T08:19:39.775Z [ERROR] Error: Error: ENOENT: no such file or directory, scandir '/Library/Application Support/ClaudeCode/.claude/skills'
+    at Module.readdirSync (node:fs:1560:26)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:9:1766
+    at fX (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:8:34782)
+    at Object.readdirSync (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:9:1736)
+    at C01 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1537:369)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1537:4279
+    at q (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:8:6807)
+    at Ih2 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4842:4362)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4842:6961
+    at q (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:8:6807)
+2026-02-12T08:19:39.775Z [ERROR] Error: Error: ENOENT: no such file or directory, scandir '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/skills'
+    at Module.readdirSync (node:fs:1560:26)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:9:1766
+    at fX (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:8:34782)
+    at Object.readdirSync (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:9:1736)
+    at C01 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1537:369)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1537:4322
+    at q (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:8:6807)
+    at Ih2 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4842:4362)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4842:6961
+    at q (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:8:6807)
+2026-02-12T08:19:39.775Z [DEBUG] Error log sink initialized
+2026-02-12T08:19:39.786Z [DEBUG] Copied local plugin pyright-lsp to versioned cache: /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/plugins/cache/claude-plugins-official/pyright-lsp/1.0.0
+2026-02-12T08:19:39.786Z [DEBUG] Plugin pyright-lsp has no entry.skills defined
+2026-02-12T08:19:39.787Z [DEBUG] [STARTUP] setup() completed in 30ms
+2026-02-12T08:19:39.787Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-02-12T08:19:39.788Z [DEBUG] Loading plugin pyright from source: "./pyright"
+2026-02-12T08:19:39.788Z [DEBUG] Using manifest version for pyright@claude-code-lsps: 1.0.0
+2026-02-12T08:19:39.789Z [DEBUG] Plugin pyright@claude-code-lsps version 1.0.0 already cached at /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/plugins/cache/claude-code-lsps/pyright/1.0.0
+2026-02-12T08:19:39.789Z [DEBUG] Copied local plugin pyright to versioned cache: /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/plugins/cache/claude-code-lsps/pyright/1.0.0
+2026-02-12T08:19:39.789Z [DEBUG] Loaded hooks from standard location for plugin pyright: /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/plugins/cache/claude-code-lsps/pyright/1.0.0/hooks/hooks.json
+2026-02-12T08:19:39.790Z [DEBUG] Found 2 plugins (2 enabled, 0 disabled)
+2026-02-12T08:19:39.790Z [DEBUG] getPluginSkills: Processing 2 enabled plugins
+2026-02-12T08:19:39.790Z [DEBUG] Checking plugin pyright-lsp: skillsPath=none, skillsPaths=0 paths
+2026-02-12T08:19:39.790Z [DEBUG] Checking plugin pyright: skillsPath=none, skillsPaths=0 paths
+2026-02-12T08:19:39.790Z [DEBUG] Total plugin skills loaded: 0
+2026-02-12T08:19:39.790Z [DEBUG] Total plugin commands loaded: 0
+2026-02-12T08:19:39.790Z [DEBUG] Loading hooks from plugin: pyright
+2026-02-12T08:19:39.790Z [DEBUG] Registered 1 hooks from 2 plugins
+2026-02-12T08:19:39.790Z [DEBUG] Total plugin agents loaded: 0
+2026-02-12T08:19:39.791Z [DEBUG] Loaded 1 unique skills (managed: 0, user: 0, project: 1, legacy commands: 0)
+2026-02-12T08:19:39.791Z [DEBUG] getSkills returning: 1 skill dir commands, 0 plugin skills, 0 bundled skills
+2026-02-12T08:19:39.791Z [DEBUG] [STARTUP] Commands and agents loaded in 4ms
+2026-02-12T08:19:39.791Z [DEBUG] [STARTUP] Running showSetupScreens()...
+2026-02-12T08:19:39.793Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-02-12T08:19:39.795Z [DEBUG] [STARTUP] showSetupScreens() completed in 4ms
+2026-02-12T08:19:39.795Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-02-12T08:19:39.795Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-02-12T08:19:39.795Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-02-12T08:19:39.796Z [DEBUG] [STARTUP] MCP configs loaded in 46ms
+2026-02-12T08:19:39.798Z [DEBUG] [ToolSearch:optimistic] mode=standard, ENABLE_TOOL_SEARCH=undefined, result=false
+2026-02-12T08:19:39.815Z [DEBUG] All plugins already exist, skipping migration
+2026-02-12T08:19:39.816Z [DEBUG] [Reconnection] computeInitialTeamContext: No teammate context set (not a teammate)
+2026-02-12T08:19:39.818Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json.tmp.21017.1770884379818
+2026-02-12T08:19:39.818Z [DEBUG] Preserving file permissions: 100600
+2026-02-12T08:19:39.818Z [DEBUG] Temp file written successfully, size: 17525 bytes
+2026-02-12T08:19:39.818Z [DEBUG] Applied original permissions to temp file
+2026-02-12T08:19:39.818Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json.tmp.21017.1770884379818 to /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json
+2026-02-12T08:19:39.818Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json written atomically
+2026-02-12T08:19:39.820Z [DEBUG] Loaded 2 installed plugins from /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/plugins/installed_plugins.json
+2026-02-12T08:19:39.820Z [DEBUG] Initialized versioned plugins system with 2 plugins
+2026-02-12T08:19:39.821Z [DEBUG] Getting matching hook commands for SessionStart with query: startup
+2026-02-12T08:19:39.821Z [DEBUG] Found 1 hook matchers in settings
+2026-02-12T08:19:39.821Z [DEBUG] Matched 1 unique hooks for query "startup" (1 before deduplication)
+2026-02-12T08:19:39.826Z [DEBUG] Loaded 1 LSP server(s) from plugin: pyright-lsp
+2026-02-12T08:19:39.832Z [DEBUG] Git remote URL: git@github.com:albertwh1te/hyperliquid_analyse.git
+2026-02-12T08:19:39.832Z [DEBUG] Parsed repository: albertwh1te/hyperliquid_analyse from git@github.com:albertwh1te/hyperliquid_analyse.git
+2026-02-12T08:19:39.832Z [DEBUG] Parsed repository: albertwh1te/hyperliquid_analyse from URL: git@github.com:albertwh1te/hyperliquid_analyse.git
+2026-02-12T08:19:39.832Z [DEBUG] Path /Users/matianjun/Dropbox/code/hyperliquid_analyse already tracked for repo albertwh1te/hyperliquid_analyse
+2026-02-12T08:19:39.838Z [DEBUG] [Claude in Chrome] Found chrome profiles: Default, Profile 1, Profile 2, Profile 3
+2026-02-12T08:19:39.839Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-02-12T08:19:39.840Z [DEBUG] [render] initYoga starting
+2026-02-12T08:19:39.856Z [DEBUG] Watching for changes in skill/command directories: /Users/matianjun/Dropbox/code/hyperliquid_analyse/.claude/skills...
+2026-02-12T08:19:39.859Z [DEBUG] [render] initYoga complete
+2026-02-12T08:19:39.860Z [DEBUG] [render] first ink render: 786ms since process start
+2026-02-12T08:19:39.870Z [DEBUG] [ToolSearch:optimistic] mode=standard, ENABLE_TOOL_SEARCH=undefined, result=false
+2026-02-12T08:19:39.874Z [DEBUG] [keybindings] KeybindingSetup initialized with 87 bindings, 0 warnings
+2026-02-12T08:19:39.909Z [DEBUG] Loaded 1 LSP server(s) from plugin: pyright
+2026-02-12T08:19:39.909Z [DEBUG] Total LSP servers loaded: 2
+2026-02-12T08:19:39.909Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 2 server(s)
+2026-02-12T08:19:39.909Z [DEBUG] Queued request handler for plugin:pyright-lsp:pyright.workspace/configuration (connection not ready)
+2026-02-12T08:19:39.909Z [DEBUG] Starting LSP server instance: plugin:pyright-lsp:pyright
+2026-02-12T08:19:39.911Z [DEBUG] Queued request handler for plugin:pyright:python.workspace/configuration (connection not ready)
+2026-02-12T08:19:39.911Z [DEBUG] Starting LSP server instance: plugin:pyright:python
+2026-02-12T08:19:39.914Z [DEBUG] LSP manager initialized with 2 servers
+2026-02-12T08:19:39.914Z [DEBUG] LSP server manager initialized successfully
+2026-02-12T08:19:39.914Z [DEBUG] Queued notification handler for plugin:pyright-lsp:pyright.textDocument/publishDiagnostics (connection not ready)
+2026-02-12T08:19:39.914Z [DEBUG] Registered diagnostics handler for plugin:pyright-lsp:pyright
+2026-02-12T08:19:39.914Z [DEBUG] Queued notification handler for plugin:pyright:python.textDocument/publishDiagnostics (connection not ready)
+2026-02-12T08:19:39.914Z [DEBUG] Registered diagnostics handler for plugin:pyright:python
+2026-02-12T08:19:39.914Z [DEBUG] LSP notification handlers registered successfully for all 2 server(s)
+2026-02-12T08:19:39.915Z [DEBUG] Applied queued notification handler for plugin:pyright-lsp:pyright.textDocument/publishDiagnostics
+2026-02-12T08:19:39.915Z [DEBUG] Applied queued request handler for plugin:pyright-lsp:pyright.workspace/configuration
+2026-02-12T08:19:39.915Z [DEBUG] LSP client started for plugin:pyright-lsp:pyright
+2026-02-12T08:19:39.915Z [DEBUG] Applied queued notification handler for plugin:pyright:python.textDocument/publishDiagnostics
+2026-02-12T08:19:39.915Z [DEBUG] Applied queued request handler for plugin:pyright:python.workspace/configuration
+2026-02-12T08:19:39.915Z [DEBUG] LSP client started for plugin:pyright:python
+2026-02-12T08:19:39.916Z [DEBUG] [LSP PROTOCOL plugin:pyright-lsp:pyright] Sending request 'initialize - (0)'.
+2026-02-12T08:19:39.916Z [DEBUG] [LSP PROTOCOL plugin:pyright:python] Sending request 'initialize - (0)'.
+2026-02-12T08:19:39.922Z [DEBUG] [keybindings] Skipping file watcher - user customization disabled
+2026-02-12T08:19:39.922Z [DEBUG] [REPL:mount] REPL mounted, disabled=false
+2026-02-12T08:19:39.925Z [DEBUG] Official marketplace auto-install skipped: already_attempted
+2026-02-12T08:19:39.925Z [DEBUG] performStartupChecks called
+2026-02-12T08:19:39.925Z [DEBUG] Starting background plugin installations
+2026-02-12T08:19:39.926Z [DEBUG] performBackgroundPluginInstallations called
+2026-02-12T08:19:39.929Z [DEBUG] Found 2 enabled plugins
+2026-02-12T08:19:39.929Z [DEBUG] All plugins already exist, skipping migration
+2026-02-12T08:19:39.934Z [DEBUG] Found 2 installed plugins (V2 format)
+2026-02-12T08:19:39.934Z [DEBUG] Loaded plugins - Enabled: 2, Disabled: 0, Commands: 0, Agents: 0, Errors: 0
+2026-02-12T08:19:39.934Z [DEBUG] Found 0 missing plugins (not installed):
+2026-02-12T08:19:39.934Z [DEBUG] Setting installation status: 0 marketplaces, 0 installable plugins, 0 uninstallable plugins
+2026-02-12T08:19:39.934Z [DEBUG] [claudeai-mcp] Checking gate (cached)...
+2026-02-12T08:19:39.934Z [DEBUG] [claudeai-mcp] Gate returned: false
+2026-02-12T08:19:39.934Z [DEBUG] [claudeai-mcp] Disabled via gate
+2026-02-12T08:19:39.972Z [DEBUG] Ripgrep first use test: PASSED (mode=builtin, path=/Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/arm64-darwin/rg)
+2026-02-12T08:19:39.974Z [DEBUG] [Claude in Chrome] Found brave profiles: Default
+2026-02-12T08:19:39.975Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json.tmp.21017.1770884379975
+2026-02-12T08:19:39.975Z [DEBUG] Preserving file permissions: 100600
+2026-02-12T08:19:39.976Z [DEBUG] Temp file written successfully, size: 17525 bytes
+2026-02-12T08:19:39.976Z [DEBUG] Applied original permissions to temp file
+2026-02-12T08:19:39.976Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json.tmp.21017.1770884379975 to /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json
+2026-02-12T08:19:39.976Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json written atomically
+2026-02-12T08:19:39.981Z [DEBUG] [ToolSearch:optimistic] mode=standard, ENABLE_TOOL_SEARCH=undefined, result=false
+2026-02-12T08:19:39.984Z [DEBUG] Skills and commands included in Skill tool: planning-with-files
+2026-02-12T08:19:39.985Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-12T08:19:39.985Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-12T08:19:40.014Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-12T08:19:40.019Z [DEBUG] [Claude in Chrome] Extension not found in any browser
+2026-02-12T08:19:40.142Z [DEBUG] AutoUpdaterWrapper: Installation type: unknown
+2026-02-12T08:19:40.184Z [DEBUG] [LSP PROTOCOL plugin:pyright-lsp:pyright] Received response 'initialize - (0)' in 268ms.
+2026-02-12T08:19:40.184Z [DEBUG] [LSP PROTOCOL plugin:pyright-lsp:pyright] Sending notification 'initialized'.
+2026-02-12T08:19:40.184Z [DEBUG] LSP server plugin:pyright-lsp:pyright initialized
+2026-02-12T08:19:40.184Z [DEBUG] LSP server instance started: plugin:pyright-lsp:pyright
+2026-02-12T08:19:40.212Z [DEBUG] [LSP PROTOCOL plugin:pyright:python] Received response 'initialize - (0)' in 296ms.
+2026-02-12T08:19:40.212Z [DEBUG] [LSP PROTOCOL plugin:pyright:python] Sending notification 'initialized'.
+2026-02-12T08:19:40.213Z [DEBUG] LSP server plugin:pyright:python initialized
+2026-02-12T08:19:40.213Z [DEBUG] LSP server instance started: plugin:pyright:python
+2026-02-12T08:19:42.138Z [ERROR] Error: Error: 404 用户不存在
+    at e7.generate (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:151:37507)
+    at XR.makeStatusError (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:168:2195)
+    at XR.makeRequest (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:168:5420)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1178:5186
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1119:2223
+    at async WwY (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1118:9406)
+    at async Q97 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1119:2156)
+    at async egA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:3599:1203)
+    at async BqA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:3599:1900)
+2026-02-12T08:19:42.139Z [DEBUG] countTokensWithFallback: API returned null, trying haiku fallback (21 tools)
+2026-02-12T08:19:42.139Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-12T08:19:42.139Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-12T08:19:42.139Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-12T08:19:42.219Z [DEBUG] [ToolSearch:optimistic] mode=standard, ENABLE_TOOL_SEARCH=undefined, result=false
+2026-02-12T08:19:42.236Z [DEBUG] Started caffeinate to prevent sleep
+2026-02-12T08:19:42.244Z [DEBUG] Stats cache stale (2026-02-06), processing 2026-02-07 to 2026-02-11 in background
+2026-02-12T08:19:42.272Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/todos/265121af-6e43-45bd-b8b5-9e6d87298428-agent-265121af-6e43-45bd-b8b5-9e6d87298428.json.tmp.21017.1770884382272
+2026-02-12T08:19:42.272Z [DEBUG] Temp file written successfully, size: 2 bytes
+2026-02-12T08:19:42.272Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/todos/265121af-6e43-45bd-b8b5-9e6d87298428-agent-265121af-6e43-45bd-b8b5-9e6d87298428.json.tmp.21017.1770884382272 to /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/todos/265121af-6e43-45bd-b8b5-9e6d87298428-agent-265121af-6e43-45bd-b8b5-9e6d87298428.json
+2026-02-12T08:19:42.272Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/todos/265121af-6e43-45bd-b8b5-9e6d87298428-agent-265121af-6e43-45bd-b8b5-9e6d87298428.json written atomically
+2026-02-12T08:19:42.361Z [DEBUG] Cleaned up old paste: /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/paste-cache/00e8db4098dbc06f.txt
+2026-02-12T08:19:42.363Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a0c04fc.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a0c04fc.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 16)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.364Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a2161ce.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a2161ce.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 12)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.364Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a2df026.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a2df026.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 19)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.364Z [DEBUG] Cleaned up old paste: /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/paste-cache/2dd15c9149222ba3.txt
+2026-02-12T08:19:42.365Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a31a328.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a31a328.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 1)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.365Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a4953b2.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a4953b2.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 7)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.365Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a69e166.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a69e166.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 18)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.365Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a6b8fed.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a6b8fed.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 1)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.365Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a824523.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a824523.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 11)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.366Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a915c1f.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a915c1f.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 1)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.366Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a939249.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a939249.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 4)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.366Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a95ac1b.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a95ac1b.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 6)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.366Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a9ec8c9.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-a9ec8c9.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 14)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.366Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-aacddaf.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-aacddaf.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 19)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.366Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-ab12e6c.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-ab12e6c.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 3)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.366Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-ac54666.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-ac54666.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 17)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.367Z [DEBUG] Cleaned up old paste: /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/paste-cache/3e1eab435cfe945b.txt
+2026-02-12T08:19:42.367Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-ae64739.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-ae64739.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 12)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.367Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-aecd096.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-aecd096.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 18)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.367Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-afec4c2.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-hyperliquid-analyse/agent-afec4c2.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 6)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.368Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/0efca92d-7787-4ca3-8f17-865ba920b7a2.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/0efca92d-7787-4ca3-8f17-865ba920b7a2.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 11)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.368Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/21563642-d657-4f53-bdbe-c5cde3c0adf4.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/21563642-d657-4f53-bdbe-c5cde3c0adf4.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 12)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.368Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/3e817f25-e17f-420c-ab2e-c5c38e59aef1.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/3e817f25-e17f-420c-ab2e-c5c38e59aef1.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 13)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.368Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-a0a5aaa.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-a0a5aaa.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 15)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.368Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-a183931.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-a183931.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 17)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.368Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-a3e7305.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-a3e7305.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 18)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.368Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-a430899.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-a430899.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 19)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.369Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-a5c5545.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-a5c5545.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 0)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.369Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-a5ec778.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-a5ec778.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 1)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.369Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-a6722fd.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-a6722fd.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 2)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.369Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-aa536d0.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-aa536d0.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 3)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.369Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-aab29ab.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-aab29ab.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 5)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.369Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-ab34b90.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-ab34b90.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 6)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.369Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-ad9a7fb.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-ad9a7fb.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 8)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.369Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-af6ab8b.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-af6ab8b.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 9)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.369Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-afcd658.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/agent-afcd658.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 10)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.369Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/e1f4307e-4253-41df-aac2-7f5345fd04e9.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code-quant-dash-board/e1f4307e-4253-41df-aac2-7f5345fd04e9.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 12)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.369Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-obsidian-zettelkasten/21e83a81-987e-44df-9481-7fc62433d051.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-obsidian-zettelkasten/21e83a81-987e-44df-9481-7fc62433d051.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 14)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.369Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-obsidian-zettelkasten/4091a77e-3742-47c6-8c95-f9d40f0dd4cb.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-obsidian-zettelkasten/4091a77e-3742-47c6-8c95-f9d40f0dd4cb.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 15)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.370Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-obsidian-zettelkasten/agent-a23390f.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-obsidian-zettelkasten/agent-a23390f.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 16)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.370Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-obsidian-zettelkasten/agent-a3adb3b.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-obsidian-zettelkasten/agent-a3adb3b.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 17)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.370Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-obsidian-zettelkasten/agent-a4e5efe.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-obsidian-zettelkasten/agent-a4e5efe.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 18)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.370Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-obsidian-zettelkasten/agent-a74f941.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-obsidian-zettelkasten/agent-a74f941.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 19)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.370Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-obsidian-zettelkasten/agent-a89fbc0.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-obsidian-zettelkasten/agent-a89fbc0.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 0)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.370Z [ERROR] Error: Error: Error opening file /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-obsidian-zettelkasten/agent-ac38886.jsonl: Error: ENOENT: no such file or directory, open '/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-obsidian-zettelkasten/agent-ac38886.jsonl'
+    at tm (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:66:172)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3921
+    at async Promise.all (index 1)
+    at async vMA (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:3757)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10973
+    at async TB6 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:203)
+    at async tZK (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:4832:10471)
+2026-02-12T08:19:42.381Z [DEBUG] Stats cache saved successfully (lastComputedDate: 2026-02-11)
+2026-02-12T08:19:42.381Z [DEBUG] Stats cache updated with 1 new sessions
+2026-02-12T08:19:42.384Z [DEBUG] Summarizing all 7 messages (~0 tokens)
+2026-02-12T08:19:42.386Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-02-12T08:19:42.386Z [DEBUG] [ToolSearch:optimistic] mode=standard, ENABLE_TOOL_SEARCH=undefined, result=false
+2026-02-12T08:19:42.387Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-12T08:19:42.387Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-12T08:19:42.387Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-12T08:19:44.062Z [DEBUG] Stream started - received first chunk
+2026-02-12T08:19:44.205Z [DEBUG] Generated summary for session 915dd602-7abc-44bf-a53f-e97a948ef2c0: "Brief Chinese Greeting Exchange"
+2026-02-12T08:19:44.208Z [DEBUG] Summarizing all 2 messages (~0 tokens)
+2026-02-12T08:19:44.208Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-02-12T08:19:44.209Z [DEBUG] [ToolSearch:optimistic] mode=standard, ENABLE_TOOL_SEARCH=undefined, result=false
+2026-02-12T08:19:44.209Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-12T08:19:44.209Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-12T08:19:44.209Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-12T08:19:45.323Z [DEBUG] Stream started - received first chunk
+2026-02-12T08:19:45.524Z [DEBUG] Generated summary for session df998124-c529-4cd0-bb8c-f640b38257c1: "Fix aden_long_grid_bot slice index type bug"
+2026-02-12T08:19:45.524Z [DEBUG] Summarizing all 2 messages (~0 tokens)
+2026-02-12T08:19:45.525Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-02-12T08:19:45.525Z [DEBUG] [ToolSearch:optimistic] mode=standard, ENABLE_TOOL_SEARCH=undefined, result=false
+2026-02-12T08:19:45.525Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-12T08:19:45.525Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-12T08:19:45.525Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-12T08:19:45.875Z [DEBUG] Successfully refreshed marketplace: claude-plugins-official
+2026-02-12T08:19:45.875Z [DEBUG] Plugin autoupdate: checking installed plugins
+2026-02-12T08:19:45.877Z [DEBUG] Using provided version for pyright-lsp@claude-plugins-official: 1.0.0
+2026-02-12T08:19:46.026Z [ERROR] Error: Error: 1P event logging: 33 events failed to export
+    at vK6.queueFailedEvents (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:685:2042)
+    at async vK6.doExport (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:685:1197)
+2026-02-12T08:19:46.026Z [ERROR] Error: Error: {"stack":"Error: Failed to export 33 events\n    at vK6.doExport (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:685:1299)","message":"Failed to export 33 events","name":"Error"}
+    at Qf6.error (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:2329:34863)
+    at m46.error (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:679:8378)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:679:39403
+    at ro3 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:679:39949)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:680:20245
+2026-02-12T08:19:46.223Z [DEBUG] FileHistory: Added snapshot for a082c3a8-8d2e-44ae-87cf-4a78a29b116a, tracking 0 files
+2026-02-12T08:19:46.250Z [DEBUG] Stopped caffeinate, allowing sleep
+2026-02-12T08:19:46.252Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json.tmp.21017.1770884386252
+2026-02-12T08:19:46.252Z [DEBUG] Preserving file permissions: 100600
+2026-02-12T08:19:46.252Z [DEBUG] Temp file written successfully, size: 17525 bytes
+2026-02-12T08:19:46.252Z [DEBUG] Applied original permissions to temp file
+2026-02-12T08:19:46.252Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json.tmp.21017.1770884386252 to /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json
+2026-02-12T08:19:46.252Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json written atomically
+2026-02-12T08:19:46.258Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json.tmp.21017.1770884386258
+2026-02-12T08:19:46.258Z [DEBUG] Preserving file permissions: 100600
+2026-02-12T08:19:46.258Z [DEBUG] Temp file written successfully, size: 17525 bytes
+2026-02-12T08:19:46.258Z [DEBUG] Applied original permissions to temp file
+2026-02-12T08:19:46.258Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json.tmp.21017.1770884386258 to /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json
+2026-02-12T08:19:46.258Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json written atomically
+2026-02-12T08:19:46.406Z [DEBUG] AutoUpdaterWrapper: Installation type: unknown
+2026-02-12T08:19:46.421Z [DEBUG] Stream started - received first chunk
+2026-02-12T08:19:46.575Z [DEBUG] Generated summary for session e66ea922-ff74-478e-b862-cc933c651d70: "MySQL data insertion functions for equity and volume records"
+2026-02-12T08:19:46.576Z [DEBUG] Summarizing all 2 messages (~0 tokens)
+2026-02-12T08:19:46.576Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-02-12T08:19:46.576Z [DEBUG] [ToolSearch:optimistic] mode=standard, ENABLE_TOOL_SEARCH=undefined, result=false
+2026-02-12T08:19:46.576Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-12T08:19:46.576Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-12T08:19:46.577Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-12T08:19:47.324Z [DEBUG] Getting matching hook commands for SessionEnd with query: prompt_input_exit
+2026-02-12T08:19:47.324Z [DEBUG] Found 0 hook matchers in settings
+2026-02-12T08:19:47.324Z [DEBUG] Matched 0 unique hooks for query "prompt_input_exit" (0 before deduplication)
+2026-02-12T08:19:47.326Z [DEBUG] [LSP PROTOCOL plugin:pyright-lsp:pyright] Sending request 'shutdown - (1)'.
+2026-02-12T08:19:47.328Z [DEBUG] Metrics opt-out check failed: No API key available
+2026-02-12T08:19:47.329Z [DEBUG] Metrics check failed, defaulting to disabled
+2026-02-12T08:19:47.329Z [DEBUG] Metrics export disabled by organization setting
+2026-02-12T08:19:47.329Z [DEBUG] BigQuery metrics exporter flush complete
+2026-02-12T08:19:47.329Z [DEBUG] BigQuery metrics exporter flush complete
+2026-02-12T08:19:47.329Z [DEBUG] BigQuery metrics exporter shutdown complete
+2026-02-12T08:19:47.332Z [DEBUG] [LSP PROTOCOL plugin:pyright-lsp:pyright] Received response 'shutdown - (1)' in 6ms.
+2026-02-12T08:19:47.332Z [DEBUG] [LSP PROTOCOL plugin:pyright-lsp:pyright] Sending notification 'exit'.
+2026-02-12T08:19:47.332Z [DEBUG] LSP client stopped for plugin:pyright-lsp:pyright
+2026-02-12T08:19:47.332Z [DEBUG] LSP server instance stopped: plugin:pyright-lsp:pyright
+2026-02-12T08:19:47.332Z [DEBUG] [LSP PROTOCOL plugin:pyright:python] Sending request 'shutdown - (1)'.
+2026-02-12T08:19:47.333Z [DEBUG] [LSP PROTOCOL plugin:pyright:python] Received response 'shutdown - (1)' in 1ms.
+2026-02-12T08:19:47.334Z [DEBUG] [LSP PROTOCOL plugin:pyright:python] Sending notification 'exit'.
+2026-02-12T08:19:47.334Z [DEBUG] LSP client stopped for plugin:pyright:python
+2026-02-12T08:19:47.334Z [DEBUG] LSP server instance stopped: plugin:pyright:python
+2026-02-12T08:19:47.334Z [DEBUG] LSP server manager shut down successfully
+2026-02-12T08:19:47.419Z [DEBUG] Stream started - received first chunk
+2026-02-12T08:19:47.768Z [DEBUG] Generated summary for session f499c5cc-754b-4dd5-914a-0faf7e3e2d42: "Fix aden_long_grid_bot.py slice index bug"
+2026-02-12T08:19:47.770Z [DEBUG] Summarizing all 4 messages (~0 tokens)
+2026-02-12T08:19:47.770Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-02-12T08:19:47.770Z [DEBUG] [ToolSearch:optimistic] mode=standard, ENABLE_TOOL_SEARCH=undefined, result=false
+2026-02-12T08:19:47.770Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-12T08:19:47.770Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-12T08:19:47.771Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-12T08:19:48.063Z [DEBUG] AutoUpdater: Detected installation type: unknown
+2026-02-12T08:19:48.063Z [DEBUG] AutoUpdater: Unknown installation type, falling back to config
+2026-02-12T08:19:48.650Z [DEBUG] Stream started - received first chunk
+2026-02-12T08:19:48.740Z [DEBUG] Generated summary for session fef9bcbc-b2ab-4d24-b733-dbc4d2bb15aa: "Session Ended"
+2026-02-12T08:19:48.751Z [DEBUG] Session index: added 2, updated 11, removed 0, summaries generated 5 (total: 106)
+2026-02-12T08:19:49.273Z [ERROR] Error: Error: 1P event logging: 19 events failed to export
+    at vK6.queueFailedEvents (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:685:2042)
+    at async vK6.doExport (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:685:1197)
+2026-02-12T08:19:49.273Z [ERROR] Error: Error: {"stack":"Error: Failed to export 19 events\n    at vK6.doExport (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:685:1299)","message":"Failed to export 19 events","name":"Error"}
+    at Qf6.error (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:2329:34863)
+    at m46.error (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:679:8378)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:679:39403
+    at ro3 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:679:39949)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:680:20245

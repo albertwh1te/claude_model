@@ -1,0 +1,273 @@
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/online/ranker_process_4h.py-4-Producer in the Producer-Consumer architecture.
+online/ranker_process_4h.py-5-Responsible for:
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/online/ranker_process_4h.py-6-1. WebSocket connection to Binance for real-time kline data
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/online/ranker_process_4h.py-7-2. Feature calculation (using RankerFeature4H) and model prediction
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/online/ranker_process_4h.py-8-3. Portfolio optimization to generate target weights
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/online/ranker_process_4h.py-9-4. Publishing target weights to Redis for Executor to consume
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/online/ranker_process_4h.py-10-
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/online/ranker_process_4h.py-11-相比1H版本的主要变化：
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/online/ranker_process_4h.py-12-- 使用 RankerFeature4H 生成4H特征
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/online/ranker_process_4h.py-13-- 加载 regression_model_online_4h_*.pkl 模型
+online/ranker_process_4h.py:14:- 使用 RANKER_FEATURE_NAMES_4H 特征名称
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/online/ranker_process_4h.py-15-- 使用 OnlinePositionManager4H (16 batch)
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/online/ranker_process_4h.py-16-- Redis key 添加 4h 后缀
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/online/ranker_process_4h.py-17-- 历史数据窗口更长（28天以支持672h特征）
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/online/ranker_process_4h.py-18-
+online/ranker_process_4h.py-19-Communication Protocol:
+online/ranker_process_4h.py-20-- Storage: Redis SET `strategy:target_weights:4h:{account_id}` with JSON payload
+online/ranker_process_4h.py-21-- Signal: Redis PUBLISH `signal:rebalance:4h:{account_id}` with 'update' message
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/online/ranker_process_4h.py-22-"""
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/online/ranker_process_4h.py-23-
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/online/ranker_process_4h.py-24-import asyncio
+--
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/docs/4_h_model.md-60-
+docs/4_h_model.md-61-  - 新增特征列:
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/docs/4_h_model.md-62-    - count_toptrader_long_short_ratio
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/docs/4_h_model.md-63-    - sum_toptrader_long_short_ratio
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/docs/4_h_model.md-64-    - count_long_short_ratio
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/docs/4_h_model.md-65-    - sum_taker_long_short_vol_ratio
+docs/4_h_model.md-66-  - 数据来源: Binance Public Data (metrics CSV)
+docs/4_h_model.md-67-  - 下载方式: `python main.py scripts bn_public_data`
+docs/4_h_model.md-68-  - 默认路径: `/home/mark/data/binance_public_data` (可用 `BINANCE_PUBLIC_DATA_PATH` 覆盖)
+docs/4_h_model.md-69-  - 使用方式: 替换为 `RankerFeature4HV2` 生成特征
+docs/4_h_model.md:70:  - 训练时特征列: `RANKER_FEATURE_NAMES_4H_V2`
+docs/4_h_model.md-71-  - 新增高级特征:
+docs/4_h_model.md-72-    - downside_volatility_4h: 仅统计负收益率的滚动标准差（4h）
+docs/4_h_model.md-73-    - momentum_acceleration_4h: momentum_4h 的一阶差分（趋势加速度）
+docs/4_h_model.md-74-  - 交互特征 (Cross-Section Z-Score):
+docs/4_h_model.md-75-    - smart_retail_divergence: TopTrader_LS_Ratio_zscore - Global_LS_Ratio_zscore
+docs/4_h_model.md-76-    - smart_money_reversal: TopTrader_LS_Ratio_zscore * momentum_12h_zscore
+docs/4_h_model.md-77-    - taker_buy_pressure: Taker_Vol_Ratio_zscore * volatility_4h_zscore
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/docs/4_h_model.md-78-
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/docs/4_h_model.md-79-  ---
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/docs/4_h_model.md-80-  Funding Rate Features (V2)
+--
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/docs/4_h_model.md-136-  相关命令与职责
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/docs/4_h_model.md-137-
+docs/4_h_model.md-138-  - feature_4h_v2: 生成 4H V2 特征文件 `tmp_feature_4h_v2_full.csv`
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/docs/4_h_model.md-139-    - 使用 `RankerFeature4HV2` + BN Public Metrics
+docs/4_h_model.md-140-    - 时间范围: start=2024-05-01, end=昨日 00:00:00
+docs/4_h_model.md-141-  - pipeline_4h_v2: 一键流程 (含 BN Public Metrics)
+docs/4_h_model.md-142-    - Step 1: feature_4h_v2 (可通过 skip_feature 跳过)
+docs/4_h_model.md-143-    - Step 2: 调优 + 训练 (可通过 skip_tune 跳过)
+docs/4_h_model.md-144-      - target: `target_4hour_zscore`
+docs/4_h_model.md-145-      - feature 文件: `tmp_feature_4h_v2_full.csv`
+docs/4_h_model.md:146:      - 特征列: `RANKER_FEATURE_NAMES_4H_V2`
+docs/4_h_model.md-147-      - 输出: `regression_model_4h.pkl` + `ranker_model_4h_predictions.feather`
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/docs/4_h_model.md-148-      - tune_trials 控制 Optuna 轮数
+docs/4_h_model.md-149-    - Step 3: generate_weights_4h
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/docs/4_h_model.md-150-      - 读取 `ranker_model_4h_predictions.feather`
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/docs/4_h_model.md-151-      - 输出 `ranker_weight_4h.feather`
+docs/4_h_model.md-152-    - Step 4: backtest_4h
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/docs/4_h_model.md-153-      - 读取 `ranker_weight_4h.feather`
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/docs/4_h_model.md-154-      - 使用 `RankerModelBacktestV5_4H`
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/docs/4_h_model.md-155-
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/docs/4_h_model.md-156-  备注
+--
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-122-    "momentum_1h_mean",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-123-    "momentum_4h_mean",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-124-    "momentum_24h_mean",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-125-    "day_of_week",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-126-    "hour_of_day",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-127-    "is_btc",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-128-    "is_eth",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-129-]
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-130-
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-131-# 4H模型的特征列表 (使用更长周期的指标)
+config/ranker_parameters.py:132:RANKER_FEATURE_NAMES_4H = [
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-133-    "has_llm_data",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-134-    "institutional_score",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-135-    "inter_inst_reversal_72h",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-136-    "inter_meme_vol_24h",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-137-    "inter_risk_vol",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-138-    "inter_safety_stable",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-139-    "inter_value_reversion_168h",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-140-    "kdj_d_21",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-141-    "kdj_d_42",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-142-    "kdj_d_63",
+--
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-203-    "momentum_72h_mean",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-204-    "day_of_week",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-205-    "hour_of_day",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-206-    "is_btc",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-207-    "is_eth",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-208-]
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-209-
+config/ranker_parameters.py-210-# 4H模型特征列表 (V2: 加入 Binance Public Metrics)
+config/ranker_parameters.py-211-# Note: OI features (sum_open_interest, sum_open_interest_value) have been removed
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-212-# due to data quality issues
+config/ranker_parameters.py:213:RANKER_FEATURE_NAMES_4H_V2 = RANKER_FEATURE_NAMES_4H + [
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-214-    "count_toptrader_long_short_ratio",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-215-    "sum_toptrader_long_short_ratio",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-216-    "count_long_short_ratio",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-217-    "sum_taker_long_short_vol_ratio",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-218-    "downside_volatility_4h",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-219-    "momentum_acceleration_4h",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-220-    "funding_rate_delta",
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/config/ranker_parameters.py-221-]
+--
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/progress.md-140-- session-catchup script not found; manual plan setup needed.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/progress.md-141-- Preparing new task_plan.md for RankerFeature4HV2 feature additions.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/progress.md-142-- Reviewed RankerFeature4HV2 header and funding feature column definitions.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/progress.md-143-- Reviewed funding feature frame and calculate_token_level_feature merge flow.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/progress.md-144-- Verified parent RankerFeature4H defines return/momentum_4h/volatility_4h with shift(1).
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/progress.md-145-- Opened test_ranker_feature_4h_v2.py to plan additions.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/progress.md-146-- Identified funding token-level test section to extend for new features.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/progress.md-147-- Identified docs/feature.md v2 section for updates.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/progress.md-148-- Reviewed docs/feature.md funding section for updates.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/progress.md-149-- Confirmed base class does not expose return in token_level_feature_names.
+progress.md:150:- Reviewed RANKER_FEATURE_NAMES_4H_V2 in config/ranker_parameters.py.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/progress.md-151-- Checked feature_4h_v2 command flow in commands/ml_commands.py.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/progress.md-152-- Inserted new helper and tests in test_ranker_feature_4h_v2.py for downside volatility, momentum acceleration, funding delta, and full-data path.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/progress.md-153-- Verified docs now mention funding_rate_delta.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/progress.md-154-- Pytest failed on test_bn_features_multiple_calls_no_keyerror due to new feature names; applied fix and will re-run.
+progress.md-155-- Ran `pytest tests/unit/test_ranker_feature_4h_v2.py -v -s`: 39 passed (PytestDeprecationWarning about asyncio_default_fixture_loop_scope).
+--
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-7-import joblib
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-8-from config.config import (
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-9-    ALL_SYMBOL_DETAIL_INFO,
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-10-    ALL_SYMBOL_INFOS,
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-11-    OPTUAN_BEST_PARAMETERS,
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-12-    TEMP_FEATURE,
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-13-    TEST_FEATURE,
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-14-)
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-15-from config.ranker_parameters import (
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-16-    RANKER_REGRESSION_BASE_PARAMETERS,
+commands/ml_commands.py:17:    RANKER_FEATURE_NAMES_4H,
+commands/ml_commands.py:18:    RANKER_FEATURE_NAMES_4H_V2,
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-19-)
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-20-from data.data_check import check_kline_data
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-21-from ranker_model.fine_tune_ranker_train import FineTuneRankerModelTrain
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-22-from ranker_model.fine_tune_regression_model import FineTuneRegressionModelTrain
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-23-from ranker_model.ranker_feature import RankerFeature
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-24-from ranker_model.ranker_feature_4h import RankerFeature4H
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-25-from ranker_model.ranker_feature_4h_v2 import RankerFeature4HV2
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-26-from ranker_model.ranker_online import sync_recent_kline
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-27-from ranker_model.ranker_train_v3 import RankerModelTrainV3
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-28-from logger import main_logger as logger
+--
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-343-    hyper_parameters = RANKER_REGRESSION_BASE_PARAMETERS.copy()
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-344-    hyper_parameters.update(final_params)
+commands/ml_commands.py-345-    logger.info(f"[4H] Final hyper parameters: {hyper_parameters}")
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-346-
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-347-    save_path = "ranker_model_4h_predictions.feather"
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-348-    pkl_path = "regression_model_4h.pkl"
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-349-    RegressionModelTrain(
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-350-        hyper_parameters=hyper_parameters,
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-351-        target_column=target_column,
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-352-        feature_file_name=feature_file_name,
+commands/ml_commands.py:353:        feature_names=RANKER_FEATURE_NAMES_4H,
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-354-    ).train(symbol_list=symbol_list, pkl_path=pkl_path, save_path=save_path)
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-355-
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-356-    logger.info(f"[4H] Finished training final model, saved to {pkl_path}")
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-357-
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-358-
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-359-@app.command("generate_weights_4h")
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-360-def generate_weights_4h(
+commands/ml_commands.py-361-    prediction_file: str = "ranker_model_4h_predictions.feather",
+commands/ml_commands.py-362-    output_file: str = "ranker_weight_4h.feather",
+commands/ml_commands.py-363-):
+--
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-490-    target_column = "target_4hour_zscore"
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-491-
+commands/ml_commands.py-492-    logger.info(f"[4H] Training with best_iteration: {final_iteration}")
+commands/ml_commands.py-493-    logger.info(f"[4H] Feature file: {feature_file_name}")
+commands/ml_commands.py-494-    logger.info(f"[4H] Target column: {target_column}")
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-495-
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-496-    RegressionModelTrain(
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-497-        hyper_parameters=hyper_parameters,
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-498-        feature_file_name=feature_file_name,
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-499-        target_column=target_column,
+commands/ml_commands.py:500:        feature_names=RANKER_FEATURE_NAMES_4H,
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-501-    ).train_online(best_iteration=final_iteration, model_suffix="4h")
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-502-
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-503-    logger.info(f"[4H] Online model training completed!")
+commands/ml_commands.py-504-    logger.info(f"[4H] Model saved as: regression_model_online_4h_{{timestamp}}.pkl")
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-505-
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-506-
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-507-@app.command("pipeline_4h")
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-508-@notify_me_command("finished 4H full pipeline")
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-509-def pipeline_4h(
+commands/ml_commands.py-510-    skip_feature: bool = False,
+--
+commands/ml_commands.py-567-            "bagging_freq": 3,
+commands/ml_commands.py-568-            "feature_fraction": 0.9177290536077969,
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-569-        }
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-570-        hyper_parameters = RANKER_REGRESSION_BASE_PARAMETERS.copy()
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-571-        hyper_parameters.update(tmp_parameters)
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-572-
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-573-        RegressionModelTrain(
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-574-            hyper_parameters=hyper_parameters,
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-575-            target_column=target_column,
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-576-            feature_file_name=feature_file_name,
+commands/ml_commands.py:577:            feature_names=RANKER_FEATURE_NAMES_4H,
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-578-        ).train(symbol_list=symbol_list, pkl_path=pkl_path, save_path=save_path)
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-579-
+commands/ml_commands.py-580-    # Step 3: 生成权重
+commands/ml_commands.py-581-    logger.info("[4H Pipeline] Step 3/4: Generating weights...")
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-582-    generate_weights_4h()
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-583-
+commands/ml_commands.py-584-    # Step 4: 运行回测
+commands/ml_commands.py-585-    logger.info("[4H Pipeline] Step 4/4: Running backtest...")
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-586-    metrics = backtest_4h()
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-587-
+--
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-677-        hyper_parameters = RANKER_REGRESSION_BASE_PARAMETERS.copy()
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-678-        hyper_parameters.update(best_params)
+commands/ml_commands.py-679-        logger.info(f"[4H V2] Final hyper parameters: {hyper_parameters}")
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-680-
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-681-        save_path = "ranker_model_4h_predictions.feather"
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-682-        pkl_path = "regression_model_4h.pkl"
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-683-        RegressionModelTrain(
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-684-            hyper_parameters=hyper_parameters,
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-685-            target_column=target_column,
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-686-            feature_file_name=feature_file_name,
+commands/ml_commands.py:687:            feature_names=RANKER_FEATURE_NAMES_4H_V2,
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-688-        ).train(symbol_list=symbol_list, pkl_path=pkl_path, save_path=save_path)
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-689-
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-690-        logger.info(f"[4H V2] Finished training final model, saved to {pkl_path}")
+commands/ml_commands.py-691-    else:
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-692-        logger.info(
+commands/ml_commands.py-693-            "[4H V2 Pipeline] Step 2/4: Skipping tuning, using saved optuna params"
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-694-        )
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-695-        symbol_list = get_symbols_by_name("full")
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-696-        feature_file_name = "tmp_feature_4h_v2_full.csv"
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-697-        target_column = "target_4hour_zscore"
+--
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-699-        save_path = "ranker_model_4h_predictions.feather"
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-700-
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-701-        best_params = load_optuna_best_params()
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-702-        hyper_parameters = RANKER_REGRESSION_BASE_PARAMETERS.copy()
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-703-        hyper_parameters.update(best_params)
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-704-
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-705-        RegressionModelTrain(
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-706-            hyper_parameters=hyper_parameters,
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-707-            target_column=target_column,
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-708-            feature_file_name=feature_file_name,
+commands/ml_commands.py:709:            feature_names=RANKER_FEATURE_NAMES_4H_V2,
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-710-        ).train(symbol_list=symbol_list, pkl_path=pkl_path, save_path=save_path)
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-711-
+commands/ml_commands.py-712-    # Step 3: 生成权重
+commands/ml_commands.py-713-    logger.info("[4H V2 Pipeline] Step 3/4: Generating weights...")
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-714-    generate_weights_4h()
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-715-
+commands/ml_commands.py-716-    # Step 4: 运行回测
+commands/ml_commands.py-717-    logger.info("[4H V2 Pipeline] Step 4/4: Running backtest...")
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-718-    metrics = backtest_4h()
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py-719-
+--
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/findings.md-115-- session-catchup script missing in repo; proceeding without auto-catchup.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/findings.md-116-- Loaded planning template for task_plan.md to follow structure.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/findings.md-117-- Located RankerFeature4HV2 and funding feature columns in ranker_model/ranker_feature_4h_v2.py; funding features list currently includes funding_rate_raw/ma_diff/accumulated_24h/interaction/inter_fr_*.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/findings.md-118-- _build_funding_rate_feature_frame computes funding_rate_raw/ma_diff/accumulated_24h and sets placeholders for funding_oi_interaction/inter_fr_*; token-level features joined in calculate_token_level_feature using funding_rate_feature_columns.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/findings.md-119-- Base RankerFeature4H computes df["return"] and momentum_4h/volatility_4h using shift(1); momentum_4h exists in parent.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/findings.md-120-- tests/unit/test_ranker_feature_4h_v2.py contains extensive token-level and funding tests; will extend to cover new features.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/findings.md-121-- Funding-related tests already exist in tests/unit/test_ranker_feature_4h_v2.py; helper _make_multi_symbol_token_features_with_funding will need new columns.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/findings.md-122-- docs/feature.md documents v2 features and funding feature counts; will update for new downside_volatility_4h, momentum_acceleration_4h, funding_rate_delta.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/findings.md-123-- docs/feature.md has Funding Rate base/interaction tables; will add funding_rate_delta and new token-level features descriptions.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/findings.md-124-- RankerFeature4H returns only token_level_feature_names (return not included), so new downside_volatility_4h must be computed within v2 using raw df returns.
+findings.md:125:- config/ranker_parameters.py defines RANKER_FEATURE_NAMES_4H_V2 as base + BN public metrics; funding features not listed yet.
+findings.md:126:- commands/ml_commands.py feature_4h_v2 uses RankerFeature4HV2 directly; training uses RANKER_FEATURE_NAMES_4H_V2 elsewhere.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/findings.md-127-- Added tests planned for new token-level features and funding_rate_delta; updated funding helper data to include new column.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/findings.md-128-- Docs search confirms funding_rate_delta references updated in docs/feature.md and docs/4_h_model.md.
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/findings.md-129-- Fixed KeyError on repeated calculate_token_level_feature calls by removing new features from token_level_feature_names before super() and copying base_feature before assignment.

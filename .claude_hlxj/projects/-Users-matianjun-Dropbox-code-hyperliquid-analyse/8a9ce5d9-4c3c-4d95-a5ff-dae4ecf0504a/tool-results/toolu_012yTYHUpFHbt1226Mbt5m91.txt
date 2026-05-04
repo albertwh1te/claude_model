@@ -1,0 +1,188 @@
+     1→import os
+     2→import tomllib
+     3→import toml
+     4→import pandas as pd
+     5→from backtest.ranker_model_backtest_v5 import RankerModelBacktestV5
+     6→from backtest.ranker_model_backtest_v7 import RankerModelBacktestV7
+     7→from backtest.ranker_model_backtest_v8 import RankerModelBacktestV8
+     8→from backtest.ranker_model_backtest_v9 import RankerModelBacktestV9
+     9→from logger import main_logger as logger
+    10→from ranker_model.long_short_weight_generator import LongShortWeightGenerator
+    11→from ranker_model.portfolio_optimizer_generator import PortfolioOptimizerGenerator
+    12→from ranker_model.ranker_train_v2 import RankerModelTrainV2
+    13→from ranker_model.regression_portfolio_optimizer_generator import (
+    14→    RegressionPortfolioOptimizerGenerator,
+    15→)
+    16→from ranker_model.shrinkage_mvo_weight_generator import ShrinkageMvoWeightGenerator
+    17→from utils.db_util import get_symbols_by_name
+    18→from pprint import pformat
+    19→
+    20→
+    21→def run_experiments_with_id_v2(experiment_id: str):
+    22→    """
+    23→    Run experiments based on the given experiment ID.
+    24→    """
+    25→    weight_models = {
+    26→        "long_short": LongShortWeightGenerator,
+    27→        "shrinkage_mvo": ShrinkageMvoWeightGenerator,
+    28→        "portfolio_optimizer": PortfolioOptimizerGenerator,
+    29→        "regression_portfolio_optimizer": RegressionPortfolioOptimizerGenerator,
+    30→    }
+    31→    backtest_models = {
+    32→        "muti_batch_1h_leverage": RankerModelBacktestV9,
+    33→        "muti_batch_1h": RankerModelBacktestV5,
+    34→        "single_batch_4h": RankerModelBacktestV7,
+    35→        "muti_batch_4h": RankerModelBacktestV8,
+    36→    }
+    37→
+    38→    # @info  check if the experiment ID is valid, if file not found, raise error
+    39→    if not experiment_id:
+    40→        raise ValueError("Experiment ID must be provided.")
+    41→
+    42→    if not os.path.exists("config/experiments_config/base_config.toml"):
+    43→        raise FileNotFoundError("Base configuration file not found.")
+    44→
+    45→    if not os.path.exists("config/experiments_config/{}.toml".format(experiment_id)):
+    46→        raise FileNotFoundError(
+    47→            f"Experiment configuration for ID '{experiment_id}' not found."
+    48→        )
+    49→
+    50→    # @info create folder at artifacts/{experiment_id} to save experiment results
+    51→    os.makedirs(os.path.join("artifacts", experiment_id), exist_ok=True)
+    52→
+    53→    experiment_config = tomllib.load(
+    54→        open("config/experiments_config/{}.toml".format(experiment_id), "rb")
+    55→    )
+    56→
+    57→    logger.info(f"load experiment success , meta info : {experiment_config['meta']} ")
+    58→
+    59→    start_stage = experiment_config.get("stage", {}).get("start_stage", None)
+    60→    if not start_stage:
+    61→        raise ValueError(
+    62→            f"Stage must be specified in the experiment configuration. {experiment_config} experiment id: {experiment_id}"
+    63→        )
+    64→
+    65→    start_time = pd.Timestamp.now()
+    66→    logger.info(
+    67→        f"Start running experiment {experiment_id} start stage: { start_stage} "
+    68→    )
+    69→
+    70→    if start_stage == "prob":
+    71→        logger.info(
+    72→            f"Start stage: ranker probability generation for  experiment {experiment_id}"
+    73→        )
+    74→        logger.info(
+    75→            f"Running ranker probability generation for experiment {experiment_id}"
+    76→        )
+    77→
+    78→        symbol_list = get_symbols_by_name(
+    79→            name=experiment_config["data"]["token_list_name"]
+    80→        )
+    81→
+    82→        save_path = None
+    83→        if experiment_config["meta"]["save_artifacts"]:
+    84→            save_path = os.path.join(
+    85→                "artifacts", experiment_id, "predicted_probability.feather"
+    86→            )
+    87→
+    88→        token_level = experiment_config["data"]["token_level"]
+    89→
+    90→        model_file_path = experiment_config["model"]["model_file"]
+    91→
+    92→        ranker_probability = RankerModelTrainV2(token_level=token_level).test(
+    93→            symbol_list=symbol_list,
+    94→            save_file_path=save_path,
+    95→            model_file_path=model_file_path,
+    96→        )
+    97→
+    98→        ranker_probability_end_time = pd.Timestamp.now()
+    99→        time_cost_on_prob = ranker_probability_end_time - start_time
+   100→
+   101→        logger.info(
+   102→            f"Finished ranker probability generation. time cost {time_cost_on_prob}"
+   103→        )
+   104→    else:
+   105→        ranker_probability_end_time = pd.Timestamp.now()
+   106→        file_path = experiment_config["data"]["ranker_probability_file"]
+   107→        ranker_probability = pd.read_feather(
+   108→            os.path.join("artifacts", experiment_id, file_path)
+   109→        )
+   110→        logger.info(f"Loaded ranker probability from file.")
+   111→
+   112→    if start_stage == "weight" or start_stage == "prob":
+   113→
+   114→        logger.info(
+   115→            f"Start stage: ranker weight generation for  experiment {experiment_id}"
+   116→        )
+   117→
+   118→        save_path = None
+   119→        if experiment_config["meta"]["save_artifacts"]:
+   120→            save_path = os.path.join(
+   121→                "artifacts", experiment_id, "ranker_weight.feather"
+   122→            )
+   123→
+   124→        token_level = experiment_config["data"]["token_level"]
+   125→
+   126→        end_time = None
+   127→        if experiment_config["meta"]["debug"]:
+   128→            end_time = pd.to_datetime("2025-07-28 00:00:00")
+   129→
+   130→        symbol_list = get_symbols_by_name(
+   131→            name=experiment_config["data"]["token_list_name"]
+   132→        )
+   133→
+   134→        # @info filter the ranker probability to only include symbols in symbol_list
+   135→        ranker_probability = ranker_probability[
+   136→            ranker_probability["symbol"].isin(symbol_list)
+   137→        ]
+   138→
+   139→        weight_generator = weight_models[experiment_config["model"]["weight_model"]]()
+   140→
+   141→        logger.info(f"using the weight model : {weight_generator} ")
+   142→
+   143→        end_time = None
+   144→        if experiment_config["meta"]["debug"]:
+   145→            end_time = pd.to_datetime("2025-07-28 00:00:00")
+   146→        # INSERT_YOUR_CODE
+   147→        unique_symbols = set(ranker_probability["symbol"])
+   148→        logger.info(
+   149→            f"Number of unique symbols in ranker_probability: {len(unique_symbols)}"
+   150→        )
+   151→        ranker_weight = weight_generator.generate_weights(
+   152→            ranker_probability=ranker_probability,
+   153→            model_file_path=experiment_config["model"]["model_file"],
+   154→            save_path=save_path,
+   155→            end_time=end_time,
+   156→        )
+   157→
+   158→        weight_end_time = pd.Timestamp.now()
+   159→        time_cost_on_weight = weight_end_time - ranker_probability_end_time
+   160→
+   161→        logger.info(
+   162→            f"Finished ranker weight generation. time cost {time_cost_on_weight} experiment id: {experiment_id}"
+   163→        )
+   164→    else:
+   165→        ranker_weight = pd.read_feather(
+   166→            os.path.join("artifacts", experiment_id, "ranker_weight.feather")
+   167→        )
+   168→        logger.info(f"Loaded ranker weight from file.")
+   169→
+   170→    if start_stage == "backtest" or start_stage == "weight" or start_stage == "prob":
+   171→
+   172→        ranker_class = backtest_models[experiment_config["model"]["backtest_model"]]
+   173→        backtest = ranker_class(
+   174→            predict_df=ranker_weight,
+   175→            use_cache=False,
+   176→        )
+   177→        backtest_result = backtest.run()
+   178→        with open(os.path.join("artifacts", experiment_id, "metrics.txt"), "w") as f:
+   179→            f.write(pformat(backtest_result))
+   180→
+   181→        logger.info(
+   182→            f"Finished backtest for experiment {experiment_id}, here is experiment_config:{experiment_config}"
+   183→        )
+   184→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

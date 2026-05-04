@@ -1,0 +1,721 @@
+     1→from datetime import datetime, timedelta
+     2→import json
+     3→from pprint import pprint
+     4→from tqdm import tqdm
+     5→import os
+     6→from typing import Optional
+     7→from backtest.ranker_model_backtest_v3 import RankerModelBacktestV3
+     8→from backtest.ranker_model_backtest_v4 import RankerModelBacktestV4
+     9→from backtest.ranker_model_backtest_v5 import RankerModelBacktestV5
+    10→from bot.hyper_boo_redis_service import HyperBooRedisService
+    11→from config.config_types import OnlinePositionInfo, PositionSide
+    12→from config.run_time import DEBUG
+    13→import typer
+    14→
+    15→import asyncio
+    16→import pandas as pd
+    17→from typing_extensions import Annotated
+    18→from backtest.ranker_model_backtest import RankerModelBacktest
+    19→from backtest.ranker_model_backtest_v2 import RankerModelBacktestV2
+    20→from binance_api.binance_api import BinanceApi
+    21→
+    22→from bot.arbitrage_data_fetcher import ArbitrageDataFetcher
+    23→from bot.copy_trading_bot import CopyTradingBot
+    24→from bot.data_fetcher import DataFetcher
+    25→from bot.data_quality_monitor import DataQualityMonitor
+    26→from bot.gate_io_new_list import GateIONewList
+    27→from bot.gmgn_trading_bot import GmGnTradingBot
+    28→from bot.hyper_evm_sniper_bot import SniperBotV1
+    29→
+    30→# from bot.position_analyst import PositionAnalyst
+    31→from bot.solana_tg_call_sniper import SolanaTgCallSniper
+    32→from config.sniper_bot_config import SniperBotConfig
+    33→from config.tokens import USDT0, HYPE, PURR
+    34→from config.config import (
+    35→    ALL_SYMBOL_INFOS,
+    36→    EXAMPLE_ADDRESS_DATA_FROM_AXIOM_API,
+    37→    FEUSD_ADDRESS,
+    38→    LENGTH_ENOUGH_TOKEN,
+    39→    LIGHTER_SYMBOLS,
+    40→    PARADEX_SYMBOLS,
+    41→    TEMP_FEATURE,
+    42→    USDXL_ADDRESS,
+    43→)
+    44→from data.data_model import create_table
+    45→from data.data_operation import insert_binance_kline, insert_online_volume_record
+    46→from data.kline_data_tools import resample_recent_15_min_kline
+    47→from dbotx.dbotx import DbotX
+    48→from gate_api.gate_api import GateAPI
+    49→from hyper_api.get_info import fetch_account_summary
+    50→from hyper_core_api.hyper_core_api import HyperCoreAPI
+    51→from hyper_evm_api.basic_api import BasicHypeEVM, Route
+    52→from hyper_evm_api.block_data import BlockData
+    53→from hyperliquid.hyper_api import HyperApi
+    54→from ranker_model.fine_tune_ranker_train import FineTuneRankerModelTrain
+    55→from ranker_model.paper_trading import run_full_pipeline
+    56→from ranker_model.ranker_dummy import RankerDummy
+    57→from ranker_model.ranker_feature import RankerFeature
+    58→from ranker_model.ranker_online import (
+    59→    calculate_total_equity,
+    60→    get_total_online_position_size,
+    61→    make_orders_with_target_info,
+    62→    online_order,
+    63→    online_predict,
+    64→    online_predict_loop,
+    65→    run_online_order,
+    66→    sync_recent_kline,
+    67→    test_oder,
+    68→)
+    69→from ranker_model.ranker_train_v2 import RankerModelTrainV2
+    70→from ranker_model.validate_bimodal_characteristics import ValidateBimodalCharacteristics
+    71→from tests.generate_test_predictions import generate_test_predictions
+    72→from utils.coin_gecko_util import CoinGeckoApi
+    73→from utils.db_util import (
+    74→    bulk_insert_address,
+    75→    bulk_insert_kline_data,
+    76→    check_and_insert_address,
+    77→    get_all_training_symbols,
+    78→    get_binance_aster_both_symbols,
+    79→    get_binance_hyper_both_symbols,
+    80→    get_all_binance_symbols,
+    81→    get_binance_lighter_both_symbols,
+    82→    get_binance_paradex_both_symbols,
+    83→    get_latest_positions,
+    84→    get_paradex_hyper_symbols,
+    85→    get_pools,
+    86→    update_address_note,
+    87→)
+    88→from utils.kline_util import get_save_binance_klines, process_symbol
+    89→from utils.pass_util import PassUtil
+    90→from utils.time_util import TimeUtil
+    91→from utils.coin_market_cap_util import CoinMarketCapApi
+    92→from commands import (
+    93→    bn_commands,
+    94→    test_commands,
+    95→    analyse_commands,
+    96→    online_commands,
+    97→    backtest_commands,
+    98→    scripts_commands,
+    99→    api_commands,
+   100→    experiment_commands,
+   101→    ml_commands,
+   102→    grid_commands,
+   103→)
+   104→
+   105→
+   106→app = typer.Typer()
+   107→
+   108→# /***************
+   109→#  * SUB COMMADS *
+   110→#  ***************/
+   111→app.add_typer(test_commands.app, name="test")
+   112→app.add_typer(analyse_commands.app, name="analyse")
+   113→app.add_typer(online_commands.app, name="online")
+   114→app.add_typer(backtest_commands.app, name="backtest")
+   115→app.add_typer(scripts_commands.app, name="scripts")
+   116→app.add_typer(api_commands.app, name="api")
+   117→app.add_typer(experiment_commands.app, name="exp")
+   118→app.add_typer(ml_commands.app, name="ml")
+   119→app.add_typer(bn_commands.app, name="bn")
+   120→app.add_typer(grid_commands.app, name="grid")
+   121→
+   122→
+   123→@app.command()
+   124→def update():
+   125→    DataFetcher().main()
+   126→
+   127→
+   128→@app.command()
+   129→def check():
+   130→    checker = DataQualityMonitor()
+   131→    asyncio.run(checker.run_quality_checks())
+   132→
+   133→
+   134→@app.command()
+   135→def copy(account_id: int):
+   136→    # follow_address = "0x7fe8cfe481ec2f702692a9152e3f002f3e417ac6"  # 做空账户
+   137→    follow_address = "0x8cc94dc843e1ea7a19805e0cca43001123512b6a"  # 新的牛逼地址
+   138→    # follow_address = "0x8e2c81960e7e472b146b373b69e45847ce90ac5c"
+   139→    # follow_address = "0x45d26f28196d226497130c4bac709d808fed4029"
+   140→
+   141→    bot = CopyTradingBot(
+   142→        account_id=account_id,
+   143→        follow_address=follow_address,
+   144→        follow_leverage=3,
+   145→        # follow_leverage=1,
+   146→    )
+   147→    bot.main()
+   148→
+   149→
+   150→@app.command()
+   151→def add(
+   152→    address: Annotated[str, typer.Argument(help="the address")],
+   153→    note: Annotated[str, typer.Argument(help="note for address")] = None,
+   154→):
+   155→    """
+   156→    Adds a new address to the database.
+   157→    If the address already exists, a notification will be shown.
+   158→    """
+   159→    result = asyncio.run(check_and_insert_address(address=address, note=note))
+   160→    print(f"{result}")
+   161→
+   162→
+   163→@app.command()
+   164→def update(
+   165→    address: Annotated[str, typer.Argument(help="the address")],
+   166→    note: Annotated[str, typer.Argument(help="note for address")],
+   167→):
+   168→    result = asyncio.run(update_address_note(address=address, new_note=note))
+   169→    print(f"{result}")
+   170→
+   171→
+   172→async def test_async():
+   173→    pool = await get_pools()
+   174→    await get_latest_positions(pool=pool)
+   175→
+   176→
+   177→@app.command()
+   178→def test():
+   179→    print("test")
+   180→
+   181→    insert_online_volume_record(
+   182→        account_id=999, volume_value=12345.67, record_time=datetime.now()
+   183→    )
+   184→    # asyncio.run(test_async())
+   185→
+   186→    # with open(EXAMPLE_ADDRESS_DATA_FROM_AXIOM_API, "r") as file:
+   187→    #     json_data = json.load(file)
+   188→
+   189→    # # Analyze trading data
+   190→    # analysis_results = analyze_trading_data(json_data)
+   191→    import ipdb
+   192→
+   193→    ipdb.set_trace()
+   194→
+   195→
+   196→@app.command()
+   197→def encode(value: str):
+   198→    print(PassUtil.encrypt(value))
+   199→
+   200→
+   201→@app.command()
+   202→def evm(account_id: int):
+   203→    key = os.environ.get(f"HYPER_EVM_{account_id}")
+   204→    api = BasicHypeEVM(key=key)
+   205→    input_amount = 10 * (10**18)
+   206→    routes = [
+   207→        Route(from_token=USDXL_ADDRESS, to_token=FEUSD_ADDRESS, stable=True),
+   208→    ]
+   209→    result = asyncio.run(api.get_kitten_swap_amounts_out(input_amount, routes))
+   210→    print(result)
+   211→
+   212→
+   213→@app.command()
+   214→def orderbook(account_id: int):
+   215→    key = os.environ.get(f"HYPER_EVM_{account_id}")
+   216→    api = HyperApi(
+   217→        private_key=key,
+   218→    )
+   219→    print(api)
+   220→
+   221→
+   222→async def test_data():
+   223→    pool = await get_pools()
+   224→    kline_data = [
+   225→        [
+   226→            1499040000000,  # open_time
+   227→            "0.01634790",  # open_price
+   228→            "0.80000000",  # high_price
+   229→            "0.01575800",  # low_price
+   230→            "0.01577100",  # close_price
+   231→            "148976.11427815",  # volume
+   232→            1499644799999,  # close_time
+   233→            "2434.19055334",  # quote_volume
+   234→            308,  # trade_count
+   235→            "1756.87402397",  # taker_buy_volume
+   236→            "28.46694368",  # taker_buy_quote_volume
+   237→            "17928899.62484339",  # ignore
+   238→        ]
+   239→    ]
+   240→
+   241→    await bulk_insert_kline_data(pool, "BTCUSDT", 1, kline_data)
+   242→
+   243→
+   244→@app.command()
+   245→def testdata():
+   246→    symbols = get_binance_hyper_both_symbols()
+   247→    print(symbols)
+   248→    # asyncio.run(test_data())
+   249→
+   250→
+   251→@app.command()
+   252→def bndata():
+   253→    asyncio.run(get_save_binance_klines())
+   254→
+   255→
+   256→@app.command()
+   257→def arbdata():
+   258→    BlockData().run()
+   259→
+   260→
+   261→async def test_gate():
+   262→    gate_api = GateAPI()
+   263→    try:
+   264→        # Get spot currencies
+   265→        currencies = await gate_api.get_spot_currencies()
+   266→        print("Spot Currencies:", currencies)
+   267→
+   268→        # Create a spot order
+   269→        order = await gate_api.create_spot_order(
+   270→            currency_pair="BTC_USDT",
+   271→            side="buy",
+   272→            amount="0.001",
+   273→            price="30000",
+   274→            order_type="limit",
+   275→            time_in_force="gtc",
+   276→        )
+   277→        print("Created Order:", order)
+   278→    finally:
+   279→        await gate_api.close()
+   280→
+   281→
+   282→@app.command()
+   283→def gate():
+   284→    asyncio.run(test_gate())
+   285→
+   286→
+   287→@app.command()
+   288→def newlist():
+   289→    GateIONewList().main()
+   290→
+   291→
+   292→# /***************************
+   293→#  * HYPER LIQUID LAUNCH BOT *
+   294→#  ***************************/
+   295→# @todo implement the launch bot her
+   296→@app.command()
+   297→def launch(account_id: int):
+   298→    key = os.environ.get(f"HYPER_EVM_{account_id}")
+   299→    bot = SniperBotV1(
+   300→        key=key, buy_amount_hype_in_wei=SniperBotConfig.BUY_AMOUNT_HYPE_IN_WEI
+   301→    )
+   302→    bot.main()
+   303→
+   304→
+   305→@app.command()
+   306→def sellbot(account_id: int):
+   307→    """
+   308→    Sell bot for hyper evm
+   309→    """
+   310→    key = os.environ.get(f"HYPER_EVM_{account_id}")
+   311→    bot = SniperBotV1(
+   312→        key=key, buy_amount_hype_in_wei=SniperBotConfig.BUY_AMOUNT_HYPE_IN_WEI
+   313→    )
+   314→    bot.sell_main()
+   315→
+   316→
+   317→# /********
+   318→#  * GMGN *
+   319→#  ********/
+   320→@app.command()
+   321→def gmgn():
+   322→    api = GmGnTradingBot()
+   323→    api.main()
+   324→
+   325→
+   326→# /*********
+   327→#  * DBOTX *
+   328→#  *********/
+   329→@app.command()
+   330→def buy(token_address: str, amount: float):
+   331→    """
+   332→    Buy token using DBOTX API
+   333→    """
+   334→    bot = DbotX()
+   335→    print(asyncio.run(bot.buy(token_address=token_address, amount=amount)))
+   336→    # print(asyncio.run(bot.get_wallets()))
+   337→
+   338→
+   339→@app.command()
+   340→def sell(token_address: str, sell_ratio: Optional[float] = None):
+   341→    """
+   342→    Sell token using DBOTX API
+   343→    """
+   344→    if not sell_ratio:
+   345→        sell_ratio = 1.0
+   346→    bot = DbotX()
+   347→    print(asyncio.run(bot.sell(token_address=token_address, sell_ratio=sell_ratio)))
+   348→
+   349→
+   350→# /************
+   351→#  * TELEGRAM *
+   352→#  ************/
+   353→@app.command()
+   354→def call():
+   355→    """
+   356→    Test Telegram client
+   357→    """
+   358→    client = SolanaTgCallSniper()
+   359→    asyncio.run(client.run_forever())
+   360→
+   361→
+   362→# /********************************
+   363→#  * KLINE RELATED FOR RANKER LLM *
+   364→#  ********************************/
+   365→
+   366→
+   367→@app.command()
+   368→def kline():
+   369→    kline_info_pairs = {
+   370→        "15m": {
+   371→            "kline_level": 15,
+   372→            "kline_name": "15m",
+   373→        },
+   374→        "1h": {
+   375→            "kline_level": 60,
+   376→            "kline_name": "1h",
+   377→        },
+   378→        "30m": {
+   379→            "kline_level": 30,
+   380→            "kline_name": "30m",
+   381→        },
+   382→        "2h": {
+   383→            "kline_level": 120,
+   384→            "kline_name": "2h",
+   385→        },
+   386→        "4h": {
+   387→            "kline_level": 240,
+   388→            "kline_name": "4h",
+   389→        },
+   390→        "8h": {
+   391→            "kline_level": 480,
+   392→            "kline_name": "8h",
+   393→        },
+   394→        "1d": {
+   395→            "kline_level": 1440,
+   396→            "kline_name": "1d",
+   397→        },
+   398→    }
+   399→    # kline_info_pair = kline_info_pairs["1h"]
+   400→    kline_info_pair = kline_info_pairs["15m"]
+   401→    symbols = get_binance_hyper_both_symbols()
+   402→    bar = tqdm(symbols)
+   403→
+   404→    api = BinanceApi(api=None, symbol="BTCUSDT")
+   405→    # days = 365
+   406→    # days = 365
+   407→    # days = 400
+   408→    days = 30
+   409→    for symbol in bar:
+   410→        try:
+   411→            start_time = TimeUtil.format_time(datetime.now() - timedelta(days=days))
+   412→            end_time = TimeUtil.format_time(datetime.now())
+   413→            print(f"{start_time}-{end_time}")
+   414→            klines = asyncio.run(
+   415→                api.get_kline(
+   416→                    # timeframe="1h",
+   417→                    timeframe=kline_info_pair["kline_name"],
+   418→                    start_date=start_time,
+   419→                    end_date=end_time,
+   420→                    symbol=symbol,
+   421→                )
+   422→            )
+   423→            bar.set_description(f"insert {symbol}")
+   424→            candles = klines.to_records()
+   425→            bar2 = tqdm(candles)
+   426→            for candle in bar2:
+   427→                time = pd.to_datetime(candle["candle_begin_time"])
+   428→                created = insert_binance_kline(
+   429→                    data=candle,
+   430→                    time=time,
+   431→                    symbol=symbol,
+   432→                    level=kline_info_pair["kline_level"],
+   433→                    # level=30,
+   434→                )
+   435→                time_str = f"{TimeUtil.format_time(time.to_pydatetime())}"
+   436→                if created:
+   437→                    bar2.set_description("created new record " + time_str)
+   438→                else:
+   439→                    bar2.set_description("find record" + time_str)
+   440→        except Exception as e:
+   441→            print(f"Error processing symbol {symbol}: {e}")
+   442→            continue
+   443→
+   444→
+   445→@app.command()
+   446→def paper():
+   447→    run_full_pipeline()
+   448→
+   449→
+   450→@app.command()
+   451→def ranker(task: str):
+   452→    token_level = 60
+   453→    # token_level = 60
+   454→    # token_level = 60 * 4
+   455→    # token_level = 60 * 24
+   456→    if task == "kline":
+   457→        recent_days = 60
+   458→        sync_recent_kline(hours=24 * recent_days, symbols=get_all_training_symbols())
+   459→    elif task == "symbol":
+   460→        print(f"all binance symbols {get_all_binance_symbols()}")
+   461→        print(f"bn and lighter symbols {get_binance_lighter_both_symbols()}")
+   462→        print(f"bn and hyper symbols {get_binance_hyper_both_symbols()}")
+   463→
+   464→    elif task == "feature":
+   465→        # start_time = pd.Timestamp("2024-12-19 00:00:00")
+   466→        start_time = pd.Timestamp("2024-05-01 00:00:00")
+   467→
+   468→        # @info remember to change the end time to recent time
+   469→        # end_time = pd.Timestamp("2025-09-20 00:00:00")
+   470→        # end_time = pd.Timestamp("2025-10-24 00:00:00")
+   471→        end_time = pd.Timestamp("2025-12-08 00:00:00")
+   472→
+   473→        feature = RankerFeature(
+   474→            # symbols=get_binance_hyper_both_symbols(),
+   475→            # @info use all symbols
+   476→            symbols=get_all_training_symbols(),
+   477→            start_time=start_time,
+   478→            end_time=end_time,
+   479→            minute_level=token_level,
+   480→        )
+   481→        feature = feature.create_feature(save_token_feature=False)
+   482→        feature.to_csv(TEMP_FEATURE)
+   483→    elif task == "tune":
+   484→        FineTuneRankerModelTrain(token_level=token_level).run(n_trials=500)
+   485→    elif task == "train":
+   486→        RankerModelTrainV2(token_level=token_level).run()
+   487→    elif task == "trainonline":
+   488→        RankerModelTrainV2(token_level=token_level).train_online()
+   489→    elif task == "test":
+   490→        # @info train的时候用全部数据，test 时候只用部分token
+   491→        # symbol_list = aster_symbol_list
+   492→        symbol_list = get_binance_hyper_both_symbols()
+   493→
+   494→        # symbol_list = get_binance_lighter_both_symbols()
+   495→
+   496→        RankerModelTrainV2(token_level=token_level).test(
+   497→            symbol_list=symbol_list,
+   498→        )
+   499→
+   500→    elif task == "weight":
+   501→        # end_time = pd.to_datetime("2025-08-15 00:00:00")
+   502→
+   503→        end_time = None
+   504→
+   505→        RankerModelTrainV2(token_level=token_level).weight(end_time=end_time)
+   506→    elif task == "check":
+   507→        ValidateBimodalCharacteristics(
+   508→            symbols=get_binance_hyper_both_symbols(),
+   509→            start_time=pd.Timestamp("2024-05-01 00:00:00"),
+   510→            end_time=pd.Timestamp("2025-08-01 00:00:00"),
+   511→            kline_level=60,
+   512→        ).validate()
+   513→
+   514→    elif task == "dummy":
+   515→        predict_df = RankerDummy().dummy(
+   516→            holding_minutes=60,
+   517→            start_time=pd.Timestamp("2025-04-14 07:00:00"),
+   518→            end_time=pd.Timestamp("2025-07-13 06:45:00"),
+   519→        )
+   520→        RankerModelBacktest(
+   521→            predict_df=predict_df, trading_fee=0.0001, is_dummy=True
+   522→        ).run()
+   523→
+   524→    elif task == "backtest":
+   525→        predict_df = pd.read_csv("ranker_prediction.csv", parse_dates=["time"])
+   526→        for col in ["long_list", "short_list"]:
+   527→            predict_df[col] = predict_df[col].apply(eval)
+   528→
+   529→        RankerModelBacktest(
+   530→            predict_df=predict_df,
+   531→            # trading_fee=0.0003,
+   532→            trading_fee=0.0001,
+   533→            # trading_fee=0,
+   534→        ).run()
+   535→
+   536→    elif task == "backtest2":
+   537→        filtered_symbols = get_binance_hyper_both_symbols()
+   538→        # filtered_symbols = LIGHTER_SYMBOLS
+   539→
+   540→        predict_df = RankerModelTrainV2(token_level=token_level).test(
+   541→            save_file=True,
+   542→            # filtered_symbols=filtered_symbols,
+   543→            symbol_list=get_all_binance_symbols(),
+   544→        )
+   545→        predict_df = pd.read_csv("ranker_prediction.csv", parse_dates=["time"])
+   546→        for col in ["long_list", "short_list"]:
+   547→            predict_df[col] = predict_df[col].apply(eval)
+   548→
+   549→        # @info no filter
+   550→        all_symbol = filtered_symbols
+   551→        human_long_list = all_symbol
+   552→        human_short_list = all_symbol
+   553→
+   554→        # @info filter out some tokens
+   555→        # black_list = ["HYPERUSDT"]
+   556→        black_list = []
+   557→        human_long_list = [i for i in human_long_list if i not in black_list]
+   558→        human_short_list = [i for i in human_short_list if i not in black_list]
+   559→
+   560→        backtest = RankerModelBacktestV2(
+   561→            predict_df=predict_df,
+   562→            trading_fee=0.0003,
+   563→            # trading_fee=0.0001,
+   564→            # trading_fee=0,
+   565→            human_long_list=human_long_list,
+   566→            human_short_list=human_short_list,
+   567→        )
+   568→        history_df = backtest.run()
+   569→
+   570→        # @todo only use for debug, delete this in future
+   571→        import ipdb
+   572→
+   573→        ipdb.set_trace()
+   574→
+   575→    elif task == "backtest3":
+   576→        predict_df = pd.read_csv("ranker_prediction.csv", parse_dates=["time"])
+   577→        for col in ["long_list", "short_list"]:
+   578→            predict_df[col] = predict_df[col].apply(eval)
+   579→
+   580→        backtest = RankerModelBacktestV3(
+   581→            predict_df=predict_df,
+   582→            # trading_fee=0.0003,
+   583→            # trading_fee=0.0001,
+   584→            trading_fee=0,
+   585→        )
+   586→        history_df = backtest.run()
+   587→
+   588→    elif task == "backtest4":
+   589→        # @info choose if I need to use kline cache
+   590→        use_cache = False
+   591→        # use_cache = True
+   592→        file_name = "ranker_prediction.csv"
+   593→        predict_df = pd.read_csv(file_name, parse_dates=["time"])
+   594→
+   595→        for col in ["long_list", "short_list"]:
+   596→            predict_df[col] = predict_df[col].apply(eval)
+   597→
+   598→        backtest = RankerModelBacktestV4(
+   599→            predict_df=predict_df,
+   600→            use_cache=use_cache,
+   601→        )
+   602→        history_df = backtest.run()
+   603→
+   604→    elif task == "backtest5":
+   605→        # @info choose if I need to use kline cache
+   606→        use_cache = False
+   607→        # use_cache = True
+   608→        file_name = "ranker_prediction.csv"
+   609→        predict_df = pd.read_csv(file_name, parse_dates=["time"])
+   610→
+   611→        # for col in ["long_list", "short_list"]:
+   612→        #     predict_df[col] = predict_df[col].apply(eval)
+   613→
+   614→        backtest = RankerModelBacktestV5(
+   615→            predict_df=predict_df,
+   616→            use_cache=use_cache,
+   617→        )
+   618→        history_df = backtest.run()
+   619→
+   620→    else:
+   621→        raise Exception(f"Not found this task: {task}")
+   622→
+   623→
+   624→@app.command()
+   625→def testdata():
+   626→    # generate_test_predictions()
+   627→    # resample_recent_15_min_kline()
+   628→    trading_account_id = 1
+   629→    key = os.environ.get(f"HYPER_ACCOUNT_{trading_account_id}")
+   630→    hyper_api = HyperCoreAPI(key=key)
+   631→
+   632→    # asyncio.run(
+   633→    #     make_orders_with_target_info(
+   634→    #         hyper_api=hyper_api,
+   635→    #         target_position_infos=[
+   636→    #             OnlinePositionInfo(
+   637→    #                 symbol="BTCUSDT", token_size=0.0002, side=PositionSide.LONG.value
+   638→    #             ),
+   639→    #             # OnlinePositionInfo(
+   640→    #             #     symbol="ETHUSDT", token_size=0.008, side=PositionSide.SHORT.value
+   641→    #             # ),
+   642→    #             # OnlinePositionInfo(
+   643→    #             #     symbol="MELANIAUSDT", token_size=2000, side=PositionSide.LONG.value
+   644→    #             # ),
+   645→    #         ],
+   646→    #         scale_factor=0.5,
+   647→    #     )
+   648→    # )
+   649→    all_tokens = get_binance_hyper_both_symbols()
+   650→    # all_tokens = get_binance_symbols()
+   651→    predict_df = pd.read_csv("ranker_prediction.csv", parse_dates=["time"])
+   652→
+   653→    unique_token = {}
+   654→    for col in ["long_list", "short_list"]:
+   655→        predict_df[col] = predict_df[col].apply(eval)
+   656→
+   657→    for tokens in predict_df["long_list"]:
+   658→        for token in tokens:
+   659→            if not unique_token.get(token):
+   660→                unique_token[token] = True
+   661→
+   662→    for tokens in predict_df["short_list"]:
+   663→        for token in tokens:
+   664→            if not unique_token.get(token):
+   665→                unique_token[token] = True
+   666→
+   667→    predict_symbols = list(unique_token.keys())
+   668→
+   669→    print(set(predict_symbols) - set(all_tokens))
+   670→    import ipdb
+   671→
+   672→    ipdb.set_trace()
+   673→    # test_oder()
+   674→
+   675→
+   676→@app.command()
+   677→def token(task: str):
+   678→    if task == "both":
+   679→        print(get_binance_hyper_both_symbols())
+   680→    elif task == "binance":
+   681→        print(get_all_binance_symbols())
+   682→    else:
+   683→        raise ValueError(f"Unknown task: {task}")
+   684→
+   685→
+   686→@app.command()
+   687→def symbol(task: str):
+   688→    if task == "generate":
+   689→        symbol_infos = asyncio.run(CoinGeckoApi().get_binance_coin_info())
+   690→        with open(ALL_SYMBOL_INFOS, "w") as json_file:
+   691→            json.dump(symbol_infos, json_file, indent=4)
+   692→
+   693→        print(f"Successfully wrote dictionary to {ALL_SYMBOL_INFOS}")
+   694→        print(f"symbols: {symbol_infos.keys()}")
+   695→        print(f"symbols length: {len(symbol_infos.keys())}")
+   696→    elif task == "check":
+   697→        symbol_infos = json.load(open(ALL_SYMBOL_INFOS, "r"))
+   698→        print(f"symbols: {symbol_infos.keys()}")
+   699→        print(f"symbols example:{symbol_infos['ETHUSDT']}")
+   700→        print(f"symbols length: {len(symbol_infos.keys())}")
+   701→    else:
+   702→        raise ValueError(f"Unknown task: {task}")
+   703→
+   704→
+   705→@app.command()
+   706→def table():
+   707→    create_table()
+   708→
+   709→
+   710→@app.command()
+   711→def analyse():
+   712→    pass
+   713→
+   714→
+   715→if __name__ == "__main__":
+   716→    app()
+   717→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

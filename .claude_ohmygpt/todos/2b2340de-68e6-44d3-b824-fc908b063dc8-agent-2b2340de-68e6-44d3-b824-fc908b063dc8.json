@@ -1,0 +1,17 @@
+[
+  {
+    "content": "查询 Claude Code 用法和功能",
+    "status": "in_progress",
+    "activeForm": "正在查询 Claude Code 用法和功能"
+  },
+  {
+    "content": "整理并撰写 Claude Code 使用指南文档",
+    "status": "pending",
+    "activeForm": "正在撰写 Claude Code 使用指南文档"
+  },
+  {
+    "content": "保存文档到 docs 目录",
+    "status": "pending",
+    "activeForm": "正在保存文档到 docs 目录"
+  }
+]

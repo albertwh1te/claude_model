@@ -1,0 +1,254 @@
+     1→import asyncio
+     2→from datetime import datetime, timedelta
+     3→import json
+     4→import typer
+     5→import pandas as pd
+     6→import joblib
+     7→from config.config import (
+     8→    ALL_SYMBOL_DETAIL_INFO,
+     9→    ALL_SYMBOL_INFOS,
+    10→    TEMP_FEATURE,
+    11→    TEST_FEATURE,
+    12→)
+    13→from config.ranker_parameters import RANKER_REGRESSION_BASE_PARAMETERS
+    14→from data.data_check import check_kline_data
+    15→from ranker_model.fine_tune_ranker_train import FineTuneRankerModelTrain
+    16→from ranker_model.fine_tune_regression_model import FineTuneRegressionModelTrain
+    17→from ranker_model.ranker_feature import RankerFeature
+    18→from ranker_model.ranker_online import sync_recent_kline
+    19→from ranker_model.ranker_train_v3 import RankerModelTrainV3
+    20→from logger import main_logger as logger
+    21→from ranker_model.regression_train import RegressionModelTrain
+    22→from utils.coin_gecko_util import CoinGeckoApi
+    23→from utils.db_util import (
+    24→    get_all_binance_symbols,
+    25→    get_binance_lighter_both_symbols,
+    26→    get_symbols_by_name,
+    27→)
+    28→from utils.ml_util import (
+    29→    check_feature_names,
+    30→    get_local_feature_data,
+    31→    split_feature_data_to_files,
+    32→)
+    33→from utils.typer_util import notify_me_command
+    34→
+    35→app = typer.Typer()
+    36→
+    37→
+    38→@app.command("coin_info")
+    39→def generate_coin_detail_info():
+    40→    symbol_infos = asyncio.run(CoinGeckoApi().get_binance_coin_info())
+    41→    with open(ALL_SYMBOL_INFOS, "w") as json_file:
+    42→        json.dump(symbol_infos, json_file, indent=4)
+    43→    coin_detail_info = asyncio.run(CoinGeckoApi().generate_coin_detail_info())
+    44→    logger.info(
+    45→        f"Coin detail info generated and saved to {ALL_SYMBOL_DETAIL_INFO} and {ALL_SYMBOL_INFOS}"
+    46→    )
+    47→
+    48→
+    49→@app.command("data")
+    50→def sync_local_data(days: int):
+    51→    logger.info(f"Start syncing {days} days local data...")
+    52→    symbol_list = get_all_binance_symbols()
+    53→    sync_recent_kline(hours=24 * days, symbols=symbol_list)
+    54→
+    55→
+    56→@app.command("train")
+    57→@notify_me_command("finished train")
+    58→def train(version: int = 4):
+    59→    if version == 3:
+    60→        RankerModelTrainV3().train()
+    61→    elif version == 4:
+    62→        # RegressionModelTrain().train(symbol_list=get_binance_lighter_both_symbols())
+    63→        hyper_parameters = RANKER_REGRESSION_BASE_PARAMETERS
+    64→        hyper_parameters.update(
+    65→            {
+    66→                "seed": 42,
+    67→                "objective": "regression",
+    68→                "metric": "rmse",
+    69→                "boosting_type": "gbdt",
+    70→                "verbose": -1,
+    71→                "n_jobs": -1,
+    72→                "learning_rate": 0.003,
+    73→                "verbosity": -1,
+    74→                "num_leaves": 214,
+    75→                "max_depth": 11,
+    76→                "min_child_samples": 8847,
+    77→                "lambda_l1": 0.01483613795220929,
+    78→                "lambda_l2": 0.002220474031800282,
+    79→                "bagging_fraction": 0.8297345017257454,
+    80→                "bagging_freq": 2,
+    81→                "feature_fraction": 0.9325107622617357,
+    82→            }
+    83→        )
+    84→        RegressionModelTrain(hyper_parameters=hyper_parameters).train(
+    85→            symbol_list=get_all_binance_symbols()
+    86→        )
+    87→    else:
+    88→        raise ValueError(f"version {version} not supported")
+    89→
+    90→
+    91→@app.command("check_kline")
+    92→def check_kline():
+    93→    symbol_set_name = "bn_lighter_local"
+    94→    symbol_list = get_symbols_by_name(f"{symbol_set_name}")
+    95→    # @info set start_time to 2024-05-01, 最开始的数据日期
+    96→    start_time = pd.Timestamp("2024-05-01 00:00:00").to_pydatetime()
+    97→
+    98→    # @info set end_time to yesterday 00:00:00
+    99→    end_time = (datetime.now() - timedelta(days=1)).replace(
+   100→        hour=0, minute=0, second=0, microsecond=0
+   101→    )
+   102→
+   103→    check_kline_data(symbol_list, start_time, end_time)
+   104→
+   105→
+   106→@app.command("feature_names")
+   107→def show_feature_names():
+   108→
+   109→    df = pd.read_csv(TEMP_FEATURE, nrows=1000)
+   110→    names = check_feature_names(df)
+   111→
+   112→    print(f"feature names:\n {names}")
+   113→
+   114→
+   115→@app.command("tune")
+   116→def tune_model(times: int = 500):
+   117→    target_column = "target_4hour"
+   118→    FineTuneRankerModelTrain(token_level=60, target_column=target_column).run(
+   119→        n_trials=times, symbol_list=get_binance_lighter_both_symbols()
+   120→    )
+   121→
+   122→
+   123→@app.command("tune_regression")
+   124→def tune_regression_model(times: int = 500):
+   125→    target_column = "target_1hour_zscore"
+   126→    FineTuneRegressionModelTrain(target_column=target_column).run(
+   127→        symbol_list=get_binance_lighter_both_symbols(),
+   128→        n_trials=times,
+   129→    )
+   130→
+   131→
+   132→@app.command("tune_regression_predict")
+   133→def tune_regression_predict(times: int = 500):
+   134→    # symbol_list_name = "bn_lighter_local"
+   135→    symbol_list_name = "full"
+   136→    symbol_list = get_symbols_by_name(f"{symbol_list_name}")
+   137→    logger.info(
+   138→        f"Symbol list name: {symbol_list_name}, total symbol count: {len(symbol_list)}"
+   139→    )
+   140→    logger.info(f"Start tuning regression model for {symbol_list_name}")
+   141→    target_column = "target_1hour_zscore"
+   142→    final_params = FineTuneRegressionModelTrain(target_column=target_column).run(
+   143→        symbol_list=symbol_list,
+   144→        n_trials=times,
+   145→    )
+   146→    logger.info(
+   147→        f"Finished tuning regression model for {symbol_list_name}, Final params: {final_params}"
+   148→    )
+   149→    logger.info(f"Start training regression model for {symbol_list_name}")
+   150→    RANKER_REGRESSION_BASE_PARAMETERS.update(final_params)
+   151→    logger.info(f"Final hyper parameters: {RANKER_REGRESSION_BASE_PARAMETERS}")
+   152→    RegressionModelTrain(hyper_parameters=RANKER_REGRESSION_BASE_PARAMETERS).train(
+   153→        symbol_list=symbol_list
+   154→    )
+   155→
+   156→
+   157→@app.command("split_feature")
+   158→def spit_feature_data():
+   159→    feature = get_local_feature_data()
+   160→    split_feature_data_to_files(feature=feature)
+   161→    logger.info("Feature data split into train and test files.")
+   162→
+   163→
+   164→@app.command("predict")
+   165→def generate_predictions():
+   166→    model = RankerModelTrainV3()
+   167→    model_file = "ranker_model_4hour.pkl"
+   168→    model_instance = joblib.load(model_file)
+   169→
+   170→    test_df = pd.read_feather(TEST_FEATURE)
+   171→    predictions = model.generate_prediction(model=model_instance, test_df=test_df)
+   172→    logger.info("Predictions generated.")
+   173→
+   174→    save_path = "ranker_model_4h_predictions.feather"
+   175→    predictions[["time", "symbol", "prob"]].to_feather(save_path)
+   176→    logger.info(
+   177→        f"Predictions results:\n {predictions[['time','symbol','prob']].head()}"
+   178→    )
+   179→    logger.info(f"Predictions saved to {save_path}.")
+   180→    predictions.to_feather(save_path)
+   181→
+   182→
+   183→@app.command("online")
+   184→def train_online():
+   185→    logger.info(f"Start online training process...")
+   186→    # @info update the best_iteration according to tuning results
+   187→    hyper_parameters = RANKER_REGRESSION_BASE_PARAMETERS.copy()
+   188→    tmp_parameters = {
+   189→        "seed": 42,
+   190→        "objective": "regression",
+   191→        "metric": "rmse",
+   192→        "boosting_type": "gbdt",
+   193→        "verbose": -1,
+   194→        "n_jobs": -1,
+   195→        "learning_rate": 0.003,
+   196→        "verbosity": -1,
+   197→        "num_leaves": 45,
+   198→        "max_depth": 15,
+   199→        "min_child_samples": 9674,
+   200→        "lambda_l1": 1.7123375973163988,
+   201→        "lambda_l2": 0.01653693718282442,
+   202→        "bagging_fraction": 0.8146508171009577,
+   203→        "bagging_freq": 4,
+   204→        "feature_fraction": 0.8660228740609401,
+   205→    }
+   206→
+   207→    hyper_parameters.update(tmp_parameters)
+   208→
+   209→    # @info 在这里更新的时候记录一下log
+   210→    # logs/main/main.log.2025-12-10_15:11:2025-12-10 15:52:29.381 regression_train.py[line:107] INFO: Best iteration found: 1000
+   211→    best_iteration = 1000
+   212→
+   213→    final_iteration = int(best_iteration * 1.05)
+   214→
+   215→    feature_file_name = "tmp_feature_bn_lighter_local.csv"
+   216→
+   217→    RegressionModelTrain(
+   218→        hyper_parameters=hyper_parameters, feature_file_name=feature_file_name
+   219→    ).train_online(best_iteration=final_iteration)
+   220→
+   221→
+   222→@app.command("feature")
+   223→def feature():
+   224→
+   225→    # symbol_set_name = "bn_lighter_local"
+   226→    symbol_set_name = "full"
+   227→
+   228→    symbol_list = get_symbols_by_name(f"{symbol_set_name}")
+   229→
+   230→    start_time = pd.Timestamp("2024-05-01 00:00:00")
+   231→
+   232→    # end_time = pd.Timestamp("2025-12-08 00:00:00")
+   233→
+   234→    end_time = pd.Timestamp(datetime.now().date()) - pd.Timedelta(days=1)
+   235→    logger.info(f"Generating feature data. from {start_time} to {end_time}")
+   236→
+   237→    feature = RankerFeature(
+   238→        symbols=symbol_list,
+   239→        start_time=start_time,
+   240→        end_time=end_time,
+   241→        minute_level=15,
+   242→    )
+   243→    feature = feature.create_feature(save_token_feature=False)
+   244→    feature_path = f"tmp_feature_{symbol_set_name}.csv"
+   245→    feature.to_csv(feature_path)
+   246→    feature.to_csv(TEMP_FEATURE)
+   247→
+   248→    # @info show feature names after generate feature
+   249→    show_feature_names()
+   250→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

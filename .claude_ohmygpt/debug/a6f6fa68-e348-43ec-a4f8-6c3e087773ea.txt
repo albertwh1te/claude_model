@@ -1,0 +1,379 @@
+2026-02-18T01:34:31.401Z [DEBUG] [init] configureGlobalMTLS starting
+2026-02-18T01:34:31.402Z [DEBUG] [init] configureGlobalMTLS complete
+2026-02-18T01:34:31.402Z [DEBUG] [init] configureGlobalAgents starting
+2026-02-18T01:34:31.402Z [DEBUG] [init] configureGlobalAgents complete
+2026-02-18T01:34:31.411Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-02-18T01:34:31.429Z [DEBUG] Loading plugin planning-with-files from source: "./"
+2026-02-18T01:34:31.430Z [DEBUG] Using manifest version for planning-with-files@planning-with-files: 2.1.2
+2026-02-18T01:34:31.430Z [DEBUG] [ToolSearch:optimistic] mode=standard, ENABLE_TOOL_SEARCH=undefined, result=false
+2026-02-18T01:34:31.431Z [DEBUG] [STARTUP] Running setup()...
+2026-02-18T01:34:31.431Z [DEBUG] Plugin planning-with-files@planning-with-files version 2.1.2 already cached at /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/plugins/cache/planning-with-files/planning-with-files/2.1.2
+2026-02-18T01:34:31.432Z [DEBUG] Copied local plugin planning-with-files to versioned cache: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/plugins/cache/planning-with-files/planning-with-files/2.1.2
+2026-02-18T01:34:31.434Z [DEBUG] Loading skills from: managed=/Library/Application Support/ClaudeCode/.claude/skills, user=/Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/skills, project=[]
+2026-02-18T01:34:31.440Z [DEBUG] Error log sink initialized
+2026-02-18T01:34:31.451Z [DEBUG] Found 1 plugins (1 enabled, 0 disabled)
+2026-02-18T01:34:31.452Z [DEBUG] [STARTUP] setup() completed in 21ms
+2026-02-18T01:34:31.452Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-02-18T01:34:31.452Z [DEBUG] getPluginSkills: Processing 1 enabled plugins
+2026-02-18T01:34:31.452Z [DEBUG] Checking plugin planning-with-files: skillsPath=exists, skillsPaths=0 paths
+2026-02-18T01:34:31.452Z [DEBUG] Attempting to load skills from plugin planning-with-files default skillsPath: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/plugins/cache/planning-with-files/planning-with-files/2.1.2/skills
+2026-02-18T01:34:31.455Z [DEBUG] Total plugin commands loaded: 0
+2026-02-18T01:34:31.455Z [DEBUG] Loaded 1 skills from plugin planning-with-files default directory
+2026-02-18T01:34:31.455Z [DEBUG] Total plugin skills loaded: 1
+2026-02-18T01:34:31.455Z [DEBUG] Registered 0 hooks from 1 plugins
+2026-02-18T01:34:31.456Z [DEBUG] Total plugin agents loaded: 0
+2026-02-18T01:34:31.456Z [DEBUG] Loaded 1 unique skills (1 unconditional, 0 conditional, managed: 0, user: 1, project: 0, additional: 0, legacy commands: 0)
+2026-02-18T01:34:31.456Z [DEBUG] getSkills returning: 1 skill dir commands, 1 plugin skills, 2 bundled skills
+2026-02-18T01:34:31.456Z [DEBUG] [STARTUP] Commands and agents loaded in 4ms
+2026-02-18T01:34:31.457Z [DEBUG] Layout engine: yoga
+2026-02-18T01:34:31.462Z [DEBUG] [Claude in Chrome] Found chrome profiles: Default, Profile 1, Profile 2, Profile 3
+2026-02-18T01:34:31.471Z [DEBUG] [STARTUP] Running showSetupScreens()...
+2026-02-18T01:34:31.493Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-02-18T01:34:31.494Z [DEBUG] [STARTUP] showSetupScreens() completed in 23ms
+2026-02-18T01:34:31.494Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-02-18T01:34:31.494Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-02-18T01:34:31.494Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-02-18T01:34:31.529Z [DEBUG] [STARTUP] MCP configs loaded in 118ms
+2026-02-18T01:34:31.532Z [DEBUG] All plugins already exist, skipping migration
+2026-02-18T01:34:31.533Z [DEBUG] [Reconnection] computeInitialTeamContext: No teammate context set (not a teammate)
+2026-02-18T01:34:31.534Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378471534
+2026-02-18T01:34:31.535Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:31.535Z [DEBUG] Temp file written successfully, size: 14038 bytes
+2026-02-18T01:34:31.535Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:31.535Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378471534 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:31.536Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:31.538Z [DEBUG] Getting matching hook commands for SessionStart with query: startup
+2026-02-18T01:34:31.538Z [DEBUG] Found 0 hook matchers in settings
+2026-02-18T01:34:31.538Z [DEBUG] Matched 0 unique hooks for query "startup" (0 before deduplication)
+2026-02-18T01:34:31.544Z [DEBUG] Loaded 1 installed plugins from /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/plugins/installed_plugins.json
+2026-02-18T01:34:31.544Z [DEBUG] Initialized versioned plugins system with 1 plugins
+2026-02-18T01:34:31.567Z [DEBUG] [keybindings] KeybindingSetup initialized with 101 bindings, 0 warnings
+2026-02-18T01:34:31.601Z [DEBUG] High write ratio: blit=0, write=1255 (100.0% writes), screen=19x212
+2026-02-18T01:34:31.607Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378471607
+2026-02-18T01:34:31.607Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:31.607Z [DEBUG] Temp file written successfully, size: 14038 bytes
+2026-02-18T01:34:31.607Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:31.607Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378471607 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:31.607Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:31.608Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378471608
+2026-02-18T01:34:31.608Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:31.608Z [DEBUG] Temp file written successfully, size: 14038 bytes
+2026-02-18T01:34:31.608Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:31.608Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378471608 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:31.608Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:31.610Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378471610
+2026-02-18T01:34:31.610Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:31.610Z [DEBUG] Temp file written successfully, size: 14037 bytes
+2026-02-18T01:34:31.610Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:31.610Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378471610 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:31.610Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:31.613Z [DEBUG] [keybindings] Skipping file watcher - user customization disabled
+2026-02-18T01:34:31.613Z [DEBUG] [REPL:mount] REPL mounted, disabled=false
+2026-02-18T01:34:31.615Z [DEBUG] Official marketplace auto-install skipped: already_attempted
+2026-02-18T01:34:31.616Z [DEBUG] performStartupChecks called
+2026-02-18T01:34:31.616Z [DEBUG] Starting background plugin installations
+2026-02-18T01:34:31.616Z [DEBUG] performBackgroundPluginInstallations called
+2026-02-18T01:34:31.617Z [DEBUG] No CLAUDE.md/rules files found
+2026-02-18T01:34:31.628Z [DEBUG] Watching for changes in setting files /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/settings.json...
+2026-02-18T01:34:31.629Z [DEBUG] Found 1 enabled plugins
+2026-02-18T01:34:31.629Z [DEBUG] All plugins already exist, skipping migration
+2026-02-18T01:34:31.629Z [DEBUG] Found 1 installed plugins (V2 format)
+2026-02-18T01:34:31.629Z [DEBUG] [claudeai-mcp] Checking gate (cached)...
+2026-02-18T01:34:31.629Z [DEBUG] [claudeai-mcp] Gate returned: true
+2026-02-18T01:34:31.629Z [DEBUG] [claudeai-mcp] No access token
+2026-02-18T01:34:31.630Z [DEBUG] Loaded plugins - Enabled: 1, Disabled: 0, Commands: 0, Agents: 0, Errors: 0
+2026-02-18T01:34:31.630Z [DEBUG] Found 0 missing plugins (not installed):
+2026-02-18T01:34:31.630Z [DEBUG] Setting installation status: 0 marketplaces, 0 installable plugins, 0 uninstallable plugins
+2026-02-18T01:34:31.633Z [DEBUG] Total LSP servers loaded: 0
+2026-02-18T01:34:31.633Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 0 server(s)
+2026-02-18T01:34:31.633Z [DEBUG] LSP manager initialized with 0 servers
+2026-02-18T01:34:31.633Z [DEBUG] LSP server manager initialized successfully
+2026-02-18T01:34:31.633Z [DEBUG] LSP notification handlers registered successfully for all 0 server(s)
+2026-02-18T01:34:31.645Z [DEBUG] Watching for changes in skill/command directories: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/skills...
+2026-02-18T01:34:31.646Z [DEBUG] [Claude in Chrome] Found brave profiles: Default
+2026-02-18T01:34:31.651Z [DEBUG] High write ratio: blit=13, write=1242 (99.0% writes), screen=19x212
+2026-02-18T01:34:31.652Z [DEBUG] Ripgrep first use test: PASSED (mode=builtin, path=/Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/arm64-darwin/rg)
+2026-02-18T01:34:31.653Z [DEBUG] Git remote URL: git@github.com:albertwh1te/claude_model.git
+2026-02-18T01:34:31.653Z [DEBUG] Parsed repository: albertwh1te/claude_model from git@github.com:albertwh1te/claude_model.git
+2026-02-18T01:34:31.653Z [DEBUG] Parsed repository: albertwh1te/claude_model from URL: git@github.com:albertwh1te/claude_model.git
+2026-02-18T01:34:31.654Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378471654
+2026-02-18T01:34:31.654Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:31.655Z [DEBUG] Temp file written successfully, size: 14089 bytes
+2026-02-18T01:34:31.655Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:31.655Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378471654 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:31.655Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:31.655Z [DEBUG] Added /Users/matianjun/Dropbox/code/claude_model to tracked paths for repo albertwh1te/claude_model
+2026-02-18T01:34:31.658Z [DEBUG] [Claude in Chrome] Extension not found in any browser
+2026-02-18T01:34:31.722Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-18T01:34:31.722Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-18T01:34:31.722Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-18T01:34:31.960Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378471960
+2026-02-18T01:34:31.960Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:31.960Z [DEBUG] Temp file written successfully, size: 14089 bytes
+2026-02-18T01:34:31.960Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:31.960Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378471960 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:31.960Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:31.981Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378471981
+2026-02-18T01:34:31.981Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:31.981Z [DEBUG] Temp file written successfully, size: 14089 bytes
+2026-02-18T01:34:31.982Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:31.982Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378471981 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:31.982Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:32.069Z [DEBUG] AutoUpdaterWrapper: Installation type: unknown
+2026-02-18T01:34:32.386Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472386
+2026-02-18T01:34:32.386Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:32.387Z [DEBUG] Temp file written successfully, size: 14121 bytes
+2026-02-18T01:34:32.387Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:32.387Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472386 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:32.387Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:32.389Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472389
+2026-02-18T01:34:32.389Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:32.389Z [DEBUG] Temp file written successfully, size: 14154 bytes
+2026-02-18T01:34:32.389Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:32.389Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472389 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:32.389Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:32.391Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472391
+2026-02-18T01:34:32.391Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:32.391Z [DEBUG] Temp file written successfully, size: 14206 bytes
+2026-02-18T01:34:32.391Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:32.391Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472391 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:32.391Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:32.393Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472393
+2026-02-18T01:34:32.393Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:32.393Z [DEBUG] Temp file written successfully, size: 14242 bytes
+2026-02-18T01:34:32.393Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:32.393Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472393 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:32.393Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:32.394Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472394
+2026-02-18T01:34:32.394Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:32.395Z [DEBUG] Temp file written successfully, size: 14266 bytes
+2026-02-18T01:34:32.395Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:32.395Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472394 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:32.395Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:32.396Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472396
+2026-02-18T01:34:32.396Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:32.396Z [DEBUG] Temp file written successfully, size: 14302 bytes
+2026-02-18T01:34:32.396Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:32.396Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472396 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:32.396Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:32.398Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472398
+2026-02-18T01:34:32.398Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:32.398Z [DEBUG] Temp file written successfully, size: 14337 bytes
+2026-02-18T01:34:32.398Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:32.398Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472398 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:32.398Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:32.400Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472400
+2026-02-18T01:34:32.400Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:32.400Z [DEBUG] Temp file written successfully, size: 14370 bytes
+2026-02-18T01:34:32.400Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:32.400Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472400 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:32.400Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:32.401Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472401
+2026-02-18T01:34:32.401Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:32.401Z [DEBUG] Temp file written successfully, size: 14406 bytes
+2026-02-18T01:34:32.401Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:32.401Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472401 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:32.401Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:32.402Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472402
+2026-02-18T01:34:32.402Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:32.402Z [DEBUG] Temp file written successfully, size: 14441 bytes
+2026-02-18T01:34:32.402Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:32.402Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472402 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:32.403Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:32.404Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472404
+2026-02-18T01:34:32.404Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:32.404Z [DEBUG] Temp file written successfully, size: 14487 bytes
+2026-02-18T01:34:32.404Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:32.404Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472404 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:32.404Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:32.405Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-02-18T01:34:32.406Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472406
+2026-02-18T01:34:32.407Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:32.407Z [DEBUG] Temp file written successfully, size: 14504 bytes
+2026-02-18T01:34:32.407Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:32.407Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472406 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:32.407Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:32.408Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.9af; cc_entrypoint=cli; cch=00000;
+2026-02-18T01:34:32.409Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-18T01:34:32.409Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-18T01:34:32.410Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472410
+2026-02-18T01:34:32.410Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:32.411Z [DEBUG] Temp file written successfully, size: 14551 bytes
+2026-02-18T01:34:32.411Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:32.411Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472410 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:32.411Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:32.413Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472413
+2026-02-18T01:34:32.413Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:32.413Z [DEBUG] Temp file written successfully, size: 14590 bytes
+2026-02-18T01:34:32.413Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:32.413Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472413 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:32.413Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:32.414Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472414
+2026-02-18T01:34:32.414Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:32.414Z [DEBUG] Temp file written successfully, size: 14628 bytes
+2026-02-18T01:34:32.414Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:32.414Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378472414 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:32.414Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:32.415Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-18T01:34:32.561Z [ERROR] Error: Error: 401 {"error":"Invalid request token"}
+    at E4.generate (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:354:8823)
+    at aC.makeStatusError (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:393:2195)
+    at aC.makeRequest (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:393:5420)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:961:3741
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:961:2624
+    at async w99 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:960:3930)
+    at async NL7 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:961:2557)
+    at async pU1 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:3530:10195)
+    at async Yc (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:3530:10891)
+2026-02-18T01:34:32.561Z [DEBUG] countTokensWithFallback: API returned null, trying haiku fallback (20 tools)
+2026-02-18T01:34:32.561Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-18T01:34:32.561Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-18T01:34:32.561Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-18T01:34:33.372Z [DEBUG] Stream started - received first chunk
+2026-02-18T01:34:33.865Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-02-18T01:34:33.866Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-02-18T01:34:33.866Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-02-18T01:34:33.866Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-02-18T01:34:33.867Z [DEBUG] Sending 2 skills via attachment (initial, 2 total sent)
+2026-02-18T01:34:33.867Z [DEBUG] Skill prompt: showing "planning-with-files:planning-with-files" (userFacingName="planning-with-files")
+2026-02-18T01:34:33.870Z [DEBUG] Getting matching hook commands for UserPromptSubmit with query: undefined
+2026-02-18T01:34:33.870Z [DEBUG] Found 0 hook matchers in settings
+2026-02-18T01:34:33.870Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-02-18T01:34:33.871Z [DEBUG] FileHistory: Added snapshot for dd1a76eb-96cb-48dd-b8d3-83e60ea22660, tracking 0 files
+2026-02-18T01:34:33.872Z [DEBUG] [useDeferredValue] Messages deferred by 2 (0→2)
+2026-02-18T01:34:33.903Z [DEBUG] Started caffeinate to prevent sleep
+2026-02-18T01:34:33.910Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378473910
+2026-02-18T01:34:33.910Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:33.910Z [DEBUG] Temp file written successfully, size: 14663 bytes
+2026-02-18T01:34:33.910Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:33.910Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378473910 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:33.910Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:33.911Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378473911
+2026-02-18T01:34:33.911Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:33.911Z [DEBUG] Temp file written successfully, size: 14740 bytes
+2026-02-18T01:34:33.911Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:33.911Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378473911 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:33.911Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:33.912Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378473912
+2026-02-18T01:34:33.912Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:33.912Z [DEBUG] Temp file written successfully, size: 14785 bytes
+2026-02-18T01:34:33.912Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:33.912Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378473912 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:33.912Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:33.914Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-02-18T01:34:33.914Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-18T01:34:33.914Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-18T01:34:33.914Z [DEBUG] Total plugin output styles loaded: 0
+2026-02-18T01:34:33.915Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-18T01:34:33.920Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378473920
+2026-02-18T01:34:33.920Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:33.920Z [DEBUG] Temp file written successfully, size: 14816 bytes
+2026-02-18T01:34:33.920Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:33.920Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378473920 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:33.920Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:33.922Z [DEBUG] autocompact: tokens=166 threshold=167000 effectiveWindow=180000
+2026-02-18T01:34:33.923Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378473923
+2026-02-18T01:34:33.923Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:33.923Z [DEBUG] Temp file written successfully, size: 14854 bytes
+2026-02-18T01:34:33.923Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:33.923Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378473923 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:33.923Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:33.924Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378473924
+2026-02-18T01:34:33.924Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:33.924Z [DEBUG] Temp file written successfully, size: 14899 bytes
+2026-02-18T01:34:33.924Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:33.924Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378473924 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:33.924Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:33.924Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-02-18T01:34:33.928Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-18T01:34:33.928Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-18T01:34:33.929Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-18T01:34:33.934Z [DEBUG] [useDeferredValue] Messages deferred by 2 (0→2)
+2026-02-18T01:34:33.937Z [DEBUG] Stats cache version mismatch (got 1, expected 2), returning empty cache
+2026-02-18T01:34:33.937Z [DEBUG] Stats cache empty, processing all historical data in background
+2026-02-18T01:34:33.986Z [DEBUG] Stats cache saved successfully (lastComputedDate: 2026-02-17)
+2026-02-18T01:34:33.986Z [DEBUG] Stats cache updated with 22 sessions
+2026-02-18T01:34:34.311Z [DEBUG] AutoUpdater: Detected installation type: unknown
+2026-02-18T01:34:34.311Z [DEBUG] AutoUpdater: Unknown installation type, falling back to config
+2026-02-18T01:34:34.805Z [DEBUG] Stream started - received first chunk
+2026-02-18T01:34:35.850Z [DEBUG] Stream started - received first chunk
+2026-02-18T01:34:36.201Z [DEBUG] [useDeferredValue] Messages deferred by 1 (2→3)
+2026-02-18T01:34:36.212Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378476212
+2026-02-18T01:34:36.212Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:36.212Z [DEBUG] Temp file written successfully, size: 14931 bytes
+2026-02-18T01:34:36.212Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:36.212Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378476212 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:36.212Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:36.263Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378476263
+2026-02-18T01:34:36.263Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:36.263Z [DEBUG] Temp file written successfully, size: 14966 bytes
+2026-02-18T01:34:36.263Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:36.263Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378476263 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:36.263Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:36.263Z [DEBUG] Getting matching hook commands for Stop with query: undefined
+2026-02-18T01:34:36.263Z [DEBUG] Found 0 hook matchers in settings
+2026-02-18T01:34:36.263Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-02-18T01:34:36.264Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378476264
+2026-02-18T01:34:36.264Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:36.264Z [DEBUG] Temp file written successfully, size: 15012 bytes
+2026-02-18T01:34:36.264Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:36.264Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378476264 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:36.264Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:36.271Z [DEBUG] Stopped caffeinate, allowing sleep
+2026-02-18T01:34:36.273Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378476273
+2026-02-18T01:34:36.273Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:36.273Z [DEBUG] Temp file written successfully, size: 15034 bytes
+2026-02-18T01:34:36.273Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:36.273Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378476273 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:36.273Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:36.275Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378476275
+2026-02-18T01:34:36.275Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:36.275Z [DEBUG] Temp file written successfully, size: 15035 bytes
+2026-02-18T01:34:36.275Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:36.275Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378476275 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:36.275Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:39.168Z [DEBUG] Successfully refreshed marketplace: claude-plugins-official
+2026-02-18T01:34:39.168Z [DEBUG] Plugin autoupdate: checking installed plugins
+2026-02-18T01:34:39.212Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378479212
+2026-02-18T01:34:39.212Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:39.212Z [DEBUG] Temp file written successfully, size: 15079 bytes
+2026-02-18T01:34:39.212Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:39.212Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378479212 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:39.212Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:39.379Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378479379
+2026-02-18T01:34:39.379Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:39.379Z [DEBUG] Temp file written successfully, size: 15079 bytes
+2026-02-18T01:34:39.379Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:39.379Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378479379 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:39.379Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:40.572Z [DEBUG] [useDeferredValue] Messages deferred by 2 (3→5)
+2026-02-18T01:34:40.578Z [DEBUG] High write ratio: blit=0, write=1533 (100.0% writes), screen=27x212
+2026-02-18T01:34:40.584Z [DEBUG] Started caffeinate to prevent sleep
+2026-02-18T01:34:40.589Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378480589
+2026-02-18T01:34:40.589Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:40.589Z [DEBUG] Temp file written successfully, size: 15079 bytes
+2026-02-18T01:34:40.589Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:40.589Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378480589 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:40.590Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:40.592Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378480592
+2026-02-18T01:34:40.592Z [DEBUG] Preserving file permissions: 100600
+2026-02-18T01:34:40.592Z [DEBUG] Temp file written successfully, size: 15079 bytes
+2026-02-18T01:34:40.592Z [DEBUG] Applied original permissions to temp file
+2026-02-18T01:34:40.592Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json.tmp.58002.1771378480592 to /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json
+2026-02-18T01:34:40.592Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_ohmygpt/.claude.json written atomically
+2026-02-18T01:34:40.593Z [DEBUG] [useDeferredValue] Messages deferred by 2 (3→5)
+2026-02-18T01:34:40.595Z [DEBUG] Stopped caffeinate, allowing sleep
+2026-02-18T01:34:40.742Z [DEBUG] AutoUpdaterWrapper: Installation type: unknown
+2026-02-18T01:34:41.137Z [DEBUG] Getting matching hook commands for SessionEnd with query: prompt_input_exit
+2026-02-18T01:34:41.137Z [DEBUG] Found 0 hook matchers in settings
+2026-02-18T01:34:41.137Z [DEBUG] Matched 0 unique hooks for query "prompt_input_exit" (0 before deduplication)
+2026-02-18T01:34:41.142Z [DEBUG] LSP server manager shut down successfully
+2026-02-18T01:34:41.143Z [DEBUG] Metrics opt-out check failed: No API key available
+2026-02-18T01:34:41.143Z [DEBUG] Metrics check failed, defaulting to disabled
+2026-02-18T01:34:41.143Z [DEBUG] Metrics export disabled by organization setting
+2026-02-18T01:34:41.143Z [DEBUG] BigQuery metrics exporter flush complete
+2026-02-18T01:34:41.143Z [DEBUG] BigQuery metrics exporter flush complete
+2026-02-18T01:34:41.143Z [DEBUG] BigQuery metrics exporter shutdown complete
+2026-02-18T01:34:42.079Z [DEBUG] AutoUpdater: Detected installation type: unknown
+2026-02-18T01:34:42.079Z [DEBUG] AutoUpdater: Unknown installation type, falling back to config

@@ -19,6 +19,6 @@
   },
   "homepage": "https://github.com/albertwh1te/claude_model#readme",
   "dependencies": {
-    "@anthropic-ai/claude-code": "^2.0.76"
+    "@anthropic-ai/claude-code": "^2.1.126"
   }
 }

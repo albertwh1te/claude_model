@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "sessionId": "c6b06eae-1264-4c87-a055-c38d17fe8996",
+      "fullPath": "/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/projects/-Users-matianjun-Dropbox-code/c6b06eae-1264-4c87-a055-c38d17fe8996.jsonl",
+      "fileMtime": 1770902284536,
+      "firstPrompt": "你好",
+      "summary": "Chinese Greeting Exchange",
+      "messageCount": 2,
+      "created": "2026-02-12T13:17:39.880Z",
+      "modified": "2026-02-12T13:17:45.342Z",
+      "gitBranch": "",
+      "projectPath": "/Users/matianjun/Dropbox/code",
+      "isSidechain": false
+    }
+  ],
+  "originalPath": "/Users/matianjun/Dropbox/code"
+}

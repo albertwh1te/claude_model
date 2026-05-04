@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "sessionId": "a7febed3-ca11-4f28-8b17-d1afd73758bc",
+      "fullPath": "/Users/matianjun/Dropbox/code/claude_model/.claude_glm/projects/-Users-matianjun-Dropbox-code-claude-model-bin/a7febed3-ca11-4f28-8b17-d1afd73758bc.jsonl",
+      "fileMtime": 1770901017975,
+      "firstPrompt": "你好",
+      "summary": "Chinese Greeting Conversation",
+      "messageCount": 2,
+      "created": "2026-02-12T11:54:08.293Z",
+      "modified": "2026-02-12T11:54:10.694Z",
+      "gitBranch": "master",
+      "projectPath": "/Users/matianjun/Dropbox/code/claude_model/bin",
+      "isSidechain": false
+    }
+  ],
+  "originalPath": "/Users/matianjun/Dropbox/code/claude_model/bin"
+}

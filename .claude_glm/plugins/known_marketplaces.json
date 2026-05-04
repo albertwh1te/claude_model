@@ -1,0 +1,18 @@
+{
+  "claude-plugins-official": {
+    "source": {
+      "source": "github",
+      "repo": "anthropics/claude-plugins-official"
+    },
+    "installLocation": "/Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/marketplaces/claude-plugins-official",
+    "lastUpdated": "2026-02-24T05:07:47.914Z"
+  },
+  "planning-with-files": {
+    "source": {
+      "source": "github",
+      "repo": "OthmanAdi/planning-with-files"
+    },
+    "installLocation": "/Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/marketplaces/planning-with-files",
+    "lastUpdated": "2026-01-19T08:31:12.631Z"
+  }
+}

@@ -1,0 +1,6 @@
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/binance_api/binance_websocket.py
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/binance_api/future_util.py
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/binance_api/binance_api.py
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/binance_api/base_request.py
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/binance_api/Binance_market_util.py
+/Users/matianjun/Dropbox/code/hyperliquid_analyse/binance_api/binance_perp_api.py

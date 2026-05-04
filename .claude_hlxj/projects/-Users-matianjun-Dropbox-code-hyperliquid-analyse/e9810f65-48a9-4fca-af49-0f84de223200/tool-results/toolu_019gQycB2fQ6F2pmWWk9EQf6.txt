@@ -1,0 +1,11 @@
+505-
+506-                        epsilon = 1e-6
+507-                        pct_rank = time_df[column].rank(pct=True)
+508-                        pct_rank = pct_rank * (1 - 2 * epsilon) + epsilon
+509-
+510:                        time_df[f"{column}_zscore"] = norm.ppf(pct_rank)
+511-                        time_df[column] = time_df[column].rank(pct=True)
+512-
+513-                # Market Cap / Momentum Label 处理
+514-                if not target and not all(time_df["momentum_4h"].isna()):
+515-                    time_df["momentum_4h_label"] = time_df["momentum_4h"].rank(pct=True)

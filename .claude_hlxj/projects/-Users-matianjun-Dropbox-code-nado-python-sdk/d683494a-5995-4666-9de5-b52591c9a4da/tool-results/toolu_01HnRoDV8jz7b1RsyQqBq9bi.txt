@@ -1,0 +1,33 @@
+     1→from nado_protocol.indexer_client.query import IndexerQueryClient
+     2→from nado_protocol.indexer_client.types import IndexerClientOpts
+     3→
+     4→
+     5→class IndexerClient(IndexerQueryClient):
+     6→    """
+     7→    Client for interacting with the indexer service.
+     8→
+     9→    It provides methods for querying data from the indexer service.
+    10→
+    11→    Attributes:
+    12→        opts (IndexerClientOpts): Client configuration options for connecting and interacting with the indexer service.
+    13→
+    14→    Methods:
+    15→        __init__: Initializes the `IndexerClient` with the provided options.
+    16→    """
+    17→
+    18→    def __init__(self, opts: IndexerClientOpts):
+    19→        """
+    20→        Initializes the IndexerClient with the provided options.
+    21→
+    22→        Args:
+    23→            opts (IndexerClientOpts): Client configuration options for connecting and interacting with the indexer service.
+    24→        """
+    25→        super().__init__(opts)
+    26→
+    27→
+    28→__all__ = ["IndexerClient", "IndexerClientOpts", "IndexerQueryClient"]
+    29→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

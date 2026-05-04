@@ -1,0 +1,50 @@
+b4e56a0 feat: Introduce hysteresis mechanism to prevent order flip-flop near grid price thresholds
+e73d88c feat: Enhance Nado grid trading bot with order synchronization and batch processing improvements
+116b6f2 refactor: Remove unused wallet management and address analysis tools
+74cfe57 feat: Implement Nado grid trading bot with strike-aligned geometric distribution
+e3071dc feat: Add unique symbol tracking and logging in analysis and training scripts; update regression model training parameters for improved performance
+0369a93 feat: Enhance regression model training with hyperparameter updates and feature file support; add script for model transfer to MacBook Pro
+2cb3aeb Add script to transfer PNG files from remote server to MacBook Pro
+9a225c4 feat: Add comprehensive Kline data validation checks
+835ad6c refactor: Update ranker parameters for optimized asset selection; reduce maximum holdings and adjust entry/exit ranks for improved strategy performance
+7f59bd5 feat: Add regression model tuning and training command; update ranker parameters for improved performance
+1ff384f feat: Update cryptocurrency data and LLM scores; enhance command notifications and symbol processing logic
+0c46d48 feat: Integrate CoinGecko API for detailed coin information retrieval; update symbol info storage and enhance ranker features with LLM scores and new interaction features
+0cb7706 fix: Adjust learning rate in ranker parameters and fine-tune regression model; enhance feature calculation with Gaussian Rank and percentile normalization
+6635b7e feat: Update ranker model training and fine-tuning processes with symbol filtering and parameter adjustments; add script for SCP transfer of predicted results
+74c0a3d feat: Enhance backtesting functionality with new trading weights calculation and improved fee structure analysis
+6fa473d feat: Add command to sync trading symbols from Binance to Redis and refactor RankerProcess to use Redis for symbol retrieval
+f948254 feat: Introduce distributed trading architecture with Ranker and Executor processes for enhanced real-time trading capabilities
+fff7318 feat: Refine order execution process with improved synchronization and enhanced error handling
+aeab157 feat: Update kline synchronization interval and enhance aggressive retry logic in order execution
+eee08b4 feat: Enhance order execution strategy with aggressive retry logic and improved price handling
+97fb6b0 docs: Add command section for running documentation server
+f4bc4ce feat: Add market order ratio calculation and logging to position alignment
+63bcba3 feat: Enhance order execution logic with position alignment and timing improvements
+eb2a044 feat: Improve order handling and validation in Binance API; update rebalance order generation
+73db1be feat: Enhance Binance API with new methods for order management and leverage settings
+f9cc12e feat: Implement rebalance order generation and enhance async command handling human: finished generate_rebalance_orders
+547c4a5 feat: Enhance Binance API with symbol rules handling and position management improvements
+e559da0 feat: Update Binance API to handle batch orders and improve order payload formatting
+994ed5e feat: Enhance Binance API with new methods for position management and order handling
+4587b6e feat: Add Binance perpetual futures API helper and commands for order management
+6ea7d5f feat: Refactor DailyKline initialization to retrieve symbols directly from the database
+9170150 feat: Implement token list retrieval and storage in Redis for online trading
+d0bcc69 feat: Update weight bounds in portfolio optimization to allow for greater flexibility
+698a14d fix: Correct backtest model configuration by re-enabling multi-batch without leverage
+5c57fc2 feat: Enhance backtest metrics with longest drawdown duration; update regression portfolio optimizer leverage limit
+7d04225 feat: Update leverage limit in regression portfolio optimizer; modify backtest model configuration
+f7fadb1 feat: Enhance position manager with leverage support; add anomaly detection command and update regression configs
+a97d61e feat: Implement multi-batch ranker model backtest strategy; add position manager with leverage and corresponding unit tests
+f996c90 Refactor analysis commands and portfolio optimizer; add blacklist for stablecoins
+d16d8db feat: Add z-score health check function and related command; enhance position manager logging and export weight data functionality
+9b30ee4 feat: Update online volume record insertion logic; modify equity record method to track increased trading volume
+9652483 feat: Add online volume record model and insertion logic; update equity record insertion to include volume tracking
+bb68aa2 feat: Add hourly kline synchronization service and file modification tracking; implement remote file transfer and notification for outdated data
+0eebc90 feat: Implement online trading logic for regression model using WebSockets; add data retrieval and processing for Binance Kline data
+22f4502 feat: Update kline data synchronization to use all Binance symbols; enhance logging for sync process
+71a7fdf feat: Update online model synchronization and configuration; replace ranker model with regression model and adjust training iteration
+c35ccf8 feat: Implement online training for regression model; update training parameters and add configuration for online experiments
+da9a27d feat: Update regression model configuration and enhance error handling in portfolio optimizer; adjust target risk and improve logging
+5e7b224 feat: Add regression model fine-tuning with Optuna; implement local data syncing and enhance parameter configurations
+b30d1b9 feat: Add multi-fee metrics calculation and update regression portfolio optimizer; enhance performance analysis with new fee scenarios

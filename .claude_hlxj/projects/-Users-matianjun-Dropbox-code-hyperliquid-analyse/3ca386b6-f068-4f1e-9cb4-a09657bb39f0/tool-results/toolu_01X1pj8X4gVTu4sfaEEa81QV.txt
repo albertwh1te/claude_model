@@ -1,0 +1,72 @@
+     1→from typing import Dict, Any, Optional
+     2→from pydantic import BaseModel, Field, field_validator
+     3→
+     4→
+     5→class SymbolRules(BaseModel):
+     6→    """
+     7→    专门用于存储交易对的规则限制
+     8→    """
+     9→
+    10→    symbol: str
+    11→    step_size: float = Field(..., alias="stepSize")  # 下单数量精度
+    12→    min_qty: float = Field(..., alias="minQty")  # 最小下单数量
+    13→    min_notional: float = 0.0  # 最小名义价值 (5 USDT 那个限制)
+    14→    tick_size: float = 0.0  # 价格精度
+    15→
+    16→    # 允许通过属性访问 (Config in Pydantic v2)
+    17→    class Config:
+    18→        populate_by_name = True
+    19→
+    20→
+    21→class BinanceMarketUtils:
+    22→
+    23→    @staticmethod
+    24→    def extract_symbol_rules(exchange_info: Dict[str, Any]) -> Dict[str, SymbolRules]:
+    25→        """
+    26→        解析 exchangeInfo，返回 {symbol: SymbolRules} 的字典
+    27→        """
+    28→        rules_map = {}
+    29→
+    30→        for symbol_data in exchange_info.get("symbols", []):
+    31→            if symbol_data.get("status") != "TRADING":
+    32→                continue
+    33→
+    34→            symbol = symbol_data["symbol"]
+    35→
+    36→            # 初始化默认值
+    37→            step_size = 0.0
+    38→            min_qty = 0.0
+    39→            min_notional = 0.0
+    40→            tick_size = 0.0
+    41→
+    42→            # 遍历 filters
+    43→            for f in symbol_data.get("filters", []):
+    44→                f_type = f["filterType"]
+    45→
+    46→                if f_type == "LOT_SIZE":
+    47→                    step_size = float(f["stepSize"])
+    48→                    min_qty = float(f["minQty"])
+    49→
+    50→                elif f_type == "MIN_NOTIONAL":
+    51→                    # Binance 有时叫 minNotional, 有时在 notional 字段
+    52→                    min_notional = float(f.get("minNotional", f.get("notional", 0)))
+    53→
+    54→                elif f_type == "PRICE_FILTER":
+    55→                    tick_size = float(f["tickSize"])
+    56→
+    57→            # 只有当获取到了关键信息才存入
+    58→            if step_size > 0:
+    59→                rules_map[symbol] = SymbolRules(
+    60→                    symbol=symbol,
+    61→                    step_size=step_size,  # Pydantic 会自动对应到 step_size
+    62→                    min_qty=min_qty,  # Pydantic 会自动对应到 min_qty
+    63→                    min_notional=min_notional,
+    64→                    tick_size=tick_size,
+    65→                )
+    66→
+    67→        return rules_map
+    68→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

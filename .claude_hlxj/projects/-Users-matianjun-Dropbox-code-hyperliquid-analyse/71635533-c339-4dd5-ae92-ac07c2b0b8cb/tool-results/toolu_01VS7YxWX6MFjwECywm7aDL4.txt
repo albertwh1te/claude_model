@@ -1,0 +1,2449 @@
+     1→# Nado API Documentation
+     2→----
+     3→
+     4→
+     5→# Executes
+     6→
+     7→## Overview
+     8→
+     9→All executes go through the following endpoint; the exact details of the execution are specified by the JSON payload.
+    10→
+    11→* **Websocket**: <mark style="color:orange;">`WEBSOCKET [GATEWAY_WEBSOCKET_ENDPOINT]`</mark>
+    12→* **REST**: <mark style="color:orange;">`POST [GATEWAY_REST_ENDPOINT]/execute`</mark>
+    13→
+    14→### **Signing**
+    15→
+    16→All executes are signed using [EIP712](https://eips.ethereum.org/EIPS/eip-712). Each execute request contains:
+    17→
+    18→1. A piece of structured data that includes the sender address
+    19→2. A signature of the hash of that structured data, signed by the sender
+    20→
+    21→You can check the SDK for some examples of how to generate these signatures.
+    22→
+    23→{% hint style="info" %}
+    24→See more info in the [signing](https://docs.nado.xyz/developer-resources/api/gateway/signing) page.
+    25→{% endhint %}
+    26→
+    27→### **Sender Field Structure**
+    28→
+    29→The sender field is a solidity <mark style="color:red;">`bytes32`</mark> . There are two components:
+    30→
+    31→* an <mark style="color:red;">`address`</mark> that is a <mark style="color:red;">`bytes20`</mark>
+    32→* a subaccount identifier that is a <mark style="color:red;">`bytes12`</mark>
+    33→
+    34→For example, if your address was <mark style="color:red;">`0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c43`</mark>, and you wanted to use the default subaccount identifier (i.e: the word <mark style="color:red;">`default`</mark>) you can set <mark style="color:red;">`sender`</mark> to <mark style="color:red;">`0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c4364656661756c740000000000`</mark> , which sets the subaccount identifier to <mark style="color:red;">`64656661756c740000000000`</mark>.
+    35→
+    36→### **Amounts**
+    37→
+    38→For <mark style="color:red;">`DepositCollateral`</mark> and <mark style="color:red;">`WithdrawCollateral`</mark>, the amount specifies the physical token amount that you want to receive. `i.e.` if USDT0 has 6 decimals, and you want to deposit or withdraw 1 USDT0, you specify <mark style="color:red;">`amount = 1e6`</mark>.
+    39→
+    40→For all other transactions, amount is normalized to 18 decimals, so <mark style="color:red;">`1e18`</mark> == one unit of the underlying asset. For example, if you want to buy 1 wETH, regardless of the amount of decimals the wETH contract has on chain, you specify <mark style="color:red;">`1e18`</mark> in the amount field of the order.
+    41→
+    42→## API Response
+    43→
+    44→All `Execute` messages return the following information:
+    45→
+    46→#### Success
+    47→
+    48→```json
+    49→{
+    50→  "status": "success",
+    51→  "signature": "{signature}",
+    52→  "data"?: {data_obj},
+    53→  "request_type": "{request_type}"
+    54→}
+    55→```
+    56→
+    57→#### Failure
+    58→
+    59→```json
+    60→{
+    61→  "status": "failure",
+    62→  "signature": "{signature}",
+    63→  "error": "{error_msg}",
+    64→  "error_code": {error_code},
+    65→  "request_type": "{request_type}"
+    66→}
+    67→```
+    68→
+    69→# Executes
+    70→
+    71→## Overview
+    72→
+    73→All executes go through the following endpoint; the exact details of the execution are specified by the JSON payload.
+    74→
+    75→* **Websocket**: <mark style="color:orange;">`WEBSOCKET [GATEWAY_WEBSOCKET_ENDPOINT]`</mark>
+    76→* **REST**: <mark style="color:orange;">`POST [GATEWAY_REST_ENDPOINT]/execute`</mark>
+    77→
+    78→### **Signing**
+    79→
+    80→All executes are signed using [EIP712](https://eips.ethereum.org/EIPS/eip-712). Each execute request contains:
+    81→
+    82→1. A piece of structured data that includes the sender address
+    83→2. A signature of the hash of that structured data, signed by the sender
+    84→
+    85→You can check the SDK for some examples of how to generate these signatures.
+    86→
+    87→{% hint style="info" %}
+    88→See more info in the [signing](https://docs.nado.xyz/developer-resources/api/gateway/signing) page.
+    89→{% endhint %}
+    90→
+    91→### **Sender Field Structure**
+    92→
+    93→The sender field is a solidity <mark style="color:red;">`bytes32`</mark> . There are two components:
+    94→
+    95→* an <mark style="color:red;">`address`</mark> that is a <mark style="color:red;">`bytes20`</mark>
+    96→* a subaccount identifier that is a <mark style="color:red;">`bytes12`</mark>
+    97→
+    98→For example, if your address was <mark style="color:red;">`0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c43`</mark>, and you wanted to use the default subaccount identifier (i.e: the word <mark style="color:red;">`default`</mark>) you can set <mark style="color:red;">`sender`</mark> to <mark style="color:red;">`0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c4364656661756c740000000000`</mark> , which sets the subaccount identifier to <mark style="color:red;">`64656661756c740000000000`</mark>.
+    99→
+   100→### **Amounts**
+   101→
+   102→For <mark style="color:red;">`DepositCollateral`</mark> and <mark style="color:red;">`WithdrawCollateral`</mark>, the amount specifies the physical token amount that you want to receive. `i.e.` if USDT0 has 6 decimals, and you want to deposit or withdraw 1 USDT0, you specify <mark style="color:red;">`amount = 1e6`</mark>.
+   103→
+   104→For all other transactions, amount is normalized to 18 decimals, so <mark style="color:red;">`1e18`</mark> == one unit of the underlying asset. For example, if you want to buy 1 wETH, regardless of the amount of decimals the wETH contract has on chain, you specify <mark style="color:red;">`1e18`</mark> in the amount field of the order.
+   105→
+   106→## API Response
+   107→
+   108→All `Execute` messages return the following information:
+   109→
+   110→#### Success
+   111→
+   112→```json
+   113→{
+   114→  "status": "success",
+   115→  "signature": "{signature}",
+   116→  "data"?: {data_obj},
+   117→  "request_type": "{request_type}"
+   118→}
+   119→```
+   120→
+   121→#### Failure
+   122→
+   123→```json
+   124→{
+   125→  "status": "failure",
+   126→  "signature": "{signature}",
+   127→  "error": "{error_msg}",
+   128→  "error_code": {error_code},
+   129→  "request_type": "{request_type}"
+   130→}
+   131→```
+   132→
+   133→# Executes
+   134→
+   135→## Overview
+   136→
+   137→All executes go through the following endpoint; the exact details of the execution are specified by the JSON payload.
+   138→
+   139→* **Websocket**: <mark style="color:orange;">`WEBSOCKET [GATEWAY_WEBSOCKET_ENDPOINT]`</mark>
+   140→* **REST**: <mark style="color:orange;">`POST [GATEWAY_REST_ENDPOINT]/execute`</mark>
+   141→
+   142→### **Signing**
+   143→
+   144→All executes are signed using [EIP712](https://eips.ethereum.org/EIPS/eip-712). Each execute request contains:
+   145→
+   146→1. A piece of structured data that includes the sender address
+   147→2. A signature of the hash of that structured data, signed by the sender
+   148→
+   149→You can check the SDK for some examples of how to generate these signatures.
+   150→
+   151→{% hint style="info" %}
+   152→See more info in the [signing](https://docs.nado.xyz/developer-resources/api/gateway/signing) page.
+   153→{% endhint %}
+   154→
+   155→### **Sender Field Structure**
+   156→
+   157→The sender field is a solidity <mark style="color:red;">`bytes32`</mark> . There are two components:
+   158→
+   159→* an <mark style="color:red;">`address`</mark> that is a <mark style="color:red;">`bytes20`</mark>
+   160→* a subaccount identifier that is a <mark style="color:red;">`bytes12`</mark>
+   161→
+   162→For example, if your address was <mark style="color:red;">`0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c43`</mark>, and you wanted to use the default subaccount identifier (i.e: the word <mark style="color:red;">`default`</mark>) you can set <mark style="color:red;">`sender`</mark> to <mark style="color:red;">`0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c4364656661756c740000000000`</mark> , which sets the subaccount identifier to <mark style="color:red;">`64656661756c740000000000`</mark>.
+   163→
+   164→### **Amounts**
+   165→
+   166→For <mark style="color:red;">`DepositCollateral`</mark> and <mark style="color:red;">`WithdrawCollateral`</mark>, the amount specifies the physical token amount that you want to receive. `i.e.` if USDT0 has 6 decimals, and you want to deposit or withdraw 1 USDT0, you specify <mark style="color:red;">`amount = 1e6`</mark>.
+   167→
+   168→For all other transactions, amount is normalized to 18 decimals, so <mark style="color:red;">`1e18`</mark> == one unit of the underlying asset. For example, if you want to buy 1 wETH, regardless of the amount of decimals the wETH contract has on chain, you specify <mark style="color:red;">`1e18`</mark> in the amount field of the order.
+   169→
+   170→## API Response
+   171→
+   172→All `Execute` messages return the following information:
+   173→
+   174→#### Success
+   175→
+   176→```json
+   177→{
+   178→  "status": "success",
+   179→  "signature": "{signature}",
+   180→  "data"?: {data_obj},
+   181→  "request_type": "{request_type}"
+   182→}
+   183→```
+   184→
+   185→#### Failure
+   186→
+   187→```json
+   188→{
+   189→  "status": "failure",
+   190→  "signature": "{signature}",
+   191→  "error": "{error_msg}",
+   192→  "error_code": {error_code},
+   193→  "request_type": "{request_type}"
+   194→}
+   195→```
+   196→
+   197→# Cancel Product Orders
+   198→
+   199→## Rate limits
+   200→
+   201→* When no **productIds** are provide&#x64;**:** 12 cancellations/min or 2 cancellations/sec per wallet. (**weight=50**)
+   202→* When **productIds** are provided: 600 / (5 \* total productIds) cancellations per minute per wallet. (**weight=5\*total productIds**)
+   203→
+   204→{% hint style="info" %}
+   205→See more details in [API Rate limits](https://docs.nado.xyz/developer-resources/api/rate-limits).
+   206→{% endhint %}
+   207→
+   208→## Request
+   209→
+   210→{% tabs %}
+   211→{% tab title="Websocket" %}
+   212→**Connect**
+   213→
+   214→<mark style="color:orange;">`WEBSOCKET [GATEWAY_WEBSOCKET_ENDPOINT]`</mark>
+   215→
+   216→**Message**
+   217→
+   218→```json
+   219→
+   220→{
+   221→  "cancel_product_orders": {
+   222→    "tx": {
+   223→      "sender": "0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c43746573743000000000000000",
+   224→      "productIds": [2],
+   225→      "nonce": "1"
+   226→    },
+   227→    "signature": "0x",
+   228→    "digest": null
+   229→  }
+   230→}
+   231→```
+   232→
+   233→{% endtab %}
+   234→
+   235→{% tab title="REST" %} <mark style="color:orange;">`POST [GATEWAY_REST_ENDPOINT]/execute`</mark>
+   236→
+   237→**Body**
+   238→
+   239→```json
+   240→{
+   241→  "cancel_product_orders": {
+   242→    "tx": {
+   243→      "sender": "0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c43746573743000000000000000",
+   244→      "productIds": [0],
+   245→      "nonce": "1"
+   246→    },
+   247→    "signature": "0x",
+   248→    "digest": "0x"
+   249→  }
+   250→}
+   251→```
+   252→
+   253→{% endtab %}
+   254→{% endtabs %}
+   255→
+   256→## Request Parameters
+   257→
+   258→<table><thead><tr><th width="178" align="center">Parameter</th><th width="142" align="center">Type</th><th width="104" align="center">Required</th><th>Description</th></tr></thead><tbody><tr><td align="center">tx</td><td align="center">object</td><td align="center">Yes</td><td>Cancel product orders transaction object. See <a href="#signing">Signing</a> section for details on transaction fields.</td></tr><tr><td align="center">tx.sender</td><td align="center">string</td><td align="center">Yes</td><td>Hex string representing the subaccount's 32 bytes (address + subaccount name) of the tx sender.</td></tr><tr><td align="center">tx.productIds</td><td align="center">number[]</td><td align="center">Yes</td><td>A list of product IDs to cancel orders for.</td></tr><tr><td align="center">tx.nonce</td><td align="center">string</td><td align="center">Yes</td><td>Used to differentiate between the same cancellation multiple times. See <a href="#signing">Signing</a> section for more details.</td></tr><tr><td align="center">signature</td><td align="center">string</td><td align="center">Yes</td><td>Signed transaction. See <a href="#signing">Signing</a> section for more details.</td></tr><tr><td align="center">digest</td><td align="center">string</td><td align="center">No</td><td>Hex string representing a hash of the <code>CancellationProducts</code> object.</td></tr></tbody></table>
+   259→
+   260→## Signing
+   261→
+   262→{% hint style="info" %}
+   263→See more details and examples in our [signing](https://docs.nado.xyz/developer-resources/api/gateway/signing) page.
+   264→{% endhint %}
+   265→
+   266→The solidity typed data struct that needs to be signed is:
+   267→
+   268→```solidity
+   269→struct CancellationProducts {
+   270→    bytes32 sender;
+   271→    uint32[] productIds;
+   272→    uint64 nonce;
+   273→}
+   274→```
+   275→
+   276→<mark style="color:red;">`sender`</mark>: a <mark style="color:red;">`bytes32`</mark> sent as a hex string; includes the address and the subaccount identifier
+   277→
+   278→<mark style="color:red;">`productIds`</mark>: a list of product Ids for which to cancel all subaccount orders. When left empty, orders from all products will be cancelled.
+   279→
+   280→<mark style="color:red;">`nonce`</mark>: used to differentiate between the same cancellation multiple times, and a user trying to place a cancellation with the same parameters twice. Sent as a string. Encodes two bit of information:
+   281→
+   282→* Most significant <mark style="color:red;">`44`</mark> bits encoding the <mark style="color:red;">`recv_time`</mark> in milliseconds after which the cancellation should be ignored by the matching engine; the engine will accept cancellations where <mark style="color:red;">`current_time < recv_time <= current_time + 100000`</mark>
+   283→* Least significant <mark style="color:red;">`20`</mark> bits are a random integer used to avoid hash collisions
+   284→
+   285→  For example, to place a cancellation with a random integer of <mark style="color:red;">`1000`</mark>, and a discard time 50 ms from now, we would send a nonce of <mark style="color:red;">`(timestamp_ms() + 50) << 20 + 1000`</mark>
+   286→
+   287→{% hint style="warning" %}
+   288→**Note**: for signing you should always use the data type specified in the solidity struct which might be different from the type sent in the request e.g: <mark style="color:red;">`nonce`</mark> should be an <mark style="color:red;">`uint64`</mark> for **Signing** but should be sent as a <mark style="color:red;">`string`</mark> in the final payload.
+   289→{% endhint %}
+   290→
+   291→## Response
+   292→
+   293→#### Success
+   294→
+   295→```json
+   296→{
+   297→  "status": "success",
+   298→  "signature": {signature},
+   299→  "data": {
+   300→    "cancelled_orders": [
+   301→      {
+   302→        "product_id": 2,
+   303→        "sender": "0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c43746573743000000000000000",
+   304→        "price_x18": "20000000000000000000000",
+   305→        "amount": "-100000000000000000",
+   306→        "expiration": "1686332748",
+   307→        "order_type": "post_only",
+   308→        "nonce": "1768248100142339392",
+   309→        "unfilled_amount": "-100000000000000000",
+   310→        "digest": "0x3195a7929feb8307edecf9c045j5ced68925108f0aa305f0ee5773854159377c",
+   311→        "appendix": "1537",
+   312→        "placed_at": 1686332708
+   313→      },
+   314→      ...
+   315→    ]
+   316→  },
+   317→  "request_type": "execute_cancel_product_orders"
+   318→}
+   319→```
+   320→
+   321→#### Failure
+   322→
+   323→```json
+   324→{
+   325→  "status": "failure",
+   326→  "signature": {signature},
+   327→  "error": "{error_msg}",
+   328→  "error_code": {error_code},
+   329→  "request_type": "execute_cancel_product_orders"
+   330→}
+   331→```
+   332→
+   333→
+   334→# Cancel And Place
+   335→
+   336→## Rate limits
+   337→
+   338→* The sum of [Cancel Orders](https://docs.nado.xyz/developer-resources/api/gateway/cancel-orders#rate-limits) + [Place Order](https://docs.nado.xyz/developer-resources/api/gateway/place-order#rate-limits) limits
+   339→
+   340→{% hint style="info" %}
+   341→See more details in [API Rate limits](https://docs.nado.xyz/developer-resources/api/rate-limits).
+   342→{% endhint %}
+   343→
+   344→## Request
+   345→
+   346→{% tabs %}
+   347→{% tab title="Websocket" %}
+   348→**Connect**
+   349→
+   350→<mark style="color:orange;">`WEBSOCKET [GATEWAY_WEBSOCKET_ENDPOINT]`</mark>
+   351→
+   352→**Message**
+   353→
+   354→```json
+   355→{
+   356→  "cancel_and_place": {
+   357→    "cancel_tx": {
+   358→      "sender": "0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c43746573743000000000000000",
+   359→      "productIds": [2],
+   360→      "digests": ["0x"],
+   361→      "nonce": "1"
+   362→    },
+   363→    "cancel_signature": "0x",
+   364→    "place_order": {
+   365→      "product_id": 1,
+   366→      "order": {
+   367→        "sender": "0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c43746573743000000000000000",
+   368→        "priceX18": "1000000000000000000",
+   369→        "amount": "1000000000000000000",
+   370→        "expiration": "4294967295",
+   371→        "appendix": "1537",
+   372→        "nonce": "1757062078359666688"
+   373→      },
+   374→      "signature": "0x",
+   375→    }
+   376→  }
+   377→}
+   378→```
+   379→
+   380→{% endtab %}
+   381→
+   382→{% tab title="REST" %} <mark style="color:orange;">`POST [GATEWAY_REST_ENDPOINT]/execute`</mark>
+   383→
+   384→**Body**
+   385→
+   386→```json
+   387→{
+   388→  "cancel_and_place": {
+   389→    "cancel_tx": {
+   390→      "sender": "0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c43746573743000000000000000",
+   391→      "productIds": [2],
+   392→      "digests": ["0x"],
+   393→      "nonce": "1"
+   394→    },
+   395→    "cancel_signature": "0x",
+   396→    "place_order": {
+   397→      "product_id": 1,
+   398→      "order": {
+   399→        "sender": "0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c43746573743000000000000000",
+   400→        "priceX18": "1000000000000000000",
+   401→        "amount": "1000000000000000000",
+   402→        "expiration": "4294967295",
+   403→        "nonce": "1757062078359666688"
+   404→      },
+   405→      "signature": "0x",
+   406→    }
+   407→  }
+   408→}
+   409→```
+   410→
+   411→{% endtab %}
+   412→{% endtabs %}
+   413→
+   414→## Request Parameters
+   415→
+   416→<table><thead><tr><th width="219" align="center">Parameter</th><th width="128" align="center">Type</th><th width="104" align="center">Required</th><th>Description</th></tr></thead><tbody><tr><td align="center">cancel_tx</td><td align="center">object</td><td align="center">Yes</td><td>Cancel order transaction object. See <a href="../cancel-orders#signing">Cancel order signing</a> for details on the transaction fields.</td></tr><tr><td align="center">cancel_tx.sender</td><td align="center">string</td><td align="center">Yes</td><td>Hex string representing the subaccount's 32 bytes (address + subaccount name) of the tx sender.</td></tr><tr><td align="center">cancel_tx.productIds</td><td align="center">number[]</td><td align="center">Yes</td><td>A list of product IDs, corresponding to the product ids of the orders in <mark style="color:red;"><code>digests</code></mark></td></tr><tr><td align="center">cancel_tx.digests</td><td align="center">string[]</td><td align="center">Yes</td><td>A list of order digests, represented as hex strings.</td></tr><tr><td align="center">cancel_tx.nonce</td><td align="center">string</td><td align="center">Yes</td><td>Used to differentiate between the same cancellation multiple times. See <a href="../cancel-orders#signing">Cancel order signing</a> section for more details.</td></tr><tr><td align="center">cancel_signature</td><td align="center">string</td><td align="center">Yes</td><td>Signed transaction. See <a href="#signing">Signing</a><a href="../cancel-orders#signing">Cancel order signing</a> for more details.</td></tr><tr><td align="center">place_order</td><td align="center">object</td><td align="center">Yes</td><td>Payload of order to be placed. See <a href="../../../trigger/executes/place-order#request-parameters">Place order request parameters</a> for payload details.</td></tr></tbody></table>
+   417→
+   418→## Signing
+   419→
+   420→{% hint style="warning" %}
+   421→**Note**: both <mark style="color:red;">`cancel_tx`</mark> and <mark style="color:red;">`place_order`</mark> objects must be signed using the same signer, otherwise the request will be rejected.
+   422→{% endhint %}
+   423→
+   424→* See [Cancel orders signing](https://docs.nado.xyz/developer-resources/api/gateway/cancel-orders#signing) for details on how to sign the order cancellation.
+   425→* See [Place order signing](https://docs.nado.xyz/developer-resources/api/gateway/place-order#signing) for details on how to sign the order placement.
+   426→
+   427→## Response
+   428→
+   429→#### Success
+   430→
+   431→```json
+   432→{
+   433→  "status": "success",
+   434→  "signature": {signature},
+   435→  "data": { 
+   436→    "digest": {order digest} 
+   437→  },
+   438→  "request_type": "execute_cancel_and_place"
+   439→}
+   440→```
+   441→
+   442→#### Failure
+   443→
+   444→```json
+   445→{
+   446→  "status": "failure",
+   447→  "signature": {signature}
+   448→  "error": "{error_msg}"
+   449→  "error_code": {error_code}
+   450→  "request_type": "execute_cancel_and_place"
+   451→}
+   452→```
+   453→# Orders
+   454→
+   455→## Rate limits
+   456→
+   457→* 1200 requests/min or 20 requests/sec per IP address. (**weight = 2**) or 2 \* length of <mark style="color:red;">`product_ids`</mark> for [multi-product orders](#multiple-products) query.
+   458→
+   459→{% hint style="info" %}
+   460→See more details in [API Rate limits](https://docs.nado.xyz/developer-resources/api/rate-limits)
+   461→{% endhint %}
+   462→
+   463→## Single Product
+   464→
+   465→### Request
+   466→
+   467→{% tabs %}
+   468→{% tab title="Websocket" %}
+   469→**Connect**
+   470→
+   471→<mark style="color:orange;">`WEBSOCKET [GATEWAY_WEBSOCKET_ENDPOINT]`</mark>
+   472→
+   473→**Message**
+   474→
+   475→```json
+   476→{
+   477→  "type": "subaccount_orders",
+   478→  "sender": "0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c43000000000000000000000000",
+   479→  "product_id": 1
+   480→}
+   481→```
+   482→
+   483→{% endtab %}
+   484→
+   485→{% tab title="REST (GET)" %} <mark style="color:green;">**GET**</mark> `[GATEWAY_REST_ENDPOINT]/query?type=subaccount_orders&sender={sender}&product_id={product_id}`
+   486→{% endtab %}
+   487→
+   488→{% tab title="REST (POST)" %} <mark style="color:orange;">`POST [GATEWAY_REST_ENDPOINT]/query`</mark>
+   489→
+   490→**Body**
+   491→
+   492→```json
+   493→{
+   494→  "type": "subaccount_orders",
+   495→  "sender": "0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c43000000000000000000000000",
+   496→  "product_id": 1
+   497→}
+   498→```
+   499→
+   500→{% endtab %}
+   501→{% endtabs %}
+   502→
+   503→### Request Parameters
+   504→
+   505→<table><thead><tr><th width="140" align="center">Parameter</th><th width="97" align="center">Type</th><th width="104" align="center">Required</th><th>Description</th></tr></thead><tbody><tr><td align="center">sender</td><td align="center">string</td><td align="center">Yes</td><td>A <mark style="color:red;"><code>bytes32</code></mark> sent as a hex string; includes the address and the subaccount identifier.</td></tr><tr><td align="center">product_id</td><td align="center">number</td><td align="center">Yes</td><td>Id of spot / perp product for which to retrieve subaccount orders.</td></tr></tbody></table>
+   506→
+   507→### Response
+   508→
+   509→```json
+   510→{
+   511→  "status": "success",
+   512→  "data": {
+   513→    "sender": "0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c43000000000000000000000000",
+   514→    "product_id": 1,
+   515→    "orders": [
+   516→      {
+   517→        "product_id": 1,
+   518→        "sender": "0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c43000000000000000000000000",
+   519→        "price_x18": "1000000000000000000",
+   520→        "amount": "1000000000000000000",
+   521→        "expiration": "2000000000",
+   522→        "nonce": "1",
+   523→        "unfilled_amount": "1000000000000000000",
+   524→        "digest": "0x0000000000000000000000000000000000000000000000000000000000000000",
+   525→        "placed_at": 1682437739,
+   526→        "appendix": "1537",
+   527→        "order_type": "ioc"
+   528→      }
+   529→    ]
+   530→  },
+   531→  "request_type": "query_subaccount_orders"
+   532→}
+   533→```
+   534→
+   535→{% hint style="info" %}
+   536→**Note**: that side of the order (buy/sell) is included in the sign of <mark style="color:red;">`amount`</mark> and <mark style="color:red;">`unfilled_amount`</mark> . They are positive if the order is a buy order, otherwise negative.
+   537→{% endhint %}
+   538→
+   539→## Multiple Products
+   540→
+   541→### Request
+   542→
+   543→{% tabs %}
+   544→{% tab title="Websocket" %}
+   545→**Connect**
+   546→
+   547→<mark style="color:orange;">`WEBSOCKET [CORE_WEBSOCKET_ENDPOINT]`</mark>
+   548→
+   549→**Message**
+   550→
+   551→```json
+   552→{
+   553→  "type": "orders",
+   554→  "sender": "0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c43000000000000000000000000",
+   555→  "product_ids": [1, 2, 3]
+   556→}
+   557→```
+   558→
+   559→{% endtab %}
+   560→
+   561→{% tab title="REST (POST)" %} <mark style="color:orange;">`POST /query`</mark>
+   562→
+   563→**Body**
+   564→
+   565→```json
+   566→{
+   567→  "type": "orders",
+   568→  "sender": "0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c43000000000000000000000000",
+   569→  "product_ids": [1, 2, 3]
+   570→}
+   571→```
+   572→
+   573→{% endtab %}
+   574→{% endtabs %}
+   575→
+   576→### Request Parameters
+   577→
+   578→<table><thead><tr><th width="140" align="center">Parameter</th><th width="109" align="center">Type</th><th width="104" align="center">Required</th><th>Description</th></tr></thead><tbody><tr><td align="center">sender</td><td align="center">string</td><td align="center">Yes</td><td>A <mark style="color:red;"><code>bytes32</code></mark> sent as a hex string; includes the address and the subaccount identifier.</td></tr><tr><td align="center">product_ids</td><td align="center">number[]</td><td align="center">Yes</td><td>List of spot / perp products for which to retrieve open orders.</td></tr></tbody></table>
+   579→
+   580→### Response
+   581→
+   582→```json
+   583→{
+   584→  "status": "success",
+   585→  "data": {
+   586→    "sender": "0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c43000000000000000000000000",
+   587→    "product_orders": [
+   588→      {
+   589→        "product_id": 1,
+   590→        "orders": [
+   591→           {
+   592→            "product_id": 1,
+   593→            "sender": "0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c43000000000000000000000000",
+   594→            "price_x18": "1000000000000000000",
+   595→            "amount": "1000000000000000000",
+   596→            "expiration": "2000000000",
+   597→            "nonce": "1",
+   598→            "unfilled_amount": "1000000000000000000",
+   599→            "digest": "0x0000000000000000000000000000000000000000000000000000000000000000",
+   600→            "appendix": "1537",
+   601→            "placed_at": 1682437739,
+   602→            "order_type": "ioc"
+   603→          }
+   604→        ]
+   605→      },
+   606→      {
+   607→        "product_id": 2,
+   608→        "orders": []
+   609→      }
+   610→    ]
+   611→  },
+   612→  "request_type": "query_orders"
+   613→}
+   614→```
+   615→# Subaccount Info
+   616→
+   617→## Rate limits
+   618→
+   619→The rate limit weight varies based on the request parameters:
+   620→
+   621→* **Basic query** (no `txns`): **weight = 2**
+   622→  * 1200 requests/min or 200 requests every 10 seconds per IP address
+   623→* **With simulation** (`txns` provided): **weight = 10**
+   624→  * 240 requests/min or 40 requests every 10 seconds per IP address
+   625→* **With simulation + pre\_state** (`txns` and `pre_state="true"`): **weight = 15**
+   626→  * 160 requests/min or \~26 requests every 10 seconds per IP address
+   627→
+   628→{% hint style="info" %}
+   629→See more details in [API Rate limits](https://docs.nado.xyz/developer-resources/api/rate-limits)
+   630→{% endhint %}
+   631→
+   632→## Request
+   633→
+   634→{% tabs %}
+   635→{% tab title="Websocket" %}
+   636→**Connect**
+   637→
+   638→<mark style="color:orange;">`WEBSOCKET [GATEWAY_WEBSOCKET_ENDPOINT]`</mark>
+   639→
+   640→**Message**
+   641→
+   642→```json
+   643→{
+   644→    "type": "subaccount_info",
+   645→    "subaccount": "0xeae27ae6412147ed6d5692fd91709dad6dbfc34264656661756c740000000000",
+   646→    "txns": "[{\"apply_delta\":{\"product_id\":4,\"subaccount\":\"0xeae27ae6412147ed6d5692fd91709dad6dbfc34264656661756c740000000000\",\"amount_delta\":\"10790000000000000000\",\"v_quote_delta\":\"-35380410000000000000000\"}}]"
+   647→}
+   648→```
+   649→
+   650→{% endtab %}
+   651→
+   652→{% tab title="REST (GET)" %} <mark style="color:green;">**GET**</mark> `[GATEWAY_REST_ENDPOINT]/query?type=subaccount_info&subaccount={subaccount}&txns=[{"apply_delta":{"product_id":2,"subaccount":"0xeae27ae6412147ed6d5692fd91709dad6dbfc34264656661756c740000000000","amount_delta":"100000000000000000","v_quote_delta":"3033500000000000000000"}}]`
+   653→{% endtab %}
+   654→
+   655→{% tab title="REST (POST)" %} <mark style="color:orange;">`POST [GATEWAY_REST_ENDPOINT]/query`</mark>
+   656→
+   657→**Message**
+   658→
+   659→```json
+   660→{
+   661→    "type": "subaccount_info",
+   662→    "subaccount": "0xeae27ae6412147ed6d5692fd91709dad6dbfc34264656661756c740000000000",
+   663→    "txns": "[{\"apply_delta\":{\"product_id\":4,\"subaccount\":\"0xeae27ae6412147ed6d5692fd91709dad6dbfc34264656661756c740000000000\",\"amount_delta\":\"10790000000000000000\",\"v_quote_delta\":\"-35380410000000000000000\"}}]"
+   664→}
+   665→```
+   666→
+   667→{% endtab %}
+   668→{% endtabs %}
+   669→
+   670→## Request Parameters
+   671→
+   672→<table><thead><tr><th width="140" align="center">Parameter</th><th width="100" align="center">Type</th><th width="104" align="center">Required</th><th>Description</th></tr></thead><tbody><tr><td align="center">subaccount</td><td align="center">string</td><td align="center">Yes</td><td>A <mark style="color:red;"><code>bytes32</code></mark> sent as a hex string; includes the address and the subaccount identifier. See <a href="../../executes#sender-field-structure">sender field structure</a> for details.</td></tr><tr><td align="center">txns</td><td align="center">string</td><td align="center">no</td><td>A list of transactions to get an estimated/simulated view. see more info below.</td></tr><tr><td align="center">pre_state</td><td align="center">string</td><td align="center">no</td><td>When <mark style="color:red;"><code>"true"</code></mark> and <mark style="color:red;"><code>txns</code></mark> are provided, returns the subaccount state before the transactions were applied in the <mark style="color:red;"><code>pre_state</code></mark> field. Defaults to <mark style="color:red;"><code>"false"</code></mark>.</td></tr></tbody></table>
+   673→
+   674→### Supported txs for an estimated subaccount info
+   675→
+   676→The following are the supported <mark style="color:red;">`txns`</mark> you can provide to get an estimated view of your subaccount.
+   677→
+   678→{% hint style="info" %}
+   679→**Note**: these <mark style="color:red;">`txns`</mark> are only used to simulate what your subaccount would look like if they were executed.
+   680→{% endhint %}
+   681→
+   682→#### ApplyDelta
+   683→
+   684→Updates internal balances for the <mark style="color:red;">`product_id`</mark> and amount deltas provided.
+   685→
+   686→```json
+   687→{
+   688→  "apply_delta": {
+   689→    "product_id": 2,
+   690→    "subaccount": "0xeae27ae6412147ed6d5692fd91709dad6dbfc34264656661756c740000000000",
+   691→    "amount_delta": "100000000000000000",
+   692→    "v_quote_delta": "3033500000000000000000"
+   693→  }
+   694→}
+   695→```
+   696→
+   697→## Response
+   698→
+   699→{% hint style="info" %}
+   700→**Note**:
+   701→
+   702→* <mark style="color:red;">`healths`</mark>:
+   703→  * <mark style="color:red;">`healths[0]`</mark>: info about your initial health, which is weighted by `long_weight_initial_x18` and `short_weight_initial_x18.`
+   704→  * <mark style="color:red;">`healths[1]`</mark>: info about your maintenance health, which is weighted by `long_weight_maintenance_x18` and `short_weight_maintenance_x18.`
+   705→  * <mark style="color:red;">`healths[2]`</mark>: info about your unweighted health.
+   706→* <mark style="color:red;">`health_contributions`</mark> is indexed by <mark style="color:red;">product\_id</mark> and represents the contribution of the corresponding product to the final health.
+   707→  * <mark style="color:red;">`health_contributions[product_id][0]`</mark>`: contribution to healths[0]`
+   708→  * <mark style="color:red;">`health_contributions[product_id][1]`</mark>`: contribution to healths[1]`
+   709→  * <mark style="color:red;">`health_contributions[product_id][2]`</mark>`: contribution to healths[2]`
+   710→* <mark style="color:red;">`pre_state`</mark>: (Optional) When <mark style="color:red;">`pre_state="true"`</mark> is provided with <mark style="color:red;">`txns`</mark>, this field contains the subaccount state **before** the simulated transactions were applied. This allows you to compare the before/after states when simulating transactions.
+   711→  * <mark style="color:red;">`pre_state.healths`</mark>: Same structure as the main `healths` field, but reflecting the state before transactions
+   712→  * <mark style="color:red;">`pre_state.health_contributions`</mark>: Health contributions before transactions
+   713→  * <mark style="color:red;">`pre_state.spot_balances`</mark>: Spot balances before transactions
+   714→  * <mark style="color:red;">`pre_state.perp_balances`</mark>: Perpetual balances before transactions
+   715→    {% endhint %}
+   716→
+   717→```json
+   718→{
+   719→    "status": "success",
+   720→    "data": {
+   721→        "subaccount": "0x8d7d64d6cf1d4f018dd101482ac71ad49e30c56064656661756c740000000000",
+   722→        "exists": true,
+   723→        "healths": [
+   724→            {
+   725→                "assets": "456895621098158389211471",
+   726→                "liabilities": "76286259844766495292488",
+   727→                "health": "380609361253391893918983"
+   728→            },
+   729→            {
+   730→                "assets": "456895621098158389211471",
+   731→                "liabilities": "72818702579095290924243",
+   732→                "health": "384076918519063098287228"
+   733→            },
+   734→            {
+   735→                "assets": "456895621098158389211471",
+   736→                "liabilities": "69351145313424086671554",
+   737→                "health": "387544475784734302539917"
+   738→            }
+   739→        ],
+   740→        "health_contributions": [
+   741→            [
+   742→                "456895621098158389211471",
+   743→                "456895621098158389211471",
+   744→                "456895621098158389211471"
+   745→            ],
+   746→            [
+   747→                "-76286259844766495292488",
+   748→                "-72818702579095290924243",
+   749→                "-69351145313424086671554"
+   750→            ],
+   751→            [
+   752→                "0",
+   753→                "0",
+   754→                "0"
+   755→            ]
+   756→        ],
+   757→        "spot_count": 2,
+   758→        "perp_count": 1,
+   759→        "spot_balances": [
+   760→            {
+   761→                "product_id": 0,
+   762→                "balance": {
+   763→                    "amount": "456895621098158389211471"
+   764→                }
+   765→            },
+   766→            {
+   767→                "product_id": 1,
+   768→                "balance": {
+   769→                    "amount": "-600152323366021154"
+   770→                }
+   771→            }
+   772→        ],
+   773→        "perp_balances": [
+   774→            {
+   775→                "product_id": 2,
+   776→                "balance": {
+   777→                    "amount": "0",
+   778→                    "v_quote_balance": "0",
+   779→                    "last_cumulative_funding_x18": "-394223711772447555304"
+   780→                }
+   781→            }
+   782→        ],
+   783→        "spot_products": [
+   784→            {
+   785→                "product_id": 0,
+   786→                "oracle_price_x18": "1000000000000000000",
+   787→                "risk": {
+   788→                    "long_weight_initial_x18": "1000000000000000000",
+   789→                    "short_weight_initial_x18": "1000000000000000000",
+   790→                    "long_weight_maintenance_x18": "1000000000000000000",
+   791→                    "short_weight_maintenance_x18": "1000000000000000000",
+   792→                    "price_x18": "1000000000000000000"
+   793→                },
+   794→                "config": {
+   795→                    "token": "0x5f65358d61a9a281ea3bb930d05889aca21e3f4f",
+   796→                    "interest_inflection_util_x18": "800000000000000000",
+   797→                    "interest_floor_x18": "10000000000000000",
+   798→                    "interest_small_cap_x18": "40000000000000000",
+   799→                    "interest_large_cap_x18": "1000000000000000000",
+   800→                    "withdraw_fee_x18": "1000000000000000000",
+   801→                    "min_deposit_rate_x18": "0"
+   802→                },
+   803→                "state": {
+   804→                    "cumulative_deposits_multiplier_x18": "1000000000025524653",
+   805→                    "cumulative_borrows_multiplier_x18": "1000347390837434279",
+   806→                    "total_deposits_normalized": "20001011744258817298755054194662",
+   807→                    "total_borrows_normalized": "1617724891363505323532211"
+   808→                },
+   809→                "book_info": {
+   810→                    "size_increment": "0",
+   811→                    "price_increment_x18": "0",
+   812→                    "min_size": "0",
+   813→                    "collected_fees": "0"
+   814→                }
+   815→            },
+   816→            {
+   817→                "product_id": 1,
+   818→                "oracle_price_x18": "115555905748161505821744",
+   819→                "risk": {
+   820→                    "long_weight_initial_x18": "900000000000000000",
+   821→                    "short_weight_initial_x18": "1100000000000000000",
+   822→                    "long_weight_maintenance_x18": "950000000000000000",
+   823→                    "short_weight_maintenance_x18": "1050000000000000000",
+   824→                    "price_x18": "115555905748161505821744"
+   825→                },
+   826→                "config": {
+   827→                    "token": "0xc57c1c64561a37ac9e8f9039cb6deab7539d99fc",
+   828→                    "interest_inflection_util_x18": "800000000000000000",
+   829→                    "interest_floor_x18": "10000000000000000",
+   830→                    "interest_small_cap_x18": "40000000000000000",
+   831→                    "interest_large_cap_x18": "1000000000000000000",
+   832→                    "withdraw_fee_x18": "40000000000000",
+   833→                    "min_deposit_rate_x18": "0"
+   834→                },
+   835→                "state": {
+   836→                    "cumulative_deposits_multiplier_x18": "1000000000000318713",
+   837→                    "cumulative_borrows_multiplier_x18": "1000347390679880473",
+   838→                    "total_deposits_normalized": "9000399823280682696107190850",
+   839→                    "total_borrows_normalized": "9580268570661550719"
+   840→                },
+   841→                "book_info": {
+   842→                    "size_increment": "1000000000000000",
+   843→                    "price_increment_x18": "1000000000000000000",
+   844→                    "min_size": "4000000000000000",
+   845→                    "collected_fees": "0"
+   846→                }
+   847→            }
+   848→        ],
+   849→        "perp_products": [
+   850→            {
+   851→                "product_id": 2,
+   852→                "oracle_price_x18": "115596528090565357611177",
+   853→                "risk": {
+   854→                    "long_weight_initial_x18": "950000000000000000",
+   855→                    "short_weight_initial_x18": "1050000000000000000",
+   856→                    "long_weight_maintenance_x18": "970000000000000000",
+   857→                    "short_weight_maintenance_x18": "1030000000000000000",
+   858→                    "price_x18": "115596528090565357611177"
+   859→                },
+   860→                "state": {
+   861→                    "cumulative_funding_long_x18": "-394223711772447555304",
+   862→                    "cumulative_funding_short_x18": "-394223711772447555304",
+   863→                    "available_settle": "20092193239667417956947",
+   864→                    "open_interest": "113605000000000000000"
+   865→                },
+   866→                "book_info": {
+   867→                    "size_increment": "1000000000000000",
+   868→                    "price_increment_x18": "1000000000000000000",
+   869→                    "min_size": "4000000000000000",
+   870→                    "collected_fees": "0"
+   871→                }
+   872→            }
+   873→        ]
+   874→    },
+   875→    "request_type": "query_subaccount_info"
+   876→}
+   877→```
+   878→
+   879→### Example with `pre_state`
+   880→
+   881→When you want to simulate transactions and compare the before/after states, you can use the `pre_state` parameter:
+   882→
+   883→#### Request
+   884→
+   885→{% tabs %}
+   886→{% tab title="REST (GET)" %} <mark style="color:green;">**GET**</mark> `[GATEWAY_REST_ENDPOINT]/query?type=subaccount_info&subaccount={subaccount}&txns=[{"apply_delta":{"product_id":2,"subaccount":"0xeae27ae6412147ed6d5692fd91709dad6dbfc34264656661756c740000000000","amount_delta":"100000000000000000","v_quote_delta":"3033500000000000000000"}}]&pre_state="true"`
+   887→{% endtab %}
+   888→
+   889→{% tab title="REST (POST)" %} <mark style="color:orange;">`POST [GATEWAY_REST_ENDPOINT]/query`</mark>
+   890→
+   891→```json
+   892→{
+   893→    "type": "subaccount_info",
+   894→    "subaccount": "0xeae27ae6412147ed6d5692fd91709dad6dbfc34264656661756c740000000000",
+   895→    "txns": "[{\"apply_delta\":{\"product_id\":2,\"subaccount\":\"0xeae27ae6412147ed6d5692fd91709dad6dbfc34264656661756c740000000000\",\"amount_delta\":\"100000000000000000\",\"v_quote_delta\":\"3033500000000000000000\"}}]",
+   896→    "pre_state": "true"
+   897→}
+   898→```
+   899→
+   900→{% endtab %}
+   901→{% endtabs %}
+   902→
+   903→#### Response
+   904→
+   905→The response will now include a `pre_state` field showing the state before the simulated transactions:
+   906→
+   907→```json
+   908→{
+   909→    "status": "success",
+   910→    "data": {
+   911→        "subaccount": "0x8d7d64d6cf1d4f018dd101482ac71ad49e30c56064656661756c740000000000",
+   912→        "exists": true,
+   913→        "healths": [
+   914→            {
+   915→                "assets": "460000000000000000000000",
+   916→                "liabilities": "80000000000000000000000",
+   917→                "health": "380000000000000000000000"
+   918→            }
+   919→        ],
+   920→        "health_contributions": [...],
+   921→        "spot_balances": [...],
+   922→        "perp_balances": [
+   923→            {
+   924→                "product_id": 2,
+   925→                "balance": {
+   926→                    "amount": "100000000000000000",
+   927→                    "v_quote_balance": "3033500000000000000000",
+   928→                    "last_cumulative_funding_x18": "-394223711772447555304"
+   929→                }
+   930→            }
+   931→        ],
+   932→        "spot_products": [...],
+   933→        "perp_products": [...],
+   934→        "pre_state": {
+   935→            "healths": [
+   936→                {
+   937→                    "assets": "456895621098158389211471",
+   938→                    "liabilities": "76286259844766495292488",
+   939→                    "health": "380609361253391893918983"
+   940→                }
+   941→            ],
+   942→            "health_contributions": [...],
+   943→            "spot_balances": [...],
+   944→            "perp_balances": [
+   945→                {
+   946→                    "product_id": 2,
+   947→                    "balance": {
+   948→                        "amount": "0",
+   949→                        "v_quote_balance": "0",
+   950→                        "last_cumulative_funding_x18": "-394223711772447555304"
+   951→                    }
+   952→                }
+   953→            ]
+   954→        }
+   955→    },
+   956→    "request_type": "query_subaccount_info"
+   957→}
+   958→```
+   959→
+   960→{% hint style="success" %}
+   961→**Use Case**: The `pre_state` feature is particularly useful for:
+   962→
+   963→* **Position Simulation**: Preview how a potential trade would affect your health and balances
+   964→* **Risk Analysis**: Compare health metrics before and after simulated transactions
+   965→* **UI/UX**: Display "before → after" views to users when they're about to execute trades
+   966→* **Testing**: Validate transaction impacts without executing them on-chain
+   967→  {% endhint %}
+   968→
+   969→# Market Prices
+   970→
+   971→## Rate limits
+   972→
+   973→* 2400 requests/min or 40 requests/sec per IP address. (**weight = 1**) or length of <mark style="color:red;">`product_ids`</mark> for [multi-product markets](#multiple-products) query.
+   974→
+   975→{% hint style="info" %}
+   976→See more details in [API Rate limits](https://docs.nado.xyz/developer-resources/api/rate-limits)
+   977→{% endhint %}
+   978→
+   979→## Single Product
+   980→
+   981→### Request
+   982→
+   983→{% tabs %}
+   984→{% tab title="Websocket" %}
+   985→**Connect**
+   986→
+   987→<mark style="color:orange;">`WEBSOCKET [GATEWAY_WEBSOCKET_ENDPOINT]`</mark>
+   988→
+   989→**Message**
+   990→
+   991→```json
+   992→{
+   993→  "type": "market_price",
+   994→  "product_id": 1
+   995→}
+   996→```
+   997→
+   998→{% endtab %}
+   999→
+  1000→{% tab title="REST (GET)" %} <mark style="color:green;">**GET**</mark> `[GATEWAY_REST_ENDPOINT]/query?type=market_price&product_id={product_id}`
+  1001→{% endtab %}
+  1002→
+  1003→{% tab title="REST (POST)" %} <mark style="color:orange;">`POST [GATEWAY_REST_ENDPOINT]/query`</mark>
+  1004→
+  1005→**Body**
+  1006→
+  1007→```json
+  1008→{
+  1009→  "type": "market_price",
+  1010→  "product_id": 1
+  1011→}
+  1012→```
+  1013→
+  1014→{% endtab %}
+  1015→{% endtabs %}
+  1016→
+  1017→### Request Parameters
+  1018→
+  1019→<table><thead><tr><th width="140" align="center">Parameter</th><th width="97" align="center">Type</th><th width="104" align="center">Required</th><th>Description</th></tr></thead><tbody><tr><td align="center">product_id</td><td align="center">number</td><td align="center">Yes</td><td>Id of spot / perp product for which to retrieve market price data.</td></tr></tbody></table>
+  1020→
+  1021→### Response
+  1022→
+  1023→```json
+  1024→{
+  1025→  "status": "success",
+  1026→  "data": {
+  1027→    "product_id": 1,
+  1028→    "bid_x18": "24224000000000000000000",
+  1029→    "ask_x18": "24243000000000000000000"
+  1030→  },
+  1031→  "request_type": "query_market_price",
+  1032→}
+  1033→```
+  1034→
+  1035→{% hint style="info" %}
+  1036→**Note**: that price is represented using fixed point, so it is <mark style="color:red;">`1e18`</mark> times greater than the decimal price.
+  1037→{% endhint %}
+  1038→
+  1039→## Multiple Products
+  1040→
+  1041→### Request
+  1042→
+  1043→{% tabs %}
+  1044→{% tab title="Websocket" %}
+  1045→**Connect**
+  1046→
+  1047→<mark style="color:orange;">`WEBSOCKET [CORE_WEBSOCKET_ENDPOINT]`</mark>
+  1048→
+  1049→**Message**
+  1050→
+  1051→```json
+  1052→{
+  1053→  "type": "market_prices",
+  1054→  "product_ids": [1, 2]
+  1055→}
+  1056→```
+  1057→
+  1058→{% endtab %}
+  1059→
+  1060→{% tab title="REST" %} <mark style="color:orange;">`POST /query`</mark>
+  1061→
+  1062→**Body**
+  1063→
+  1064→```json
+  1065→{
+  1066→  "type": "market_prices",
+  1067→  "product_ids": [1, 2]
+  1068→}
+  1069→```
+  1070→
+  1071→{% endtab %}
+  1072→{% endtabs %}
+  1073→
+  1074→### Request Parameters
+  1075→
+  1076→<table><thead><tr><th width="140" align="center">Parameter</th><th width="118" align="center">Type</th><th width="135.125" align="center">Required</th><th>Description</th></tr></thead><tbody><tr><td align="center">product_ids</td><td align="center">number[]</td><td align="center">Yes</td><td>List of spot / perp products for which to retrieve market price data.</td></tr></tbody></table>
+  1077→
+  1078→### Response
+  1079→
+  1080→```json
+  1081→{
+  1082→  "status": "success",
+  1083→  "data": {
+  1084→    "market_prices": [
+  1085→      {
+  1086→        "product_id": 1,
+  1087→        "bid_x18": "31315000000000000000000",
+  1088→        "ask_x18": "31326000000000000000000"
+  1089→      },
+  1090→      {
+  1091→        "product_id": 2,
+  1092→        "bid_x18": "31291000000000000000000",
+  1093→        "ask_x18": "31301000000000000000000"
+  1094→      },
+  1095→    ]
+  1096→  },
+  1097→  "request_type": "query_market_prices"
+  1098→}
+  1099→```
+  1100→
+  1101→# Signing
+  1102→
+  1103→All executes are signed using [EIP712](https://eips.ethereum.org/EIPS/eip-712). Each execute request contains:
+  1104→
+  1105→1. A piece of structured data that includes the sender address i.e: the <mark style="color:red;">`primaryType`</mark> that needs to be signed.
+  1106→2. A signature of the hash of that structured data, signed by the sender.
+  1107→
+  1108→## Domain
+  1109→
+  1110→The following is the domain required as part of the EIP712 structure:
+  1111→
+  1112→```json
+  1113→{
+  1114→    name: 'Nado',
+  1115→    version: '0.0.1',
+  1116→    chainId: chainId,
+  1117→    verifyingContract: contractAddress
+  1118→}
+  1119→```
+  1120→
+  1121→You can retrieve the corresponding chain id and verifying contract via the [contracts](https://docs.nado.xyz/developer-resources/api/gateway/queries/contracts) query.
+  1122→
+  1123→{% hint style="warning" %}
+  1124→**Note**: make sure to use the correct verifying contract for each execute:
+  1125→
+  1126→* For place order: should use `address(producId)` i.e: the 20 bytes hex representation of the `productId` for the order. For example, the verify contract of product `18` is `0x0000000000000000000000000000000000000012` .
+  1127→* For everything else: should use the endpoint address.
+  1128→
+  1129→See more details in the [contracts](https://docs.nado.xyz/developer-resources/api/gateway/queries/contracts) query page.
+  1130→{% endhint %}
+  1131→
+  1132→```python
+  1133→def gen_order_verifying_contract(product_id: int) -> str:
+  1134→    """
+  1135→    Generates the order verifying contract address based on the product ID.
+  1136→
+  1137→    Args:
+  1138→        product_id (int): The product ID for which to generate the verifying contract address.
+  1139→
+  1140→    Returns:
+  1141→        str: The generated order verifying contract address in hexadecimal format.
+  1142→    """
+  1143→    be_bytes = product_id.to_bytes(20, byteorder="big", signed=False)
+  1144→    return "0x" + be_bytes.hex()
+  1145→```
+  1146→
+  1147→## EIP712 Types
+  1148→
+  1149→See below the EIP712 type for each execute:
+  1150→
+  1151→{% hint style="info" %}
+  1152→See more details in the **Signing** section of each execute's page.
+  1153→{% endhint %}
+  1154→
+  1155→### [Place Order](https://docs.nado.xyz/developer-resources/api/gateway/executes/place-order)
+  1156→
+  1157→**Primary Type**: <mark style="color:red;">`Order`</mark>
+  1158→
+  1159→Solidity struct that needs to be signed:
+  1160→
+  1161→```solidity
+  1162→struct Order {
+  1163→    bytes32 sender;
+  1164→    int128 priceX18;
+  1165→    int128 amount;
+  1166→    uint64 expiration;
+  1167→    uint64 nonce;
+  1168→    uint128 appendix;
+  1169→}
+  1170→```
+  1171→
+  1172→**JSON representation:**
+  1173→
+  1174→```typescript
+  1175→{
+  1176→  Order: [
+  1177→    { name: 'sender', type: 'bytes32' },
+  1178→    { name: 'priceX18', type: 'int128' },
+  1179→    { name: 'amount', type: 'int128' },
+  1180→    { name: 'expiration', type: 'uint64' },
+  1181→    { name: 'nonce', type: 'uint64' },
+  1182→    { name: 'appendix', type: 'uint128' }
+  1183→  ],
+  1184→}
+  1185→```
+  1186→
+  1187→### [Cancel Orders](https://docs.nado.xyz/developer-resources/api/gateway/executes/cancel-orders)
+  1188→
+  1189→**Primary Type:** <mark style="color:red;">`Cancellation`</mark>
+  1190→
+  1191→Solidity struct that needs to be signed:
+  1192→
+  1193→```solidity
+  1194→struct Cancellation {
+  1195→    bytes32 sender;
+  1196→    uint32[] productIds;
+  1197→    bytes32[] digests;
+  1198→    uint64 nonce;
+  1199→}
+  1200→```
+  1201→
+  1202→**JSON representation:**
+  1203→
+  1204→```typescript
+  1205→{
+  1206→  Cancellation: [
+  1207→    { name: 'sender', type: 'bytes32' },
+  1208→    { name: 'productIds', type: 'uint32[]' },
+  1209→    { name: 'digests', type: 'bytes32[]' },
+  1210→    { name: 'nonce', type: 'uint64' },
+  1211→  ],
+  1212→}
+  1213→```
+  1214→
+  1215→### [Cancel Product Orders](https://docs.nado.xyz/developer-resources/api/gateway/executes/cancel-product-orders)
+  1216→
+  1217→**Primary Type**: <mark style="color:red;">`CancellationProducts`</mark>
+  1218→
+  1219→Solidity struct that needs to be signed:
+  1220→
+  1221→```solidity
+  1222→struct CancellationProducts {
+  1223→    bytes32 sender;
+  1224→    uint32[] productIds;
+  1225→    uint64 nonce;
+  1226→}
+  1227→```
+  1228→
+  1229→**JSON representation:**
+  1230→
+  1231→```typescript
+  1232→{
+  1233→  CancellationProducts: [
+  1234→    { name: 'sender', type: 'bytes32' },
+  1235→    { name: 'productIds', type: 'uint32[]' },
+  1236→    { name: 'nonce', type: 'uint64' },
+  1237→  ],
+  1238→}
+  1239→```
+  1240→
+  1241→### [Withdraw Collateral](https://docs.nado.xyz/developer-resources/api/gateway/executes/withdraw-collateral)
+  1242→
+  1243→**Primary Type:** <mark style="color:red;">`WithdrawCollateral`</mark>
+  1244→
+  1245→Solidity struct that needs to be signed:
+  1246→
+  1247→```solidity
+  1248→struct WithdrawCollateral {
+  1249→    bytes32 sender;
+  1250→    uint32 productId;
+  1251→    uint128 amount;
+  1252→    uint64 nonce;
+  1253→}
+  1254→```
+  1255→
+  1256→**JSON representation:**
+  1257→
+  1258→```typescript
+  1259→{
+  1260→  WithdrawCollateral: [
+  1261→    { name: 'sender', type: 'bytes32' },
+  1262→    { name: 'productId', type: 'uint32' },
+  1263→    { name: 'amount', type: 'uint128' },
+  1264→    { name: 'nonce', type: 'uint64' },
+  1265→  ],
+  1266→}
+  1267→```
+  1268→
+  1269→### [Liquidate Subaccount](https://docs.nado.xyz/developer-resources/api/gateway/executes/liquidate-subaccount)
+  1270→
+  1271→**Primary Type:** <mark style="color:red;">`LiquidateSubaccount`</mark>
+  1272→
+  1273→Solidity struct that needs to be signed:
+  1274→
+  1275→```solidity
+  1276→struct LiquidateSubaccount {
+  1277→    bytes32 sender;
+  1278→    bytes32 liquidatee;
+  1279→    uint32 productId;
+  1280→    bool isEncodedSpread;
+  1281→    int128 amount;
+  1282→    uint64 nonce;
+  1283→}
+  1284→```
+  1285→
+  1286→**JSON representation:**
+  1287→
+  1288→```typescript
+  1289→{
+  1290→  LiquidateSubaccount: [
+  1291→    { name: 'sender', type: 'bytes32' },
+  1292→    { name: 'liquidatee', type: 'bytes32' },
+  1293→    { name: 'productId', type: 'uint32' },
+  1294→    { name: 'isEncodedSpread', type: 'bool' },
+  1295→    { name: 'amount', type: 'int128' },
+  1296→    { name: 'nonce', type: 'uint64' },
+  1297→  ],
+  1298→}
+  1299→```
+  1300→
+  1301→### [Mint NLP](https://docs.nado.xyz/developer-resources/api/gateway/executes/mint-nlp)
+  1302→
+  1303→**Primary Type**: <mark style="color:red;">`MintNlp`</mark>
+  1304→
+  1305→Solidity struct that needs to be signed:
+  1306→
+  1307→```solidity
+  1308→struct MintNlp {
+  1309→    bytes32 sender;
+  1310→    uint32 productId;
+  1311→    uint128 quoteAmount;
+  1312→    uint64 nonce;
+  1313→}
+  1314→```
+  1315→
+  1316→**JSON representation:**
+  1317→
+  1318→```typescript
+  1319→{
+  1320→  MintNlp: [
+  1321→    { name: 'sender', type: 'bytes32' },
+  1322→    { name: 'quoteAmount', type: 'uint128' },
+  1323→    { name: 'nonce', type: 'uint64' },
+  1324→  ],
+  1325→}
+  1326→```
+  1327→
+  1328→## [Burn NLP](https://docs.nado.xyz/developer-resources/api/gateway/executes/burn-nlp)
+  1329→
+  1330→**Primary Type:** <mark style="color:red;">`BurnNlp`</mark>
+  1331→
+  1332→Solidity struct that needs to be signed:
+  1333→
+  1334→```solidity
+  1335→struct BurnNlp {
+  1336→    bytes32 sender;
+  1337→    uint128 nlpAmount;
+  1338→    uint64 nonce;
+  1339→}
+  1340→```
+  1341→
+  1342→**JSON representation:**
+  1343→
+  1344→```typescript
+  1345→{
+  1346→  BurnNlp: [
+  1347→    { name: 'sender', type: 'bytes32' },
+  1348→    { name: 'nlpAmount', type: 'uint128' },
+  1349→    { name: 'nonce', type: 'uint64' },
+  1350→  ],
+  1351→}
+  1352→```
+  1353→
+  1354→## [Link Signer](https://docs.nado.xyz/developer-resources/api/gateway/executes/link-signer)
+  1355→
+  1356→**Primary Type**: <mark style="color:red;">`LinkSigner`</mark>
+  1357→
+  1358→Solidity struct that needs to be signed:
+  1359→
+  1360→```solidity
+  1361→struct LinkSigner {
+  1362→    bytes32 sender;
+  1363→    bytes32 signer;
+  1364→    uint64 nonce;
+  1365→}
+  1366→```
+  1367→
+  1368→**JSON representation:**
+  1369→
+  1370→```typescript
+  1371→{
+  1372→  LinkSigner: [
+  1373→    { name: 'sender', type: 'bytes32' },
+  1374→    { name: 'signer', type: 'bytes32' },
+  1375→    { name: 'nonce', type: 'uint64' },
+  1376→  ],
+  1377→}
+  1378→```
+  1379→
+  1380→## [List Trigger Orders](https://docs.nado.xyz/developer-resources/api/trigger/queries/list-trigger-orders)
+  1381→
+  1382→**Primary Type**: <mark style="color:red;">`ListTriggerOrders`</mark>
+  1383→
+  1384→Solidity struct that needs to be signed:
+  1385→
+  1386→```solidity
+  1387→struct ListTriggerOrders {
+  1388→    bytes32 sender;
+  1389→    uint64 recvTime;
+  1390→}
+  1391→```
+  1392→
+  1393→**JSON representation:**
+  1394→
+  1395→```typescript
+  1396→{
+  1397→  ListTriggerOrders: [
+  1398→    { name: 'sender', type: 'bytes32' },
+  1399→    { name: 'recvTime', type: 'uint64' },
+  1400→  ],
+  1401→}
+  1402→```
+  1403→
+  1404→## [Authenticate Subscription Streams](https://docs.nado.xyz/developer-resources/subscriptions#authentication)
+  1405→
+  1406→**Primary Type**: <mark style="color:red;">`StreamAuthentication`</mark>
+  1407→
+  1408→Struct that needs to be signed:
+  1409→
+  1410→```solidity
+  1411→struct StreamAuthentication {
+  1412→    bytes32 sender;
+  1413→    uint64 expiration;
+  1414→}
+  1415→```
+  1416→
+  1417→**JSON representation:**
+  1418→
+  1419→```typescript
+  1420→{
+  1421→  StreamAuthentication: [
+  1422→    { name: 'sender', type: 'bytes32' },
+  1423→    { name: 'expiration', type: 'uint64' },
+  1424→  ],
+  1425→}
+  1426→```
+  1427→# Examples
+  1428→
+  1429→The following are full examples of EIP12 typed data for each of Nado's executes. Each execute includes a <mark style="color:red;">`sender`</mark> field which is a solidity <mark style="color:red;">`bytes32`</mark> . There are two components to this field:
+  1430→
+  1431→* an <mark style="color:red;">`address`</mark> that is a <mark style="color:red;">`bytes20`</mark>
+  1432→* a subaccount identifier that is a <mark style="color:red;">`bytes12`</mark>
+  1433→
+  1434→For example, if your address was <mark style="color:red;">`0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c43`</mark>, and you wanted to use the default subaccount identifier (i.e: an empty identifier `""`) you can set <mark style="color:red;">`sender`</mark> to <mark style="color:red;">`0x7a5ec2748e9065794491a8d29dcf3f9edb8d7c43000000000000000000000000`</mark> , which sets all bytes of the subaccount identifier to <mark style="color:red;">`0`</mark>.
+  1435→
+  1436→{% hint style="info" %}
+  1437→**Note**: a <mark style="color:red;">`bytes32`</mark> representation of the sender must used when signing the request.
+  1438→{% endhint %}
+  1439→
+  1440→See below a sample util to convert a hex to a **bytes32**:
+  1441→
+  1442→{% tabs %}
+  1443→{% tab title="Python" %}
+  1444→
+  1445→```python
+  1446→def hex_to_bytes32(hex_string):
+  1447→    if hex_string.startswith("0x"):
+  1448→        hex_string = hex_string[2:]
+  1449→    data_bytes = bytes.fromhex(hex_string)
+  1450→    padded_data = data_bytes + b"\x00" * (32 - len(data_bytes))
+  1451→    return padded_data
+  1452→
+  1453→sender = hex_to_bytes32('0x841fe4876763357975d60da128d8a54bb045d76a64656661756c740000000000')
+  1454→```
+  1455→
+  1456→{% endtab %}
+  1457→
+  1458→{% tab title="Typescript" %}
+  1459→
+  1460→```typescript
+  1461→import { arrayify } from 'ethers/lib/utils';
+  1462→
+  1463→export function hexToBytes32(subaccount: string) {
+  1464→  const subaccountBytes = arrayify(subaccount);
+  1465→  const bytes32 = new Uint8Array(32);
+  1466→  for (let i = 0; i < Math.min(subaccountBytes.length, 32); i++) {
+  1467→    bytes32[i] = subaccountBytes[i];
+  1468→  }
+  1469→  return bytes32;
+  1470→}
+  1471→
+  1472→const sender = hexToBytes32('0x841fe4876763357975d60da128d8a54bb045d76a64656661756c740000000000')
+  1473→```
+  1474→
+  1475→{% endtab %}
+  1476→{% endtabs %}
+  1477→
+  1478→## EIP712 Typed data examples
+  1479→
+  1480→{% tabs %}
+  1481→{% tab title="Place Order" %}
+  1482→
+  1483→```python
+  1484→{
+  1485→    'types': {
+  1486→        'EIP712Domain': [
+  1487→            {'name': 'name', 'type': 'string'},
+  1488→            {'name': 'version', 'type': 'string'},
+  1489→            {'name': 'chainId', 'type': 'uint256'},
+  1490→            {'name': 'verifyingContract', 'type': 'address'}
+  1491→        ],
+  1492→        'Order': [
+  1493→            {'name': 'sender', 'type': 'bytes32'},
+  1494→            {'name': 'priceX18', 'type': 'int128'},
+  1495→            {'name': 'amount', 'type': 'int128'},
+  1496→            {'name': 'expiration', 'type': 'uint64'},
+  1497→            {'name': 'nonce', 'type': 'uint64'},
+  1498→            {'name': 'appendix', 'type': 'uint128'},
+  1499→        ],
+  1500→    },
+  1501→    'primaryType': 'Order',
+  1502→    'domain': {
+  1503→        'name': 'Nado',
+  1504→        'version': '0.0.1',
+  1505→        'chainId': 763373,  
+  1506→        'verifyingContract': '0x0000000000000000000000000000000000000001'
+  1507→    },
+  1508→    'message': {
+  1509→        'sender': hex_to_bytes32('0x841fe4876763357975d60da128d8a54bb045d76a64656661756c740000000000'),
+  1510→        'priceX18': 28898000000000000000000,
+  1511→        'amount': -10000000000000000,
+  1512→        'expiration': 4611687701117784255,
+  1513→        'appendix': 1537,  # Version 1, POST_ONLY order
+  1514→        'nonce': 1764428860167815857,
+  1515→    },
+  1516→}
+  1517→```
+  1518→
+  1519→{% endtab %}
+  1520→
+  1521→{% tab title="Cancel Orders" %}
+  1522→
+  1523→```python
+  1524→{
+  1525→    'types': {
+  1526→        'EIP712Domain': [
+  1527→            {'name': 'name', 'type': 'string'},
+  1528→            {'name': 'version', 'type': 'string'},
+  1529→            {'name': 'chainId', 'type': 'uint256'},
+  1530→            {'name': 'verifyingContract', 'type': 'address'}
+  1531→        ],
+  1532→        'Cancellation': [
+  1533→            { 'name': 'sender', 'type': 'bytes32' },
+  1534→            { 'name': 'productIds', 'type': 'uint32[]'},
+  1535→            { 'name': 'digests', 'type': 'bytes32[]'},
+  1536→            { 'name': 'nonce', 'type': 'uint64'},
+  1537→        ],
+  1538→    },
+  1539→    'primaryType': 'Cancellation',
+  1540→    'domain': {
+  1541→        'name': 'Nado',
+  1542→        'version': '0.0.1',
+  1543→        'chainId': 763373,  
+  1544→        'verifyingContract': '0xbf16e41fb4ac9922545bfc1500f67064dc2dcc3b'
+  1545→    },
+  1546→    'message': {
+  1547→        'sender': hex_to_bytes32('0x841fe4876763357975d60da128d8a54bb045d76a64656661756c740000000000'),
+  1548→        'productIds': [4],
+  1549→        'digests': [hex_to_bytes32('0x51ba8762bc5f77957a4e896dba34e17b553b872c618ffb83dba54878796f2821')],
+  1550→        'nonce': 1,
+  1551→    },
+  1552→}
+  1553→```
+  1554→
+  1555→{% endtab %}
+  1556→
+  1557→{% tab title="Cancel Product orders" %}
+  1558→
+  1559→```python
+  1560→{
+  1561→    'types': {
+  1562→        'EIP712Domain': [
+  1563→            {'name': 'name', 'type': 'string'},
+  1564→            {'name': 'version', 'type': 'string'},
+  1565→            {'name': 'chainId', 'type': 'uint256'},
+  1566→            {'name': 'verifyingContract', 'type': 'address'}
+  1567→        ],
+  1568→        'CancellationProducts': [
+  1569→            {'name': 'sender', 'type': 'bytes32'},
+  1570→            {'name': 'productIds', 'type': 'uint32[]'},
+  1571→            {'name': 'nonce', 'type': 'uint64'},
+  1572→        ],
+  1573→    },
+  1574→    'primaryType': 'CancellationProducts',
+  1575→    'domain': {
+  1576→        'name': 'Nado',
+  1577→        'version': '0.0.1',
+  1578→        'chainId': 763373,  
+  1579→        'verifyingContract': '0xbf16e41fb4ac9922545bfc1500f67064dc2dcc3b'
+  1580→    },
+  1581→    'message': {
+  1582→        'sender': hex_to_bytes32('0x841fe4876763357975d60da128d8a54bb045d76a64656661756c740000000000'),
+  1583→        'productIds': [1, 2],
+  1584→        'nonce': 1,
+  1585→    },
+  1586→}
+  1587→```
+  1588→
+  1589→{% endtab %}
+  1590→
+  1591→{% tab title="Link Signer" %}
+  1592→
+  1593→```python
+  1594→{
+  1595→    'types': {
+  1596→        'EIP712Domain': [
+  1597→            {'name': 'name', 'type': 'string'},
+  1598→            {'name': 'version', 'type': 'string'},
+  1599→            {'name': 'chainId', 'type': 'uint256'},
+  1600→            {'name': 'verifyingContract', 'type': 'address'}
+  1601→        ],
+  1602→        'LinkSigner': [
+  1603→            {'name': 'sender', 'type': 'bytes32'},
+  1604→            {'name': 'signer', 'type': 'bytes32'},
+  1605→            {'name': 'nonce', 'type': 'uint64'},
+  1606→        ],
+  1607→    },
+  1608→    'primaryType': 'LinkSigner',
+  1609→    'domain': {
+  1610→        'name': 'Nado',
+  1611→        'version': '0.0.1',
+  1612→        'chainId': 763373,  
+  1613→        'verifyingContract': '0xbf16e41fb4ac9922545bfc1500f67064dc2dcc3b'
+  1614→    },
+  1615→    'message': {
+  1616→        'sender': hex_to_bytes32('0x841fe4876763357975d60da128d8a54bb045d76a64656661756c740000000000'),
+  1617→        'signer': hex_to_bytes32('0x12a0b4888021576eb10a67616dd3dd3d9ce206b664656661756c740000000000'),
+  1618→        'nonce': 1,
+  1619→    },
+  1620→}
+  1621→```
+  1622→
+  1623→{% endtab %}
+  1624→{% endtabs %}
+  1625→
+  1626→{% tabs %}
+  1627→{% tab title="Withdraw Collateral" %}
+  1628→
+  1629→```python
+  1630→{
+  1631→    'types': {
+  1632→        'EIP712Domain': [
+  1633→            {'name': 'name', 'type': 'string'},
+  1634→            {'name': 'version', 'type': 'string'},
+  1635→            {'name': 'chainId', 'type': 'uint256'},
+  1636→            {'name': 'verifyingContract', 'type': 'address'}
+  1637→        ],
+  1638→        'WithdrawCollateral': [
+  1639→            {'name': 'sender', 'type': 'bytes32'},
+  1640→            {'name': 'productId', 'type': 'uint32'},
+  1641→            {'name': 'amount', 'type': 'uint128'},
+  1642→            {'name': 'nonce', 'type': 'uint64'},
+  1643→        ],
+  1644→    },
+  1645→    'primaryType': 'WithdrawCollateral',
+  1646→    'domain': {
+  1647→        'name': 'Nado',
+  1648→        'version': '0.0.1',
+  1649→        'chainId': 763373,  
+  1650→        'verifyingContract': '0xbf16e41fb4ac9922545bfc1500f67064dc2dcc3b'
+  1651→    },
+  1652→    'message': {
+  1653→        'sender': hex_to_bytes32('0x841fe4876763357975d60da128d8a54bb045d76a64656661756c740000000000'),
+  1654→        'productId': 2,
+  1655→        'amount': 10000000000000000,
+  1656→        'nonce': 1
+  1657→    },
+  1658→}
+  1659→```
+  1660→
+  1661→{% endtab %}
+  1662→
+  1663→{% tab title="Liquidate Subaccount" %}
+  1664→
+  1665→```python
+  1666→{
+  1667→    'types': {
+  1668→        'EIP712Domain': [
+  1669→            {'name': 'name', 'type': 'string'},
+  1670→            {'name': 'version', 'type': 'string'},
+  1671→            {'name': 'chainId', 'type': 'uint256'},
+  1672→            {'name': 'verifyingContract', 'type': 'address'}
+  1673→        ],
+  1674→        'LiquidateSubaccount': [
+  1675→            {'name': 'sender', 'type': 'bytes32'},
+  1676→            {'name': 'liquidatee', 'type': 'bytes32'},
+  1677→            {'name': 'productId', 'type': 'uint32'},
+  1678→            {'name': 'isEncodedSpread', 'type': 'bool'},
+  1679→            {'name': 'amount', 'type': 'int128'},
+  1680→            {'name': 'nonce', 'type': 'uint64'},
+  1681→        ],
+  1682→    },
+  1683→    'primaryType': 'LiquidateSubaccount',
+  1684→    'domain': {
+  1685→        'name': 'Nado',
+  1686→        'version': '0.0.1',
+  1687→        'chainId': 763373,  
+  1688→        'verifyingContract': '0xbf16e41fb4ac9922545bfc1500f67064dc2dcc3b'
+  1689→    },
+  1690→    'message': {
+  1691→        'sender': hex_to_bytes32('0x841fe4876763357975d60da128d8a54bb045d76a64656661756c740000000000'),
+  1692→        'liquidatee': hex_to_bytes32('0x12a0b4888021576eb10a67616dd3dd3d9ce206b664656661756c740000000000'),
+  1693→        'productId': 1,
+  1694→        'isEncodedSpread': false,
+  1695→        'amount': 10000000000000000,
+  1696→        'nonce': 1,
+  1697→    },
+  1698→}
+  1699→```
+  1700→
+  1701→{% endtab %}
+  1702→
+  1703→{% tab title="Mint NLP" %}
+  1704→
+  1705→```python
+  1706→{
+  1707→    'types': {
+  1708→        'EIP712Domain': [
+  1709→            {'name': 'name', 'type': 'string'},
+  1710→            {'name': 'version', 'type': 'string'},
+  1711→            {'name': 'chainId', 'type': 'uint256'},
+  1712→            {'name': 'verifyingContract', 'type': 'address'}
+  1713→        ],
+  1714→        'MintNlp': [
+  1715→            {'name': 'sender', 'type': 'bytes32' },
+  1716→            {'name': 'quoteAmount', 'type': 'uint128'},
+  1717→            {'name': 'nonce', 'type': 'uint64' },
+  1718→        ],
+  1719→    },
+  1720→    'primaryType': 'MintNlp',
+  1721→    'domain': {
+  1722→        'name': 'Nado',
+  1723→        'version': '0.0.1',
+  1724→        'chainId': 763373,  
+  1725→        'verifyingContract': '0xbf16e41fb4ac9922545bfc1500f67064dc2dcc3b'
+  1726→    },
+  1727→    'message': {
+  1728→        'sender': hex_to_bytes32('0x841fe4876763357975d60da128d8a54bb045d76a64656661756c740000000000'),
+  1729→        'quoteAmount': 20000000000000000000000,
+  1730→        'nonce': 1,
+  1731→    },
+  1732→}
+  1733→```
+  1734→
+  1735→{% endtab %}
+  1736→
+  1737→{% tab title="Burn NLP" %}
+  1738→
+  1739→```python
+  1740→{
+  1741→    'types': {
+  1742→        'EIP712Domain': [
+  1743→            {'name': 'name', 'type': 'string'},
+  1744→            {'name': 'version', 'type': 'string'},
+  1745→            {'name': 'chainId', 'type': 'uint256'},
+  1746→            {'name': 'verifyingContract', 'type': 'address'}
+  1747→        ],
+  1748→        'BurnNlp': [
+  1749→            {'name': 'sender', 'type': 'bytes32'},
+  1750→            {'name': 'nlpAmount', 'type': 'uint128'},
+  1751→            {'name': 'nonce', 'type': 'uint64'},
+  1752→        ],
+  1753→    },
+  1754→    'primaryType': 'BurnNlp',
+  1755→    'domain': {
+  1756→        'name': 'Nado',
+  1757→        'version': '0.0.1',
+  1758→        'chainId': 763373,  
+  1759→        'verifyingContract': '0xbf16e41fb4ac9922545bfc1500f67064dc2dcc3b'
+  1760→    },
+  1761→    'message': {
+  1762→        'sender': hex_to_bytes32('0x841fe4876763357975d60da128d8a54bb045d76a64656661756c740000000000'),
+  1763→        'nlpAmount': 1000000000000000000,
+  1764→        'nonce': 1,
+  1765→    },
+  1766→}
+  1767→```
+  1768→
+  1769→{% endtab %}
+  1770→
+  1771→{% tab title="List Trigger Orders" %}
+  1772→
+  1773→```python
+  1774→{
+  1775→    'types': {
+  1776→        'EIP712Domain': [
+  1777→            {'name': 'name', 'type': 'string'},
+  1778→            {'name': 'version', 'type': 'string'},
+  1779→            {'name': 'chainId', 'type': 'uint256'},
+  1780→            {'name': 'verifyingContract', 'type': 'address'}
+  1781→        ],
+  1782→        'ListTriggerOrders': [
+  1783→            {'name': 'sender', 'type': 'bytes32' },
+  1784→            {'name': 'recvTime', 'type': 'uint64' }
+  1785→        ],
+  1786→    },
+  1787→    'primaryType': 'WithdrawCollateral',
+  1788→    'domain': {
+  1789→        'name': 'Nado',
+  1790→        'version': '0.0.1',
+  1791→        'chainId': 763373,  
+  1792→        'verifyingContract': '0xbf16e41fb4ac9922545bfc1500f67064dc2dcc3b'
+  1793→    },
+  1794→    'message': {
+  1795→        'sender': hex_to_bytes32('0x841fe4876763357975d60da128d8a54bb045d76a64656661756c740000000000'),
+  1796→        'recvTime': 1688939576000
+  1797→    },
+  1798→}
+  1799→```
+  1800→
+  1801→{% endtab %}
+  1802→{% endtabs %}
+  1803→
+  1804→# Q\&A
+  1805→
+  1806→### Q: **What is Nado's EIP712 domain?**
+  1807→
+  1808→```json
+  1809→{
+  1810→    name: 'Nado',
+  1811→    version: '0.0.1',
+  1812→    chainId: chainId,
+  1813→    verifyingContract: contractAddress
+  1814→}
+  1815→```
+  1816→
+  1817→{% hint style="info" %}
+  1818→See [signing](https://docs.nado.xyz/developer-resources/api/gateway/signing/..#domain) for more details.
+  1819→{% endhint %}
+  1820→
+  1821→### Q: How can i retrieve the verifying contracts to use?
+  1822→
+  1823→* Via the [contracts](https://docs.nado.xyz/developer-resources/api/gateway/queries/contracts) query for all executes except place orders.
+  1824→
+  1825→### Q: Which contract should I use for each execute?
+  1826→
+  1827→* For place orders: must be computed as <mark style="color:red;">`address(productId)`</mark>. For example, the verify contract of product <mark style="color:red;">`18`</mark> is <mark style="color:red;">`0x0000000000000000000000000000000000000012`</mark>.
+  1828→* For everything else: use the endpoint contract from the contracts query.
+  1829→
+  1830→{% hint style="info" %}
+  1831→See the [contracts](https://docs.nado.xyz/developer-resources/api/queries/contracts#response) query for more details.
+  1832→{% endhint %}
+  1833→
+  1834→### Q: I am running into signature errors, how to fix?
+  1835→
+  1836→Signature errors can arise for several reasons:
+  1837→
+  1838→* **An invalid struct**: confirm you are signing the correct struct. See the [Signing](https://docs.nado.xyz/developer-resources/api/gateway/signing) page to verify the struct of each execute request.
+  1839→* **An invalid chain id**: confirm you have the correct chain id for the network you are on.
+  1840→* **An invalid verifying contract**: confirm you have the correct verifying contract address for the network and execute you are signing. i.e: confirm you are using the correct orderbook address for place orders and endpoint address for everything else.
+  1841→
+  1842→### Q: Is any other signing standard supported?
+  1843→
+  1844→No, only [EIP712](https://eips.ethereum.org/EIPS/eip-712).
+  1845→
+  1846→### Q: Are there any examples you can provide?
+  1847→
+  1848→See [examples](https://docs.nado.xyz/developer-resources/api/gateway/signing/examples).
+  1849→
+  1850→### Q: What is the PrimaryType of execute X?
+  1851→
+  1852→All primary types are listed in our [signing](https://docs.nado.xyz/developer-resources/api/gateway/signing) page.
+  1853→
+  1854→
+  1855→# Endpoints
+  1856→
+  1857→## Mainnet
+  1858→
+  1859→### <mark style="color:purple;">Ink Mainnet</mark>
+  1860→
+  1861→* **Gateway Websocket**: <mark style="color:green;">`wss://gateway.prod.nado.xyz/v1/ws`</mark>
+  1862→* **Gateway REST:** <mark style="color:green;">`https://gateway.prod.nado.xyz/v1`</mark>
+  1863→* **Gateway V2:** <mark style="color:green;">`https://gateway.prod.nado.xyz/v2`</mark>
+  1864→* **Subscriptions**: <mark style="color:green;">`wss://gateway.prod.nado.xyz/v1/subscribe`</mark>
+  1865→* **Archive (Indexer):** <mark style="color:green;">`https://archive.prod.nado.xyz/v1`</mark>
+  1866→* **Archive (Indexer) V2:** <mark style="color:green;">`https://archive.prod.nado.xyz/v2`</mark>
+  1867→* **Trigger**: <mark style="color:green;">`https://trigger.prod.nado.xyz/v1`</mark>
+  1868→
+  1869→## Testnet
+  1870→
+  1871→### <mark style="color:purple;">Ink Sepolia</mark>
+  1872→
+  1873→* **Gateway Websocket**: <mark style="color:red;">`wss://gateway.test.nado.xyz/v1/ws`</mark>
+  1874→* **Gateway REST:** <mark style="color:red;">`https://gateway.test.nado.xyz/v1`</mark>
+  1875→* **Gateway V2:** <mark style="color:red;">`https://gateway.test.nado.xyz/v2`</mark>
+  1876→* **Subscriptions**: <mark style="color:red;">`wss://gateway.test.nado.xyz/v1/subscribe`</mark>
+  1877→* **Archive (Indexer):** <mark style="color:red;">`https://archive.test.nado.xyz/v1`</mark>
+  1878→* **Archive (Indexer) V2:** <mark style="color:red;">`https://archive.test.nado.xyz/v2`</mark>
+  1879→* **Trigger**: <mark style="color:red;">`https://trigger.test.nado.xyz/v1`</mark>
+  1880→
+  1881→
+  1882→
+  1883→# Rate limits
+  1884→
+  1885→## Overview
+  1886→
+  1887→* Nado uses a weight-based rate-limiting system across queries and executes. We limit based on <mark style="color:red;">`IP address`</mark>, <mark style="color:red;">`Wallet address`</mark>, and a global <mark style="color:red;">`max # of orders per subaccount per market`</mark>.
+  1888→* These limits equally apply to both <mark style="color:red;">`http`</mark> requests and <mark style="color:red;">`Websocket`</mark> messages.
+  1889→* Limits are applied on a <mark style="color:red;">`1 minute`</mark> and <mark style="color:red;">`10 seconds`</mark> basis.
+  1890→
+  1891→## Limits
+  1892→
+  1893→* IP addresses have a max weight limit of <mark style="color:red;">`2400`</mark> per minute or <mark style="color:red;">`400`</mark> every 10 seconds applied only to queries.
+  1894→* Wallet addresses have a max weight limit of <mark style="color:red;">`600`</mark> per minute or <mark style="color:red;">`100`</mark> every 10 seconds applied only to executes.
+  1895→* Users can have up to <mark style="color:red;">`500`</mark> open orders per subaccount per market.
+  1896→* Orders have the following additional limits:
+  1897→  * Place orders (with spot leverage): up to <mark style="color:red;">`600`</mark> per minute or <mark style="color:red;">`100`</mark> every 10 seconds across all markets.
+  1898→  * Place orders (without spot leverage): up to <mark style="color:red;">`30`</mark> per minute or <mark style="color:red;">`5`</mark> every 10 seconds across all markets. **Note**: orders without spot leverage are <mark style="color:red;">`20x`</mark> more expensive to place due to additional health checks needed.
+  1899→  * Order cancellations: up to <mark style="color:red;">`600`</mark> per minute or <mark style="color:red;">`100`</mark> every 10 seconds.
+  1900→
+  1901→## Query Weights
+  1902→
+  1903→Queries are rate-limited based on IP. The following weights are applied per query:
+  1904→
+  1905→* [**Status**](https://docs.nado.xyz/developer-resources/api/gateway/queries/status): <mark style="color:red;">`IP weight = 1`</mark>
+  1906→* [**Contracts**](https://docs.nado.xyz/developer-resources/api/gateway/queries/contracts): <mark style="color:red;">`IP weight = 1`</mark>
+  1907→* [**Nonces**](https://docs.nado.xyz/developer-resources/api/gateway/queries/nonces): <mark style="color:red;">`IP weight = 2`</mark>
+  1908→* [**Order**](https://docs.nado.xyz/developer-resources/api/gateway/queries/order)**:** <mark style="color:red;">`IP weight = 1`</mark>
+  1909→* [**Orders**](https://docs.nado.xyz/developer-resources/api/gateway/queries/orders): <mark style="color:red;">`IP weight = 2 * product_ids.length`</mark>
+  1910→* [**Subaccount Info**](https://docs.nado.xyz/developer-resources/api/gateway/queries/subaccount-info): <mark style="color:red;">`IP weight = 2`</mark> (or <mark style="color:red;">`10`</mark> with `txns`, or <mark style="color:red;">`15`</mark> with `txns` + `pre_state="true"`)
+  1911→* [**Isolated Positions**](https://docs.nado.xyz/developer-resources/api/gateway/queries/isolated-positions): <mark style="color:red;">`IP weight = 10`</mark>
+  1912→* [**Market Liquidity**](https://docs.nado.xyz/developer-resources/api/gateway/queries/market-liquidity): <mark style="color:red;">`IP weight = 1`</mark>
+  1913→* [**Symbols**](https://docs.nado.xyz/developer-resources/api/gateway/queries/symbols): <mark style="color:red;">`IP weight = 2`</mark>
+  1914→* [**All Products**](https://docs.nado.xyz/developer-resources/api/gateway/queries/all-products): <mark style="color:red;">`IP weight = 5`</mark>
+  1915→* [**Edge All Products**](https://docs.nado.xyz/developer-resources/api/gateway/queries/edge-all-products): <mark style="color:red;">`IP weight = 5`</mark>
+  1916→* [**Market Prices**](https://docs.nado.xyz/developer-resources/api/gateway/queries/market-prices)**:** <mark style="color:red;">`IP weight = product_ids.length`</mark>
+  1917→* [**Max Order Size**](https://docs.nado.xyz/developer-resources/api/gateway/queries/max-order-size)**:** <mark style="color:red;">`IP weight = 5`</mark>
+  1918→* [**Max Withdrawable**](https://docs.nado.xyz/developer-resources/api/gateway/queries/max-withdrawable)**:** <mark style="color:red;">`IP weight = 5`</mark>
+  1919→* [**Max NLP Mintable**](https://docs.nado.xyz/developer-resources/api/gateway/queries/max-nlp-mintable)**:** <mark style="color:red;">`IP weight = 20`</mark>
+  1920→* [**Max NLP Burnable**](https://docs.nado.xyz/developer-resources/api/gateway/queries/max-nlp-burnable)**:** <mark style="color:red;">`IP weight = 20`</mark>
+  1921→* [**NLP Pool Info**](https://docs.nado.xyz/developer-resources/api/gateway/queries/nlp-pool-info)**:** <mark style="color:red;">`IP weight = 20`</mark>
+  1922→* [**NLP Locked Balances**](https://docs.nado.xyz/developer-resources/api/gateway/queries/nlp-locked-balances)**:** <mark style="color:red;">`IP weight = 20`</mark>
+  1923→* [**Health Groups**](https://docs.nado.xyz/developer-resources/api/gateway/queries/health-groups)**:** <mark style="color:red;">`IP weight = 2`</mark>
+  1924→* [**Linked Signer**](https://docs.nado.xyz/developer-resources/api/gateway/queries/linked-signer)**:** <mark style="color:red;">`IP weight = 5`</mark>
+  1925→* [**Insurance**](https://docs.nado.xyz/developer-resources/api/gateway/queries/insurance): <mark style="color:red;">`IP weight = 2`</mark>
+  1926→* [**Fee Rates**](https://docs.nado.xyz/developer-resources/api/gateway/queries/fee-rates)**:** <mark style="color:red;">`IP weight = 2`</mark>
+  1927→* [**Assets**](https://docs.nado.xyz/developer-resources/api/v2/assets): <mark style="color:red;">`IP weight = 2`</mark>
+  1928→* [**Orderbook**](https://docs.nado.xyz/developer-resources/api/v2/orderbook): <mark style="color:red;">`IP weight = 1`</mark>
+  1929→
+  1930→## Archive (indexer) Weights
+  1931→
+  1932→* Archive (indexer) queries are rate-limited based on IP.
+  1933→* IP addresses have a max weight limit of <mark style="color:red;">`2400`</mark> per minute or <mark style="color:red;">`400`</mark> every 10 seconds.
+  1934→
+  1935→The following weights are applied per query:
+  1936→
+  1937→* [**Orders**](https://docs.nado.xyz/developer-resources/api/archive-indexer/orders)**:** <mark style="color:red;">`IP Weight = 2 + (limit * subaccounts.length / 20)`</mark>; where <mark style="color:red;">`limit`</mark> and <mark style="color:red;">`subaccounts`</mark> are query params.
+  1938→* [**Matches**](https://docs.nado.xyz/developer-resources/api/archive-indexer/matches)**:** <mark style="color:red;">`IP Weight = 2 + (limit * subaccounts.length / 10)`</mark>; where <mark style="color:red;">`limit`</mark> and <mark style="color:red;">`subaccounts`</mark> are query params.
+  1939→* [**Events**](https://docs.nado.xyz/developer-resources/api/archive-indexer/events)**:** <mark style="color:red;">`IP Weight = 2 + (limit * subaccounts.length / 10)`</mark>; where <mark style="color:red;">`limit`</mark> and <mark style="color:red;">`subaccounts`</mark> are query params.
+  1940→* [**Candlesticks**](https://docs.nado.xyz/developer-resources/api/archive-indexer/candlesticks)**:** <mark style="color:red;">`IP Weight = 1 + limit / 20`</mark>; where <mark style="color:red;">`limit`</mark> is a query param.
+  1941→* [**Edge Candlesticks**](https://docs.nado.xyz/developer-resources/api/archive-indexer/edge-candlesticks): <mark style="color:red;">`IP Weight = 1 + limit / 20`</mark>; where <mark style="color:red;">`limit`</mark> is a query param.
+  1942→* [**Product Snapshots**](https://docs.nado.xyz/developer-resources/api/archive-indexer/product-snapshots)**:** <mark style="color:red;">`IP Weight = 10`</mark> for single `products` query, or <mark style="color:red;">`10 * timestamps.length`</mark> for multiple `product_snapshots` query with max\_time parameter
+  1943→* [**Funding Rate**](https://docs.nado.xyz/developer-resources/api/archive-indexer/funding-rate)**:** <mark style="color:red;">`IP Weight = 2`</mark>
+  1944→* [**Interest & funding payments**](https://docs.nado.xyz/developer-resources/api/archive-indexer/interest-and-funding-payments)**:** <mark style="color:red;">`IP Weight = 5`</mark>
+  1945→* [**Oracle Price**](https://docs.nado.xyz/developer-resources/api/archive-indexer/oracle-price)**:** <mark style="color:red;">`IP Weight = 2`</mark>
+  1946→* [**Oracle Snapshots**](https://docs.nado.xyz/developer-resources/api/archive-indexer/oracle-snapshots): <mark style="color:red;">`IP Weight = max((snapshot_count * product_ids.length / 100), 2)`</mark>; where snapshot\_count is <mark style="color:red;">`interval.count.min(500)`</mark>
+  1947→* [**Perp Prices**](https://docs.nado.xyz/developer-resources/api/archive-indexer/perp-prices)**:** <mark style="color:red;">`IP Weight = 2`</mark> (includes both single `price` and multiple `perp_prices` queries)
+  1948→* [**Market Snapshots**](https://docs.nado.xyz/developer-resources/api/archive-indexer/market-snapshots)**:** <mark style="color:red;">`IP Weight = max((snapshot_count * product_ids.length / 100), 2)`</mark>; where snapshot\_count is <mark style="color:red;">`interval.count.min(500)`</mark>
+  1949→* [**Edge Market Snapshots**](https://docs.nado.xyz/developer-resources/api/archive-indexer/edge-market-snapshots): <mark style="color:red;">`IP weight = (interval.count.min(500) / 20) + (interval.count.clamp(2, 20) * 2)`</mark>
+  1950→* [**Subaccounts**](https://docs.nado.xyz/developer-resources/api/archive-indexer/subaccounts)**:** <mark style="color:red;">`IP Weight = 2`</mark>
+  1951→* [**Subaccount Snapshots**](https://docs.nado.xyz/developer-resources/api/archive-indexer/subaccount-snapshots): <mark style="color:red;">`IP Weight = 2 + (limit * subaccounts.length / 10)`</mark>; where <mark style="color:red;">`limit`</mark> and <mark style="color:red;">`subaccounts`</mark> are query params.
+  1952→* [**Linked Signers**](https://docs.nado.xyz/developer-resources/api/archive-indexer/linked-signers): <mark style="color:red;">`IP Weight = 2`</mark>
+  1953→* [**Linked Signer Rate Limit**](https://docs.nado.xyz/developer-resources/api/archive-indexer/linked-signer-rate-limit)**:** <mark style="color:red;">`IP Weight = 2`</mark>
+  1954→* [**Isolated Subaccounts**](https://docs.nado.xyz/developer-resources/api/archive-indexer/isolated-subaccounts): <mark style="color:red;">`IP Weight = 2`</mark>
+  1955→* [**Signatures**](https://docs.nado.xyz/developer-resources/api/archive-indexer/signatures): <mark style="color:red;">`IP Weight = 2 + len(digests) / 10`</mark>; where <mark style="color:red;">`digests`</mark> is a query param.
+  1956→* [**Fast Withdrawal Signature**](https://docs.nado.xyz/developer-resources/api/archive-indexer/fast-withdrawal-signature): <mark style="color:red;">`IP Weight = 10`</mark>
+  1957→* [**NLP Funding Payments**](https://docs.nado.xyz/developer-resources/api/archive-indexer/nlp-funding-payments): <mark style="color:red;">`IP Weight = 5`</mark>
+  1958→* [**NLP Interest Payments**](https://docs.nado.xyz/developer-resources/api/archive-indexer/nlp-interest-payments): <mark style="color:red;">`IP Weight = 5`</mark>
+  1959→* [**NLP Snapshots**](https://docs.nado.xyz/developer-resources/api/archive-indexer/nlp-snapshots): <mark style="color:red;">`IP Weight = limit.min(500) / 100`</mark>; where <mark style="color:red;">`limit`</mark> is a query param.
+  1960→* [**Tx Hashes**](https://docs.nado.xyz/developer-resources/api/archive-indexer/tx-hashes): <mark style="color:red;">`IP Weight = idxs.length * 2`</mark>; where <mark style="color:red;">`idxs`</mark> is an array of submission indices (max 100).
+  1961→* [**Liquidation Feed**](https://docs.nado.xyz/developer-resources/api/archive-indexer/liquidation-feed)**:** <mark style="color:red;">`IP Weight = 2`</mark>
+  1962→* [**Sequencer Backlog**](https://docs.nado.xyz/developer-resources/api/archive-indexer/sequencer-backlog): <mark style="color:red;">`IP Weight = 1`</mark>
+  1963→* [**Direct Deposit Address**](https://docs.nado.xyz/developer-resources/api/archive-indexer/direct-deposit-address): <mark style="color:red;">`IP Weight = 10`</mark>
+  1964→* [**Quote Price**](https://docs.nado.xyz/developer-resources/api/archive-indexer/quote-price): <mark style="color:red;">`IP Weight = 2`</mark>
+  1965→* [**Ink Airdrop**](https://docs.nado.xyz/developer-resources/api/archive-indexer/ink-airdrop): <mark style="color:red;">`IP Weight = 2`</mark>
+  1966→
+  1967→## Execute Weights
+  1968→
+  1969→Executes are rate-limited based on Wallet address. The following weights are applied per execute:
+  1970→
+  1971→* [**Place order**](https://docs.nado.xyz/developer-resources/api/gateway/executes/place-order)**:**
+  1972→  * With spot leverage: <mark style="color:red;">`Wallet weight = 1`</mark>
+  1973→  * Without spot leverage: <mark style="color:red;">`Wallet weight = 20`</mark>
+  1974→* [**Place orders**](https://docs.nado.xyz/developer-resources/api/gateway/executes/place-orders)**:**
+  1975→  * With spot leverage: <mark style="color:red;">`Wallet weight = 1 per order`</mark>
+  1976→  * Without spot leverage: <mark style="color:red;">`Wallet weight = 20 per order`</mark>
+  1977→  * **Note**: 50ms processing penalty per request
+  1978→* [**Cancel orders**](https://docs.nado.xyz/developer-resources/api/gateway/executes/cancel-orders)**:**
+  1979→  * When no **digests** are provided: <mark style="color:red;">`Wallet weight = 1`</mark>
+  1980→  * When **digests** are provided: <mark style="color:red;">`Wallet weight = total digests`</mark>
+  1981→* [**Cancel Product Orders**](https://docs.nado.xyz/developer-resources/api/gateway/executes/cancel-product-orders)**:**
+  1982→  * When no **productIds** are provide&#x64;**:** <mark style="color:red;">`Wallet weight = 50`</mark>
+  1983→  * When **productIds** are provided: <mark style="color:red;">`Wallet weight = 5 * total productIds`</mark>
+  1984→* [**Cancel And Place**](https://docs.nado.xyz/developer-resources/api/gateway/executes/cancel-and-place):
+  1985→  * The sum of [Cancel orders](https://docs.nado.xyz/developer-resources/api/gateway/executes/cancel-orders) + [Place order](https://docs.nado.xyz/developer-resources/api/gateway/executes/place-order) limits
+  1986→* [**Withdraw Collateral**](https://docs.nado.xyz/developer-resources/api/gateway/executes/withdraw-collateral)**:**
+  1987→  * With spot leverage: <mark style="color:red;">`Wallet weight = 10`</mark>
+  1988→  * Without spot leverage: <mark style="color:red;">`Wallet weight = 20`</mark>
+  1989→* [**Liquidate Subaccount**](https://docs.nado.xyz/developer-resources/api/gateway/executes/liquidate-subaccount): <mark style="color:red;">`Wallet weight = 20`</mark>
+  1990→* [**Mint NLP**](https://docs.nado.xyz/developer-resources/api/gateway/executes/mint-nlp): <mark style="color:red;">`Wallet weight = 10`</mark>
+  1991→* [**Burn NLP**](https://docs.nado.xyz/developer-resources/api/gateway/executes/burn-nlp): <mark style="color:red;">`Wallet weight = 10`</mark>
+  1992→* [**Link Signer**](https://docs.nado.xyz/developer-resources/api/gateway/executes/link-signer): <mark style="color:red;">`Wallet weight = 30`</mark>
+  1993→  * Can only perform a max of 50 link signer requests every 7 days per subaccount.
+  1994→* [**Transfer Quote:**](https://docs.nado.xyz/developer-resources/api/gateway/executes/transfer-quote) <mark style="color:red;">`Wallet weight = 10`</mark>
+  1995→  * Can only transfer to a max of 5 new recipients within 24hrs.
+  1996→
+  1997→## Trigger Service Limits
+  1998→
+  1999→The trigger service has additional limits specific to conditional orders:
+  2000→
+  2001→* **Pending trigger orders**: Max of <mark style="color:red;">`25`</mark> pending trigger orders per product per subaccount
+  2002→* **TWAP orders**: Must use IOC execution type and cannot be combined with isolated margin
+  2003→
+  2004→
+  2005→# Definitions / Formulas
+  2006→
+  2007→## Definitions
+  2008→
+  2009→### **Unsettled USDT0**
+  2010→
+  2011→Perp balances have two main components:
+  2012→
+  2013→* <mark style="color:red;">`amount`</mark>
+  2014→* <mark style="color:red;">`v_quote_balance`</mark>
+  2015→
+  2016→When you buy a perp, <mark style="color:red;">`amount`</mark> increments and <mark style="color:red;">`v_quote_balance`</mark> decrements, and vice versa for selling.
+  2017→
+  2018→Settlement is the process of converting from <mark style="color:red;">v\_quote\_balance</mark> into actual USDT0 balance. This happens mostly on position close, but may happen on extremely negative PNL positions when we need to pay out positive PNL positions.
+  2019→
+  2020→The amount that is transferred between <mark style="color:red;">`v_quote_balance`</mark> in the perp and your USDT0 balance is an amount that results in <mark style="color:red;">`amount * oracle_price + v_quote_balance == 0`</mark>. Unsettled USDT0 is the total amount that would be transferred between <mark style="color:red;">`v_quote_balance`</mark> and your USDT0 balance summed across all perps.
+  2021→
+  2022→### **Unsettled PNL**
+  2023→
+  2024→**Note:** Technically, there is no such concept as "Unsettled PNL" in our system. However, the UI displays "Unsettled PnL" in some places (e.g., in the USDT0 Balance section) for user clarity.
+  2025→
+  2026→**What the UI actually shows:** When you see "Unsettled PnL" in the UI, it refers to **Unsettled USDT0** (see above) - the total unsettled quote balance across all perp positions.
+  2027→
+  2028→**For developers:** Always use **Unsettled USDT0** when referring to this value programmatically. It represents the sum of <mark style="color:red;">`amount × oracle_price + v_quote_balance`</mark> across all perp positions, which is the amount that would be settled into your USDT0 balance.
+  2029→
+  2030→### **Unrealized PNL**
+  2031→
+  2032→Refers to the estimated gains or losses of a current position based on the difference between the average entry price and the current oracle price.
+  2033→
+  2034→## Formulas
+  2035→
+  2036→### **Unrealized PNL**
+  2037→
+  2038→Using the [indexer's events query](https://docs.nado.xyz/developer-resources/api/archive-indexer/events), your unrealized PNL at the end of some event is given by:
+  2039→
+  2040→{% code lineNumbers="true" %}
+  2041→
+  2042→```python
+  2043→unrealized_pnl = (
+  2044→    event.post_balance.amount * event.product.oracle_price_x18 
+  2045→    - event.net_entry_unrealized
+  2046→)
+  2047→```
+  2048→
+  2049→{% endcode %}
+  2050→
+  2051→### Total PNL
+  2052→
+  2053→Your total PNL between <mark style="color:red;">`event1`</mark> and <mark style="color:red;">`event2`</mark>, assuming <mark style="color:red;">`event1`</mark> is after <mark style="color:red;">`event2`</mark> - is given by:
+  2054→
+  2055→<pre class="language-python" data-line-numbers><code class="lang-python"><strong>total_pnl = (
+  2056→</strong><strong>    (event1.post_balance.amount * event1.product.oracle_price_x18 - event1.net_entry_cumulative)
+  2057→</strong><strong>    - (event2.post_balance.amount * event2.product.oracle_price_x18 - event2.net_entry_cumulative)
+  2058→</strong><strong>)
+  2059→</strong></code></pre>
+  2060→
+  2061→{% hint style="info" %}
+  2062→**Notes**:
+  2063→
+  2064→* You can use 0 for the second term for the PNL to compute since the beginning of time.
+  2065→* For spots, we will count deposits and withdraws towards your PNL. i.e. if you deposit BTC, for PNL tracking purposes it is counted as a BTC long at the oracle price.
+  2066→  {% endhint %}
+  2067→
+  2068→
+  2069→# Symbols
+  2070→
+  2071→## Request
+  2072→
+  2073→{% tabs %}
+  2074→{% tab title="REST" %} <mark style="color:green;">**GET**</mark> `[GATEWAY_REST_ENDPOINT]/symbols`
+  2075→{% endtab %}
+  2076→{% endtabs %}
+  2077→
+  2078→## Response
+  2079→
+  2080→```json
+  2081→[
+  2082→    {
+  2083→        "product_id": 0,
+  2084→        "symbol": "USDT0",
+  2085→        "delisted": false
+  2086→    },
+  2087→    {
+  2088→        "product_id": 1,
+  2089→        "symbol": "KBTC",
+  2090→        "delisted": false
+  2091→    },
+  2092→    {
+  2093→        "product_id": 2,
+  2094→        "symbol": "BTC-PERP",
+  2095→        "delisted": false
+  2096→    },
+  2097→    {
+  2098→        "product_id": 3,
+  2099→        "symbol": "WETH",
+  2100→        "delisted": false
+  2101→    },
+  2102→    {
+  2103→        "product_id": 4,
+  2104→        "symbol": "ETH-PERP",
+  2105→        "delisted": false
+  2106→    },
+  2107→    {
+  2108→        "product_id": 5,
+  2109→        "symbol": "USDC",
+  2110→        "delisted": false
+  2111→    },
+  2112→    {
+  2113→        "product_id": 8,
+  2114→        "symbol": "SOL-PERP",
+  2115→        "delisted": false
+  2116→    },
+  2117→    {
+  2118→        "product_id": 10,
+  2119→        "symbol": "XRP-PERP",
+  2120→        "delisted": false
+  2121→    },
+  2122→    {
+  2123→        "product_id": 14,
+  2124→        "symbol": "BNB-PERP",
+  2125→        "delisted": false
+  2126→    },
+  2127→    {
+  2128→        "product_id": 16,
+  2129→        "symbol": "HYPE-PERP",
+  2130→        "delisted": false
+  2131→    },
+  2132→    {
+  2133→        "product_id": 18,
+  2134→        "symbol": "ZEC-PERP",
+  2135→        "delisted": false
+  2136→    },
+  2137→    {
+  2138→        "product_id": 20,
+  2139→        "symbol": "MON-PERP",
+  2140→        "delisted": false
+  2141→    },
+  2142→    {
+  2143→        "product_id": 22,
+  2144→        "symbol": "FARTCOIN-PERP",
+  2145→        "delisted": false
+  2146→    }
+  2147→]
+  2148→```
+  2149→
+  2150→
+  2151→# Order Appendix
+  2152→
+  2153→The **Order Appendix** is a 128-bit integer that encodes extra order parameters like execution type, isolated margin, and trigger configurations.
+  2154→
+  2155→## Bit Layout
+  2156→
+  2157→```json
+  2158→| value   | reserved | trigger | reduce only | order type | isolated | version |
+  2159→| 64 bits | 50 bits  | 2 bits  | 1 bit       | 2 bits     | 1 bit    | 8 bits  |
+  2160→| 127..64 | 63..14   | 13..12  | 11          | 10..9      | 8        | 7..0    |
+  2161→```
+  2162→
+  2163→## Fields (from LSB to MSB)
+  2164→
+  2165→### <mark style="color:red;">Version</mark>
+  2166→
+  2167→**8-bits (0-7)**. Protocol version identifier. Currently <mark style="color:red;">`1`</mark>. May increment when encoding structure updates.
+  2168→
+  2169→### <mark style="color:red;">Isolated</mark>
+  2170→
+  2171→**1-bit (8)**. Indicates whether the order uses isolated margin. Isolated positions have dedicated margin for a specific product, creating a separate isolated subaccount. The original account becomes the "parent subaccount" that can manage the isolated position.
+  2172→
+  2173→*Key Properties:*
+  2174→
+  2175→* Creates isolated subaccount with dedicated margin
+  2176→* Only quote transfers allowed between isolated and parent subaccounts
+  2177→* Parent account can sign orders for isolated subaccount
+  2178→* Cannot be combined with TWAP orders
+  2179→
+  2180→*Example:*
+  2181→
+  2182→```python
+  2183→from nado_protocol.utils.appendix import build_appendix
+  2184→from nado_protocol.utils.math import to_x6
+  2185→
+  2186→# Create isolated order with 1000 USDT0 margin
+  2187→appendix = build_appendix(
+  2188→    order_type=OrderType.DEFAULT,
+  2189→    isolated=True,
+  2190→    isolated_margin=to_x6(1000)  # 1000 USDT0 (x6 precision)
+  2191→)
+  2192→```
+  2193→
+  2194→### <mark style="color:red;">Order Type</mark>
+  2195→
+  2196→**2-bits (9-10)**. Execution behavior for the order.
+  2197→
+  2198→*Values:*
+  2199→
+  2200→* <mark style="color:red;">`0`</mark> - <mark style="color:red;">`DEFAULT`</mark>: Standard limit order behavior.
+  2201→* <mark style="color:red;">`1`</mark> - <mark style="color:red;">`IOC (Immediate or Cancel)`</mark>: Execute immediately, cancel unfilled portion.
+  2202→* <mark style="color:red;">`2`</mark> - <mark style="color:red;">`FOK (Fill or Kill)`</mark>: Execute completely or cancel entire order.
+  2203→* <mark style="color:red;">`3`</mark> - <mark style="color:red;">`POST_ONLY`</mark>: Only add liquidity, reject if would take liquidity.
+  2204→
+  2205→*Example:*
+  2206→
+  2207→```python
+  2208→from nado_protocol.utils.appendix import build_appendix
+  2209→
+  2210→# Post-only order that only provides liquidity
+  2211→appendix = build_appendix(
+  2212→    order_type=OrderType.POST_ONLY
+  2213→)
+  2214→```
+  2215→
+  2216→### <mark style="color:red;">Reduce Only</mark>
+  2217→
+  2218→**1-bit (11)**. Restricts order to only decrease existing positions. Prevent accidentally increasing position size. Order will be rejected if it would increase the position in the same direction.
+  2219→
+  2220→*Use Cases:*
+  2221→
+  2222→* Risk management when closing positions.
+  2223→* Taking profits without adding exposure.
+  2224→* Automated position reduction strategies.
+  2225→
+  2226→*Example:*
+  2227→
+  2228→```python
+  2229→from nado_protocol.utils.appendix import build_appendix
+  2230→
+  2231→# Reduce-only order to close part of existing position
+  2232→appendix = build_appendix(
+  2233→    order_type=OrderType.DEFAULT,
+  2234→    reduce_only=True
+  2235→)
+  2236→```
+  2237→
+  2238→### <mark style="color:red;">Trigger Type</mark>
+  2239→
+  2240→**2-bits (12-13)**. Conditional execution behavior.
+  2241→
+  2242→*Values:*
+  2243→
+  2244→* <mark style="color:red;">`0`</mark> - <mark style="color:red;">`NONE`</mark>: Execute immediately (regular order).
+  2245→* <mark style="color:red;">`1`</mark> - <mark style="color:red;">`PRICE`</mark>: Price-based conditional order.
+  2246→* <mark style="color:red;">`2`</mark> - <mark style="color:red;">`TWAP`</mark>: Time-Weighted Average Price execution.
+  2247→* <mark style="color:red;">`3`</mark> - <mark style="color:red;">`TWAP_CUSTOM_AMOUNTS`</mark>: TWAP with randomized amounts.
+  2248→
+  2249→*Example:*
+  2250→
+  2251→```python
+  2252→from nado_protocol.utils.appendix import build_appendix
+  2253→
+  2254→# TWAP order executing 5 times with 0.5% max slippage
+  2255→appendix = build_appendix(
+  2256→    order_type=OrderType.DEFAULT,
+  2257→    trigger_type=OrderAppendixTriggerType.TWAP,
+  2258→    twap_times=5,
+  2259→    twap_slippage_frac=0.005  # 0.5%
+  2260→)
+  2261→```
+  2262→
+  2263→### <mark style="color:red;">Reserved</mark>
+  2264→
+  2265→**50-bits (14-63)**. Reserved for future protocol extensions. Must be set to `0`.
+  2266→
+  2267→### <mark style="color:red;">Value</mark>
+  2268→
+  2269→**64-bits (64-127)**. Context-dependent data based on other flags.
+  2270→
+  2271→#### <mark style="color:red;">**TWAP Configuration (when trigger = 2 or 3)**</mark>
+  2272→
+  2273→Encodes TWAP execution parameters in the 64-bit value field:
+  2274→
+  2275→```json
+  2276→| times  | slippage_x6 |
+  2277→| 32 bits|   32 bits   |
+  2278→```
+  2279→
+  2280→**Fields:**
+  2281→
+  2282→* <mark style="color:red;">`times`</mark>: Number of TWAP executions.
+  2283→* <mark style="color:red;">`slippage_x6`</mark>: Maximum slippage × 1\_000\_000 (6 decimal precision).
+  2284→
+  2285→**Example:**
+  2286→
+  2287→```python
+  2288→from nado_protocol.utils.appendix import build_appendix, order_twap_data
+  2289→
+  2290→# TWAP: 10 executions, 1% max slippage
+  2291→appendix = build_appendix(
+  2292→    order_type=OrderType.DEFAULT,
+  2293→    trigger_type=OrderAppendixTriggerType.TWAP,
+  2294→    twap_times=10,
+  2295→    twap_slippage_frac=0.01  # 1%
+  2296→)
+  2297→
+  2298→# Extract TWAP data
+  2299→times, slippage = order_twap_data(appendix)
+  2300→# times = 10, slippage = 0.01
+  2301→```
+  2302→
+  2303→#### <mark style="color:red;">**Isolated Margin (when isolated = 1)**</mark>
+  2304→
+  2305→Amount of quote (margin\_x6) to transfer to isolated subaccount on first fill, stored in the 64-bit value field.
+  2306→
+  2307→{% hint style="warning" %}
+  2308→**Important:** Isolated margin is stored in **x6 precision** (6 decimals) in the appendix value field.
+  2309→
+  2310→* Stored as `margin_x6` (6 decimal places)
+  2311→* Takes up 64 bits (bits 64-127 of the appendix)
+  2312→  {% endhint %}
+  2313→
+  2314→*Example:*
+  2315→
+  2316→```python
+  2317→from nado_protocol.utils.appendix import build_appendix, order_isolated_margin
+  2318→from nado_protocol.utils.math import to_x6
+  2319→
+  2320→# Isolated order with 500 USDT0 margin
+  2321→appendix = build_appendix(
+  2322→    order_type=OrderType.DEFAULT,
+  2323→    isolated=True,
+  2324→    isolated_margin=to_x6(500)  # 500 USDT0 (x6 precision)
+  2325→)
+  2326→
+  2327→# Extract isolated margin
+  2328→margin = order_isolated_margin(appendix)
+  2329→# Returns: 500000000 (500 * 10^6 in x6 precision)
+  2330→```
+  2331→
+  2332→## Constraints
+  2333→
+  2334→* **Isolated + TWAP**: Cannot combine isolated orders with TWAP (trigger types 2 or 3).
+  2335→* **TWAP Requirements**: TWAP orders must specify both <mark style="color:red;">`twap_times`</mark> and <mark style="color:red;">`twap_slippage_frac`</mark> .
+  2336→* **Isolated Margin**: Can only set <mark style="color:red;">`isolated_margin`</mark> when <mark style="color:red;">`isolated=True`</mark> .
+  2337→
+  2338→## Migration from Legacy Format
+  2339→
+  2340→**Before (deprecated):**
+  2341→
+  2342→* Order type encoded in <mark style="color:red;">`expiration`</mark> field.
+  2343→* Reduce-only flag encoded in <mark style="color:red;">`nonce`</mark> field.
+  2344→* Limited trigger functionality.
+  2345→
+  2346→**After (current):**
+  2347→
+  2348→* All flags consolidated in 128-bit <mark style="color:red;">`appendix`</mark> .
+  2349→* <mark style="color:red;">`expiration`</mark> is pure timestamp.
+  2350→* <mark style="color:red;">`nonce`</mark> encodes <mark style="color:red;">`recv_time`</mark> only.
+  2351→* Enhanced trigger and isolated margin support.
+  2352→
+  2353→## Building Appendix Values
+  2354→
+  2355→#### Using Python SDK (Recommended)
+  2356→
+  2357→```python
+  2358→from nado_protocol.utils.expiration import OrderType
+  2359→from nado_protocol.utils.appendix import build_appendix, OrderAppendixTriggerType
+  2360→
+  2361→# Simple market order
+  2362→appendix = build_appendix(order_type=OrderType.DEFAULT)
+  2363→
+  2364→# Post-only reduce order
+  2365→appendix = build_appendix(
+  2366→    order_type=OrderType.POST_ONLY,
+  2367→    reduce_only=True
+  2368→)
+  2369→
+  2370→# Isolated order with margin
+  2371→appendix = build_appendix(
+  2372→    order_type=OrderType.DEFAULT,
+  2373→    isolated=True,
+  2374→    isolated_margin=to_x6(1000)  # 1000 USDT0 (x6 precision)
+  2375→)
+  2376→
+  2377→# TWAP order
+  2378→appendix = build_appendix(
+  2379→    order_type=OrderType.DEFAULT,
+  2380→    trigger_type=OrderAppendixTriggerType.TWAP,
+  2381→    twap_times=5,
+  2382→    twap_slippage_frac=0.01  # 1%
+  2383→)
+  2384→```
+  2385→
+  2386→#### Manual Bit Manipulation (Advanced)
+  2387→
+  2388→{% hint style="info" %}
+  2389→Refer to [nado\_protocol.utils.order](https://nadohq.github.io/nado-python-sdk/_modules/nado_protocol/utils/order.html) for a detailed implementation.
+  2390→{% endhint %}
+  2391→
+  2392→```python
+  2393→# Build appendix manually
+  2394→def build_manual_appendix(order_type=0, isolated=False, reduce_only=False,
+  2395→                         trigger_type=0, value=0):
+  2396→    appendix = 0
+  2397→
+  2398→    # Version (bits 0-7)
+  2399→    appendix |= 1  # Version 1
+  2400→
+  2401→    # Isolated (bit 8)
+  2402→    if isolated:
+  2403→        appendix |= 1 << 8
+  2404→
+  2405→    # Order type (bits 9-10)
+  2406→    appendix |= (order_type & 0b11) << 9
+  2407→
+  2408→    # Reduce only (bit 11)
+  2409→    if reduce_only:
+  2410→        appendix |= 1 << 11
+  2411→
+  2412→    # Trigger type (bits 12-13)
+  2413→    appendix |= (trigger_type & 0b11) << 12
+  2414→
+  2415→    # Reserved bits 14-63 (set to 0)
+  2416→
+  2417→    # Value (bits 64-127)
+  2418→    # Note: Value is stored in x6 precision for isolated margin
+  2419→    appendix |= (value & ((1 << 64) - 1)) << 64
+  2420→
+  2421→    return appendix
+  2422→
+  2423→# Example: Post-only reduce order
+  2424→appendix = build_manual_appendix(
+  2425→    order_type=3,  # POST_ONLY
+  2426→    reduce_only=True
+  2427→)
+  2428→```
+  2429→
+  2430→### Utility Functions
+  2431→
+  2432→```python
+  2433→# Check order properties
+  2434→is_reduce_only = order_reduce_only(appendix)
+  2435→is_trigger = order_is_trigger_order(appendix)
+  2436→is_isolated = order_is_isolated(appendix)
+  2437→version = order_version(appendix)
+  2438→order_type = order_execution_type(appendix)
+  2439→trigger_type = order_trigger_type(appendix)
+  2440→
+  2441→# Extract context data
+  2442→twap_data = order_twap_data(appendix)  # Returns (times, slippage) or None
+  2443→isolated_margin = order_isolated_margin(appendix)  # Returns margin or None
+  2444→```
+  2445→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

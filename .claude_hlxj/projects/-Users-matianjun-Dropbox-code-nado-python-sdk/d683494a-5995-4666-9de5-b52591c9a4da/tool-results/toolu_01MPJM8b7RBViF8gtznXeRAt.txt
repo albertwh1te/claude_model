@@ -1,0 +1,225 @@
+     1→import logging
+     2→from nado_protocol.client.apis.market import MarketAPI
+     3→from nado_protocol.client.apis.perp import PerpAPI
+     4→from nado_protocol.client.apis.spot import SpotAPI
+     5→from nado_protocol.client.apis.subaccount import SubaccountAPI
+     6→from nado_protocol.client.apis.rewards import RewardsAPI
+     7→from nado_protocol.client.context import (
+     8→    NadoClientContext,
+     9→    NadoClientContextOpts,
+    10→    create_nado_client_context,
+    11→)
+    12→from nado_protocol.contracts import NadoContractsContext
+    13→from nado_protocol.contracts.loader import load_deployment
+    14→from nado_protocol.contracts.types import NadoNetwork
+    15→from nado_protocol.utils.backend import NadoBackendURL, Signer
+    16→from nado_protocol.utils.enum import StrEnum
+    17→from nado_protocol.client.context import *
+    18→
+    19→from pydantic import parse_obj_as
+    20→
+    21→
+    22→class NadoClientMode(StrEnum):
+    23→    """
+    24→    NadoClientMode is an enumeration representing the operational modes of the NadoClient.
+    25→
+    26→    Attributes:
+    27→        MAINNET: For operating in Nado's mainnet environment deployed on Ink.
+    28→
+    29→        DEVNET: For local development.
+    30→
+    31→        TESTING: For running tests.
+    32→    """
+    33→
+    34→    # dev
+    35→    DEVNET = "devnet"
+    36→    TESTING = "testing"
+    37→
+    38→    # testnet
+    39→    TESTNET = "testnet"  # Ink Sepolia
+    40→
+    41→    # mainnet
+    42→    MAINNET = "mainnet"  # Ink Mainnet
+    43→
+    44→
+    45→class NadoClient:
+    46→    """
+    47→    The primary client interface for interacting with Nado Protocol.
+    48→
+    49→    This client consolidates the functionality of various aspects of Nado such as spot, market,
+    50→    subaccount, and perpetual (perp) operations.
+    51→
+    52→    To initialize an instance of this client, use the `create_nado_client` utility.
+    53→
+    54→    Attributes:
+    55→        - context (NadoClientContext): The client context containing configuration for interacting with Nado.
+    56→        - market (MarketAPI): Sub-client for executing and querying market operations.
+    57→        - subaccount (SubaccountAPI): Sub-client for executing and querying subaccount operations.
+    58→        - spot (SpotAPI): Sub-client for executing and querying spot operations.
+    59→        - perp (PerpAPI): Sub-client for executing and querying perpetual operations.
+    60→        - rewards (RewardsAPI): Sub-client for executing and querying rewards operations (e.g: staking, claiming, etc).
+    61→    """
+    62→
+    63→    context: NadoClientContext
+    64→    market: MarketAPI
+    65→    subaccount: SubaccountAPI
+    66→    spot: SpotAPI
+    67→    perp: PerpAPI
+    68→    rewards: RewardsAPI
+    69→
+    70→    def __init__(self, context: NadoClientContext):
+    71→        """
+    72→        Initialize a new instance of the NadoClient.
+    73→
+    74→        This constructor should not be called directly. Instead, use the `create_nado_client` utility to
+    75→        create a new NadoClient. This is because the `create_nado_client` utility includes important
+    76→        additional setup steps that aren't included in this constructor.
+    77→
+    78→        Args:
+    79→            context (NadoClientContext): The client context.
+    80→
+    81→        Note:
+    82→            Use `create_nado_client` for creating instances.
+    83→        """
+    84→        self.context = context
+    85→        self.market = MarketAPI(context)
+    86→        self.subaccount = SubaccountAPI(context)
+    87→        self.spot = SpotAPI(context)
+    88→        self.perp = PerpAPI(context)
+    89→        self.rewards = RewardsAPI(context)
+    90→
+    91→
+    92→def create_nado_client(
+    93→    mode: NadoClientMode,
+    94→    signer: Optional[Signer] = None,
+    95→    context_opts: Optional[NadoClientContextOpts] = None,
+    96→) -> NadoClient:
+    97→    """
+    98→    Create a new NadoClient based on the given mode and signer.
+    99→
+   100→    This function will create a new NadoClientContext based on the provided mode, and then
+   101→    initialize a new NadoClient with that context.
+   102→
+   103→    If `context_opts` are provided, they will be used to create the client context. Otherwise,
+   104→    default context options for the given mode will be used.
+   105→
+   106→    Args:
+   107→        mode (NadoClientMode): The mode in which to operate the client. Can be one of the following:
+   108→            NadoClientMode.DEVNET: For local development.
+   109→
+   110→        signer (Signer, optional): An instance of LocalAccount or a private key string for signing transactions.
+   111→
+   112→        context_opts (NadoClientContextOpts, optional): Options for creating the client context.
+   113→            If not provided, default options for the given mode will be used.
+   114→
+   115→    Returns:
+   116→        NadoClient: The created NadoClient instance.
+   117→    """
+   118→    logging.info(f"Initializing default {mode} context")
+   119→    (
+   120→        engine_endpoint_url,
+   121→        indexer_endpoint_url,
+   122→        trigger_endpoint_url,
+   123→        network_name,
+   124→    ) = client_mode_to_setup(mode)
+   125→    try:
+   126→        network = NadoNetwork(network_name)
+   127→        deployment = load_deployment(network)
+   128→        rpc_node_url = deployment.node_url
+   129→        contracts_context = NadoContractsContext(
+   130→            network=network,
+   131→            endpoint_addr=deployment.endpoint_addr,
+   132→            querier_addr=deployment.querier_addr,
+   133→            perp_engine_addr=deployment.perp_engine_addr,
+   134→            spot_engine_addr=deployment.spot_engine_addr,
+   135→            clearinghouse_addr=deployment.clearinghouse_addr,
+   136→            airdrop_addr=deployment.airdrop_addr,
+   137→            staking_addr=deployment.staking_addr,
+   138→            foundation_rewards_airdrop_addr=deployment.foundation_rewards_airdrop_addr,
+   139→        )
+   140→    except Exception as e:
+   141→        logging.warning(
+   142→            f"Failed to load contracts for mode {mode} with error: {e}, using provided defaults."
+   143→        )
+   144→        assert context_opts is not None and context_opts.rpc_node_url is not None
+   145→        assert context_opts is not None and context_opts.contracts_context is not None
+   146→
+   147→        rpc_node_url = context_opts.rpc_node_url
+   148→        contracts_context = context_opts.contracts_context
+   149→
+   150→    if context_opts:
+   151→        parsed_context_opts: NadoClientContextOpts = NadoClientContextOpts.parse_obj(
+   152→            context_opts
+   153→        )
+   154→        engine_endpoint_url = (
+   155→            parsed_context_opts.engine_endpoint_url or engine_endpoint_url
+   156→        )
+   157→        indexer_endpoint_url = (
+   158→            parsed_context_opts.indexer_endpoint_url or indexer_endpoint_url
+   159→        )
+   160→        trigger_endpoint_url = (
+   161→            parsed_context_opts.trigger_endpoint_url or trigger_endpoint_url
+   162→        )
+   163→        rpc_node_url = parsed_context_opts.rpc_node_url or rpc_node_url
+   164→        contracts_context = parsed_context_opts.contracts_context or contracts_context
+   165→
+   166→    context = create_nado_client_context(
+   167→        NadoClientContextOpts(
+   168→            rpc_node_url=rpc_node_url,
+   169→            engine_endpoint_url=parse_obj_as(AnyUrl, engine_endpoint_url),
+   170→            indexer_endpoint_url=parse_obj_as(AnyUrl, indexer_endpoint_url),
+   171→            trigger_endpoint_url=parse_obj_as(AnyUrl, trigger_endpoint_url),
+   172→            contracts_context=contracts_context,
+   173→        ),
+   174→        signer,
+   175→    )
+   176→    return NadoClient(context)
+   177→
+   178→
+   179→def client_mode_to_setup(
+   180→    client_mode: NadoClientMode,
+   181→) -> tuple[str, str, str, str]:
+   182→    try:
+   183→        return {
+   184→            NadoClientMode.DEVNET: (
+   185→                NadoBackendURL.DEVNET_GATEWAY.value,
+   186→                NadoBackendURL.DEVNET_INDEXER.value,
+   187→                NadoBackendURL.DEVNET_TRIGGER.value,
+   188→                NadoNetwork.HARDHAT.value,
+   189→            ),
+   190→            NadoClientMode.TESTING: (
+   191→                NadoBackendURL.DEVNET_GATEWAY.value,
+   192→                NadoBackendURL.DEVNET_INDEXER.value,
+   193→                NadoBackendURL.DEVNET_TRIGGER.value,
+   194→                NadoNetwork.TESTING.value,
+   195→            ),
+   196→            NadoClientMode.TESTNET: (
+   197→                NadoBackendURL.TESTNET_GATEWAY.value,
+   198→                NadoBackendURL.TESTNET_INDEXER.value,
+   199→                NadoBackendURL.TESTNET_TRIGGER.value,
+   200→                NadoNetwork.TESTNET.value,
+   201→            ),
+   202→            NadoClientMode.MAINNET: (
+   203→                NadoBackendURL.MAINNET_GATEWAY.value,
+   204→                NadoBackendURL.MAINNET_INDEXER.value,
+   205→                NadoBackendURL.MAINNET_TRIGGER.value,
+   206→                NadoNetwork.MAINNET.value,
+   207→            ),
+   208→        }[client_mode]
+   209→    except KeyError:
+   210→        raise Exception(f"Mode provided `{client_mode}` not supported!")
+   211→
+   212→
+   213→__all__ = [
+   214→    "NadoClient",
+   215→    "NadoClientMode",
+   216→    "create_nado_client",
+   217→    "NadoClientContext",
+   218→    "NadoClientContextOpts",
+   219→    "create_nado_client_context",
+   220→]
+   221→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

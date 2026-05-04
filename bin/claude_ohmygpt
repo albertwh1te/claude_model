@@ -5,15 +5,17 @@
 CLAUDE_BIN="$HOME/Dropbox/code/claude_model/node_modules/.bin/claude"
 
 # --- 核心配置区 ---
-# 注入豆包的 API Key (填写你的 Key)
-export ANTHROPIC_AUTH_TOKEN="sk-9I4Pd46efb89E3bFbB15T3BLbkFJa6e66de523e84fcD867F"
+# Set these in your shell (e.g., ~/.bashrc, ~/.zshrc)
+export ANTHROPIC_BASE_URL="https://api.poe.com"
+export ANTHROPIC_AUTH_TOKEN="eQX8cTo5BitEKAEHu8DKktngMH_qb9xT15xwB2HqlcQ"
+export ANTHROPIC_API_KEY="" # Important: Must be explicitly empty
 
-# 强制将 Base URL 指向ohmygpt的兼容接口
-# export ANTHROPIC_BASE_URL="https://cn2us02.opapi.win"
-export ANTHROPIC_BASE_URL="https://apic1.ohmycdn.com"
+
+# export ANTHROPIC_AUTH_TOKEN="sk-9I4Pd46efb89E3bFbB15T3BLbkFJa6e66de523e84fcD867F"
+# export ANTHROPIC_BASE_URL="https://apic1.ohmycdn.com"
 
 # 指定使用的模型名称
-export ANTHROPIC_MODEL="claude-haiku-4-5"
+# export ANTHROPIC_MODEL="claude-haiku-4-5"
 
 # 设置超长超时时间 (防止生成长代码时断开，单位毫秒)
 export API_TIMEOUT_MS=3000000

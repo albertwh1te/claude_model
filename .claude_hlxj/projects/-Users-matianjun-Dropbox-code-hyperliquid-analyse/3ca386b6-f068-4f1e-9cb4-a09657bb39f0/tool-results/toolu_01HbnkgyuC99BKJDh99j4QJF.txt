@@ -1,0 +1,32 @@
+# Binance Funding Rate History API
+
+## Endpoint
+`GET /fapi/v1/fundingRate`
+
+## Request Parameters
+
+| Parameter | Type | Required | Details |
+|-----------|------|----------|---------|
+| symbol | STRING | No | Trading pair identifier |
+| startTime | LONG | No | "Timestamp in ms to get funding rate from INCLUSIVE" |
+| endTime | LONG | No | "Timestamp in ms to get funding rate until INCLUSIVE" |
+| limit | INT | No | Default 100; maximum 1000 |
+
+## Response Format
+
+The API returns an array of objects with this structure:
+
+```json
+{
+  "symbol": "BTCUSDT",
+  "fundingRate": "-0.03750000",
+  "fundingTime": 1570608000000,
+  "markPrice": "34287.54619963"
+}
+```
+
+## Key Notes
+
+- "If `startTime` and `endTime` are not sent, the most recent 200 records are returned"
+- Response data is in ascending order
+- Request weight shares a 500/5min/IP rate limit with the funding info endpoint

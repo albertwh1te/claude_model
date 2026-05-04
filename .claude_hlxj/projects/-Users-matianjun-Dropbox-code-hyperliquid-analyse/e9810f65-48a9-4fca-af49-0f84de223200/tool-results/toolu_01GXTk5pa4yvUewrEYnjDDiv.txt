@@ -1,0 +1,23 @@
+The file /Users/matianjun/Dropbox/code/hyperliquid_analyse/commands/ml_commands.py has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   453→        logger.info(
+   454→            f"[4H Pipeline] Step 2/4: Tuning and training (trials={tune_trials})..."
+   455→        )
+   456→        tune_regression_predict_4h(times=tune_trials)
+   457→    else:
+   458→        logger.info("[4H Pipeline] Step 2/4: Skipping tuning, using default params")
+   459→        # 使用默认参数训练
+   460→        symbol_list = get_symbols_by_name("full")
+   461→        feature_file_name = "tmp_feature_4h_full.csv"
+   462→        target_column = "target_4hour_zscore"
+   463→        pkl_path = "regression_model_4h.pkl"
+   464→        save_path = "ranker_model_4h_predictions.feather"
+   465→
+   466→        RegressionModelTrain(
+   467→            hyper_parameters=RANKER_REGRESSION_BASE_PARAMETERS,
+   468→            target_column=target_column,
+   469→            feature_file_name=feature_file_name,
+   470→        ).train(symbol_list=symbol_list, pkl_path=pkl_path, save_path=save_path)
+   471→
+   472→    # Step 3: 生成权重
+   473→    logger.info("[4H Pipeline] Step 3/4: Generating weights...")
+   474→    generate_weights_4h()

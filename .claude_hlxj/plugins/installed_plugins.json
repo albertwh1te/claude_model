@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "plugins": {
+    "pyright-lsp@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/plugins/cache/claude-plugins-official/pyright-lsp/1.0.0",
+        "version": "1.0.0",
+        "installedAt": "2026-01-03T15:46:48.405Z",
+        "lastUpdated": "2026-01-03T15:46:48.405Z",
+        "gitCommitSha": "52e41d40d36c44499909e4bb0c2546fc5256822c"
+      }
+    ],
+    "pyright@claude-code-lsps": [
+      {
+        "scope": "user",
+        "installPath": "/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/plugins/cache/claude-code-lsps/pyright/1.0.0",
+        "version": "1.0.0",
+        "installedAt": "2026-01-04T13:15:19.673Z",
+        "lastUpdated": "2026-01-04T13:15:19.673Z",
+        "gitCommitSha": "52e41d40d36c44499909e4bb0c2546fc5256822c"
+      }
+    ]
+  }
+}

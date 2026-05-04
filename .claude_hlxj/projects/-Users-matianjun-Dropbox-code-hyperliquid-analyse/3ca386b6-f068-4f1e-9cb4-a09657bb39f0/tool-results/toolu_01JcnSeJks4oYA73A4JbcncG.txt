@@ -1,0 +1,65 @@
+     1→# Task Plan: 重构 RankerFeature4HV2 特征交互逻辑
+     2→
+     3→## Goal
+     4→将特征组合（Interaction）从 token level 移动到 cross-section level，实现先去量纲、再 Z-Score 标准化、最后计算交互特征的流程。
+     5→
+     6→## Phases
+     7→- [x] Phase 1: 研究现有代码结构和测试文件
+     8→- [x] Phase 2: 清空 `_compute_derived_features`，移除 token level 的交互计算
+     9→- [x] Phase 3: 重写 `cross_section_feature`，实现三步流程
+    10→- [x] Phase 4: 更新测试文件确保测试通过
+    11→- [x] Phase 5: 更新文档
+    12→
+    13→## Summary of Changes
+    14→
+    15→### 1. `BN_DERIVED_FEATURE_COLUMNS` (ranker_feature_4h_v2.py:30-52)
+    16→- 新增 `oi_market_cap_ratio` 特征（去量纲）
+    17→- 更新注释说明交互特征在 Cross Section Level 计算
+    18→
+    19→### 2. `_compute_derived_features` (ranker_feature_4h_v2.py:253-281)
+    20→- 清空了交互特征计算逻辑
+    21→- 仅保留 `oi_momentum_4h` 的计算（Token Level）
+    22→- 其他派生特征初始化为 0，作为占位符
+    23→
+    24→### 3. `calculate_token_level_feature` (ranker_feature_4h_v2.py:283-323)
+    25→- 移除了交互特征的计算逻辑
+    26→- 简化为仅合并 BN 特征并填充 NaN
+    27→
+    28→### 4. `cross_section_feature` (ranker_feature_4h_v2.py:325-543)
+    29→重写实现三步流程：
+    30→
+    31→**Step 1 - 去量纲:**
+    32→```python
+    33→oi_market_cap_ratio = sum_open_interest_value / market_cap
+    34→```
+    35→
+    36→**Step 2 - Z-Score 标准化:**
+    37→- 使用 Gaussian Rank 对关键特征做标准化
+    38→- 标准化的特征：`oi_market_cap_ratio`, `oi_momentum_4h`, `sum_toptrader_long_short_ratio`, `count_long_short_ratio`, `sum_taker_long_short_vol_ratio`, `momentum_4h`, `momentum_12h`, `volatility_4h`
+    39→
+    40→**Step 3 - 计算交互特征:**
+    41→```python
+    42→price_oi_consistency = momentum_4h_zscore * oi_momentum_4h_zscore
+    43→smart_retail_divergence = toptrader_zscore - global_ratio_zscore
+    44→smart_money_reversal = toptrader_zscore * momentum_12h_zscore
+    45→taker_buy_pressure = taker_zscore * volatility_4h_zscore
+    46→squeeze_potential = oi_market_cap_ratio_zscore * (1 - toptrader_zscore)
+    47→```
+    48→
+    49→### 5. 测试文件 (tests/unit/test_ranker_feature_4h_v2.py)
+    50→- 更新测试数据生成函数，确保不同币种有不同的特征值
+    51→- 新增 Cross Section Level 的测试用例
+    52→- 添加空 DataFrame 处理的边界情况测试
+    53→
+    54→### 6. 文档 (docs/feature.md)
+    55→- 更新 V2 部分说明交互特征在 Cross Section Level 计算
+    56→- 新增 `oi_market_cap_ratio` 特征
+    57→- 添加交互特征设计理念说明
+    58→
+    59→## Status
+    60→**完成** - 所有 16 个测试通过
+    61→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

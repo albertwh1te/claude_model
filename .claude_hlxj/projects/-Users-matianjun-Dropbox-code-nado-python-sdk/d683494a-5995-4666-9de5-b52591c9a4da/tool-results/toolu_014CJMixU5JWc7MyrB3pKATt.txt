@@ -1,0 +1,392 @@
+     1→from typing import Optional, Union
+     2→import requests
+     3→from functools import singledispatchmethod
+     4→from nado_protocol.indexer_client.types import IndexerClientOpts
+     5→from nado_protocol.indexer_client.types.models import MarketType
+     6→from nado_protocol.indexer_client.types.query import (
+     7→    IndexerCandlesticksParams,
+     8→    IndexerCandlesticksData,
+     9→    IndexerEventsParams,
+    10→    IndexerEventsData,
+    11→    IndexerFundingRateParams,
+    12→    IndexerFundingRateData,
+    13→    IndexerFundingRatesParams,
+    14→    IndexerFundingRatesData,
+    15→    IndexerHistoricalOrdersByDigestParams,
+    16→    IndexerHistoricalOrdersData,
+    17→    IndexerSubaccountHistoricalOrdersParams,
+    18→    IndexerLinkedSignerRateLimitData,
+    19→    IndexerLinkedSignerRateLimitParams,
+    20→    IndexerLiquidationFeedData,
+    21→    IndexerLiquidationFeedParams,
+    22→    IndexerMarketSnapshotsData,
+    23→    IndexerMarketSnapshotsParams,
+    24→    IndexerMatchesParams,
+    25→    IndexerMatchesData,
+    26→    IndexerOraclePricesData,
+    27→    IndexerOraclePricesParams,
+    28→    IndexerParams,
+    29→    IndexerPerpPricesData,
+    30→    IndexerPerpPricesParams,
+    31→    IndexerProductSnapshotsData,
+    32→    IndexerProductSnapshotsParams,
+    33→    IndexerRequest,
+    34→    IndexerResponse,
+    35→    IndexerSubaccountsData,
+    36→    IndexerSubaccountsParams,
+    37→    IndexerQuotePriceParams,
+    38→    IndexerQuotePriceData,
+    39→    IndexerInterestAndFundingParams,
+    40→    IndexerInterestAndFundingData,
+    41→    IndexerAccountSnapshotsParams,
+    42→    IndexerAccountSnapshotsData,
+    43→    IndexerTickersData,
+    44→    IndexerPerpContractsData,
+    45→    IndexerHistoricalTradesData,
+    46→    to_indexer_request,
+    47→)
+    48→from nado_protocol.utils.model import (
+    49→    NadoBaseModel,
+    50→    ensure_data_type,
+    51→    is_instance_of_union,
+    52→)
+    53→
+    54→
+    55→class IndexerQueryClient:
+    56→    """
+    57→    Client for querying data from the indexer service.
+    58→
+    59→    Attributes:
+    60→        _opts (IndexerClientOpts): Client configuration options for connecting and interacting with the indexer service.
+    61→        url (str): URL of the indexer service.
+    62→    """
+    63→
+    64→    def __init__(self, opts: IndexerClientOpts):
+    65→        """
+    66→        Initializes the IndexerQueryClient with the provided options.
+    67→
+    68→        Args:
+    69→            opts (IndexerClientOpts): Client configuration options for connecting and interacting with the indexer service.
+    70→        """
+    71→        self._opts = IndexerClientOpts.parse_obj(opts)
+    72→        self.url = self._opts.url
+    73→        self.url_v2: str = self.url.replace("/v1", "") + "/v2"
+    74→        self.session = requests.Session()
+    75→
+    76→    @singledispatchmethod
+    77→    def query(self, params: Union[IndexerParams, IndexerRequest]) -> IndexerResponse:
+    78→        """
+    79→        Sends a query request to the indexer service and returns the response.
+    80→
+    81→        The `query` method is overloaded to accept either `IndexerParams` or a dictionary or `IndexerRequest`
+    82→        as the input parameters. Based on the type of the input, the appropriate internal method is invoked
+    83→        to process the query request.
+    84→
+    85→        Args:
+    86→            params (IndexerParams | dict | IndexerRequest): The parameters for the query request.
+    87→
+    88→        Returns:
+    89→            IndexerResponse: The response from the indexer service.
+    90→        """
+    91→        req: IndexerRequest = (
+    92→            params if is_instance_of_union(params, IndexerRequest) else to_indexer_request(params)  # type: ignore
+    93→        )
+    94→        return self._query(req)
+    95→
+    96→    @query.register
+    97→    def _(self, req: dict) -> IndexerResponse:
+    98→        return self._query(NadoBaseModel.parse_obj(req))  # type: ignore
+    99→
+   100→    def _query(self, req: IndexerRequest) -> IndexerResponse:
+   101→        res = self.session.post(self.url, json=req.dict())
+   102→        if res.status_code != 200:
+   103→            raise Exception(res.text)
+   104→        try:
+   105→            indexer_res = IndexerResponse(data=res.json())
+   106→        except Exception:
+   107→            raise Exception(res.text)
+   108→        return indexer_res
+   109→
+   110→    def _query_v2(self, url):
+   111→        res = self.session.get(url)
+   112→        if res.status_code != 200:
+   113→            raise Exception(res.text)
+   114→        return res.json()
+   115→
+   116→    def get_subaccount_historical_orders(
+   117→        self, params: IndexerSubaccountHistoricalOrdersParams
+   118→    ) -> IndexerHistoricalOrdersData:
+   119→        """
+   120→        Retrieves the historical orders associated with a specific subaccount.
+   121→
+   122→        Args:
+   123→            params (IndexerSubaccountHistoricalOrdersParams): The parameters specifying the subaccount for which to retrieve historical orders.
+   124→
+   125→        Returns:
+   126→            IndexerHistoricalOrdersData: The historical orders associated with the specified subaccount.
+   127→        """
+   128→        return ensure_data_type(
+   129→            self.query(IndexerSubaccountHistoricalOrdersParams.parse_obj(params)).data,
+   130→            IndexerHistoricalOrdersData,
+   131→        )
+   132→
+   133→    def get_historical_orders_by_digest(
+   134→        self, digests: list[str]
+   135→    ) -> IndexerHistoricalOrdersData:
+   136→        """
+   137→        Retrieves historical orders using their unique digests.
+   138→
+   139→        Args:
+   140→            digests (list[str]): A list of order digests.
+   141→
+   142→        Returns:
+   143→            IndexerHistoricalOrdersData: The historical orders corresponding to the provided digests.
+   144→        """
+   145→        return ensure_data_type(
+   146→            self.query(IndexerHistoricalOrdersByDigestParams(digests=digests)).data,
+   147→            IndexerHistoricalOrdersData,
+   148→        )
+   149→
+   150→    def get_matches(self, params: IndexerMatchesParams) -> IndexerMatchesData:
+   151→        """
+   152→        Retrieves match data based on provided parameters.
+   153→
+   154→        Args:
+   155→            params (IndexerMatchesParams): The parameters for the match data retrieval request.
+   156→
+   157→        Returns:
+   158→            IndexerMatchesData: The match data corresponding to the provided parameters.
+   159→        """
+   160→        return ensure_data_type(
+   161→            self.query(IndexerMatchesParams.parse_obj(params)).data, IndexerMatchesData
+   162→        )
+   163→
+   164→    def get_events(self, params: IndexerEventsParams) -> IndexerEventsData:
+   165→        """
+   166→        Retrieves event data based on provided parameters.
+   167→
+   168→        Args:
+   169→            params (IndexerEventsParams): The parameters for the event data retrieval request.
+   170→
+   171→        Returns:
+   172→            IndexerEventsData: The event data corresponding to the provided parameters.
+   173→        """
+   174→        return ensure_data_type(
+   175→            self.query(IndexerEventsParams.parse_obj(params)).data, IndexerEventsData
+   176→        )
+   177→
+   178→    def get_product_snapshots(
+   179→        self, params: IndexerProductSnapshotsParams
+   180→    ) -> IndexerProductSnapshotsData:
+   181→        """
+   182→        Retrieves snapshot data for specific products.
+   183→
+   184→        Args:
+   185→            params (IndexerProductSnapshotsParams): Parameters specifying the products for which to retrieve snapshot data.
+   186→
+   187→        Returns:
+   188→            IndexerProductSnapshotsData: The product snapshot data corresponding to the provided parameters.
+   189→        """
+   190→        return ensure_data_type(
+   191→            self.query(IndexerProductSnapshotsParams.parse_obj(params)).data,
+   192→            IndexerProductSnapshotsData,
+   193→        )
+   194→
+   195→    def get_market_snapshots(
+   196→        self, params: IndexerMarketSnapshotsParams
+   197→    ) -> IndexerMarketSnapshotsData:
+   198→        """
+   199→        Retrieves historical market snapshots.
+   200→
+   201→        Args:
+   202→            params (IndexerMarketSnapshotsParams): Parameters specifying the historical market snapshot request.
+   203→
+   204→        Returns:
+   205→            IndexerMarketSnapshotsData: The market snapshot data corresponding to the provided parameters.
+   206→        """
+   207→        return ensure_data_type(
+   208→            self.query(IndexerMarketSnapshotsParams.parse_obj(params)).data,
+   209→            IndexerMarketSnapshotsData,
+   210→        )
+   211→
+   212→    def get_candlesticks(
+   213→        self, params: IndexerCandlesticksParams
+   214→    ) -> IndexerCandlesticksData:
+   215→        """
+   216→        Retrieves candlestick data based on provided parameters.
+   217→
+   218→        Args:
+   219→            params (IndexerCandlesticksParams): The parameters for retrieving candlestick data.
+   220→
+   221→        Returns:
+   222→            IndexerCandlesticksData: The candlestick data corresponding to the provided parameters.
+   223→        """
+   224→        return ensure_data_type(
+   225→            self.query(IndexerCandlesticksParams.parse_obj(params)).data,
+   226→            IndexerCandlesticksData,
+   227→        )
+   228→
+   229→    def get_perp_funding_rate(self, product_id: int) -> IndexerFundingRateData:
+   230→        """
+   231→        Retrieves the funding rate data for a specific perp product.
+   232→
+   233→        Args:
+   234→            product_id (int): The identifier of the perp product.
+   235→
+   236→        Returns:
+   237→            IndexerFundingRateData: The funding rate data for the specified perp product.
+   238→        """
+   239→        return ensure_data_type(
+   240→            self.query(IndexerFundingRateParams(product_id=product_id)).data,
+   241→            IndexerFundingRateData,
+   242→        )
+   243→
+   244→    def get_perp_funding_rates(self, product_ids: list) -> IndexerFundingRatesData:
+   245→        """
+   246→        Fetches the latest funding rates for a list of perp products.
+   247→
+   248→        Args:
+   249→            product_ids (list): List of identifiers for the perp products.
+   250→
+   251→        Returns:
+   252→            dict: A dictionary mapping each product_id to its latest funding rate and related details.
+   253→        """
+   254→        return ensure_data_type(
+   255→            self.query(IndexerFundingRatesParams(product_ids=product_ids)).data, dict
+   256→        )
+   257→
+   258→    def get_perp_prices(self, product_id: int) -> IndexerPerpPricesData:
+   259→        """
+   260→        Retrieves the price data for a specific perp product.
+   261→
+   262→        Args:
+   263→            product_id (int): The identifier of the perp product.
+   264→
+   265→        Returns:
+   266→            IndexerPerpPricesData: The price data for the specified perp product.
+   267→        """
+   268→        return ensure_data_type(
+   269→            self.query(IndexerPerpPricesParams(product_id=product_id)).data,
+   270→            IndexerPerpPricesData,
+   271→        )
+   272→
+   273→    def get_oracle_prices(self, product_ids: list[int]) -> IndexerOraclePricesData:
+   274→        """
+   275→        Retrieves the oracle price data for specific products.
+   276→
+   277→        Args:
+   278→            product_ids (list[int]): A list of product identifiers.
+   279→
+   280→        Returns:
+   281→            IndexerOraclePricesData: The oracle price data for the specified products.
+   282→        """
+   283→        return ensure_data_type(
+   284→            self.query(IndexerOraclePricesParams(product_ids=product_ids)).data,
+   285→            IndexerOraclePricesData,
+   286→        )
+   287→
+   288→    def get_liquidation_feed(self) -> IndexerLiquidationFeedData:
+   289→        """
+   290→        Retrieves the liquidation feed data.
+   291→
+   292→        Returns:
+   293→            IndexerLiquidationFeedData: The latest liquidation feed data.
+   294→        """
+   295→        return ensure_data_type(self.query(IndexerLiquidationFeedParams()).data, list)
+   296→
+   297→    def get_linked_signer_rate_limits(
+   298→        self, subaccount: str
+   299→    ) -> IndexerLinkedSignerRateLimitData:
+   300→        """
+   301→        Retrieves the rate limits for a linked signer of a specific subaccount.
+   302→
+   303→        Args:
+   304→            subaccount (str): The identifier of the subaccount.
+   305→
+   306→        Returns:
+   307→            IndexerLinkedSignerRateLimitData: The rate limits for the linked signer of the specified subaccount.
+   308→        """
+   309→        return ensure_data_type(
+   310→            self.query(IndexerLinkedSignerRateLimitParams(subaccount=subaccount)).data,
+   311→            IndexerLinkedSignerRateLimitData,
+   312→        )
+   313→
+   314→    def get_subaccounts(
+   315→        self, params: IndexerSubaccountsParams
+   316→    ) -> IndexerSubaccountsData:
+   317→        """
+   318→        Retrieves subaccounts via the indexer.
+   319→
+   320→        Args:
+   321→            params (IndexerSubaccountsParams): The filter parameters for retrieving subaccounts.
+   322→
+   323→        Returns:
+   324→            IndexerSubaccountsData: List of subaccounts found.
+   325→        """
+   326→        return ensure_data_type(
+   327→            self.query(params).data,
+   328→            IndexerSubaccountsData,
+   329→        )
+   330→
+   331→    def get_quote_price(self) -> IndexerQuotePriceData:
+   332→        return ensure_data_type(
+   333→            self.query(IndexerQuotePriceParams()).data,
+   334→            IndexerQuotePriceData,
+   335→        )
+   336→
+   337→    def get_interest_and_funding_payments(
+   338→        self, params: IndexerInterestAndFundingParams
+   339→    ) -> IndexerInterestAndFundingData:
+   340→        return ensure_data_type(
+   341→            self.query(
+   342→                params,
+   343→            ).data,
+   344→            IndexerInterestAndFundingData,
+   345→        )
+   346→
+   347→    def get_tickers(
+   348→        self, market_type: Optional[MarketType] = None
+   349→    ) -> IndexerTickersData:
+   350→        url = f"{self.url_v2}/tickers"
+   351→        if market_type is not None:
+   352→            url += f"?market={str(market_type)}"
+   353→        return ensure_data_type(self._query_v2(url), dict)
+   354→
+   355→    def get_perp_contracts_info(self) -> IndexerPerpContractsData:
+   356→        return ensure_data_type(self._query_v2(f"{self.url_v2}/contracts"), dict)
+   357→
+   358→    def get_historical_trades(
+   359→        self, ticker_id: str, limit: Optional[int], max_trade_id: Optional[int] = None
+   360→    ) -> IndexerHistoricalTradesData:
+   361→        url = f"{self.url_v2}/trades?ticker_id={ticker_id}"
+   362→        if limit is not None:
+   363→            url += f"&limit={limit}"
+   364→        if max_trade_id is not None:
+   365→            url += f"&max_trade_id={max_trade_id}"
+   366→        return ensure_data_type(self._query_v2(url), list)
+   367→
+   368→    def get_multi_subaccount_snapshots(
+   369→        self, params: IndexerAccountSnapshotsParams
+   370→    ) -> IndexerAccountSnapshotsData:
+   371→        """
+   372→        Retrieves subaccount snapshots at specified timestamps.
+   373→        Each snapshot is a view of the subaccount's balances at that point in time,
+   374→        with tracked variables for interest, funding, etc.
+   375→
+   376→        Args:
+   377→            params (IndexerAccountSnapshotsParams): Parameters specifying subaccounts,
+   378→                timestamps, and whether to include isolated positions.
+   379→
+   380→        Returns:
+   381→            IndexerAccountSnapshotsData: Dict mapping subaccount hex -> timestamp -> snapshot data.
+   382→                Each snapshot contains balances with trackedVars including netEntryUnrealized.
+   383→        """
+   384→        return ensure_data_type(
+   385→            self.query(IndexerAccountSnapshotsParams.parse_obj(params)).data,
+   386→            IndexerAccountSnapshotsData,
+   387→        )
+   388→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

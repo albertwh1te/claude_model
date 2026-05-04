@@ -1,0 +1,159 @@
+     1→"""Async Subaccount API for Nado Protocol."""
+     2→
+     3→from typing import Optional
+     4→
+     5→from nado_api.apis.base import AsyncNadoBaseAPI
+     6→from nado_api.types import (
+     7→    ExecuteResponse,
+     8→    LinkSignerParams,
+     9→    LiquidateSubaccountParams,
+    10→    FeeRatesData,
+    11→    SubaccountInfoData,
+    12→    QuerySubaccountInfoTx,
+    13→    IndexerLinkedSignerRateLimitData,
+    14→    IndexerSubaccountsData,
+    15→    IndexerSubaccountsParams,
+    16→    IndexerInterestAndFundingParams,
+    17→    IndexerInterestAndFundingData,
+    18→)
+    19→
+    20→
+    21→class AsyncSubaccountAPI(AsyncNadoBaseAPI):
+    22→    """
+    23→    Async API for subaccount operations in Nado Protocol.
+    24→
+    25→    Provides functionality for querying subaccount state, linking signers,
+    26→    and managing subaccount operations.
+    27→    """
+    28→
+    29→    # ==================== Execute Operations ====================
+    30→
+    31→    async def liquidate_subaccount(
+    32→        self, params: LiquidateSubaccountParams
+    33→    ) -> ExecuteResponse:
+    34→        """
+    35→        Execute a liquidate subaccount operation.
+    36→
+    37→        Args:
+    38→            params: Parameters required for liquidating a subaccount.
+    39→
+    40→        Returns:
+    41→            ExecuteResponse: The response from the engine execution.
+    42→        """
+    43→        return await self.context.engine_client.liquidate_subaccount(params)
+    44→
+    45→    async def link_signer(self, params: LinkSignerParams) -> ExecuteResponse:
+    46→        """
+    47→        Execute a link signer operation.
+    48→
+    49→        Links a secondary signer for rate-limited transactions.
+    50→
+    51→        Args:
+    52→            params: Parameters required for linking a signer.
+    53→
+    54→        Returns:
+    55→            ExecuteResponse: The response from the engine execution.
+    56→        """
+    57→        return await self.context.engine_client.link_signer(params)
+    58→
+    59→    # ==================== Query Operations ====================
+    60→
+    61→    async def get_engine_subaccount_summary(
+    62→        self, subaccount: str, txs: Optional[list[QuerySubaccountInfoTx]] = None
+    63→    ) -> SubaccountInfoData:
+    64→        """
+    65→        Retrieve a comprehensive summary of the specified subaccount's state.
+    66→
+    67→        Args:
+    68→            subaccount: Unique identifier for the subaccount.
+    69→            txs: Optional list of transactions for estimated view.
+    70→
+    71→        Returns:
+    72→            SubaccountInfoData: Detailed state information about the subaccount.
+    73→        """
+    74→        return await self.context.engine_client.get_subaccount_info(subaccount, txs)
+    75→
+    76→    async def get_subaccount_fee_rates(self, subaccount: str) -> FeeRatesData:
+    77→        """
+    78→        Retrieve the fee rates associated with a specific subaccount.
+    79→
+    80→        Args:
+    81→            subaccount: Unique identifier for the subaccount.
+    82→
+    83→        Returns:
+    84→            FeeRatesData: Detailed fee rates data for the subaccount.
+    85→        """
+    86→        return await self.context.engine_client.get_fee_rates(subaccount)
+    87→
+    88→    async def get_subaccount_linked_signer_rate_limits(
+    89→        self, subaccount: str
+    90→    ) -> IndexerLinkedSignerRateLimitData:
+    91→        """
+    92→        Retrieve the current linked signer and their rate limit.
+    93→
+    94→        Args:
+    95→            subaccount: Unique identifier for the subaccount.
+    96→
+    97→        Returns:
+    98→            IndexerLinkedSignerRateLimitData: Information about the linked signer.
+    99→        """
+   100→        return await self.context.indexer_client.get_linked_signer_rate_limits(
+   101→            subaccount
+   102→        )
+   103→
+   104→    async def get_subaccounts(
+   105→        self,
+   106→        address: Optional[str] = None,
+   107→        start_idx: Optional[int] = None,
+   108→        limit: Optional[int] = None,
+   109→    ) -> IndexerSubaccountsData:
+   110→        """
+   111→        List nado subaccounts via the indexer.
+   112→
+   113→        Args:
+   114→            address: Optional wallet address to find associated subaccounts.
+   115→            start_idx: Optional subaccount id to start from (pagination).
+   116→            limit: Maximum number of subaccounts to return.
+   117→
+   118→        Returns:
+   119→            IndexerSubaccountsData: List of subaccounts found.
+   120→        """
+   121→        return await self.context.indexer_client.get_subaccounts(
+   122→            IndexerSubaccountsParams(address=address, start=start_idx, limit=limit)
+   123→        )
+   124→
+   125→    async def get_interest_and_funding_payments(
+   126→        self,
+   127→        subaccount: str,
+   128→        product_ids: list[int],
+   129→        limit: int,
+   130→        max_idx: Optional[int] = None,
+   131→    ) -> IndexerInterestAndFundingData:
+   132→        """
+   133→        List interests and funding payments for a subaccount.
+   134→
+   135→        Args:
+   136→            subaccount: Subaccount to fetch payments for.
+   137→            product_ids: List of product IDs to fetch payments for.
+   138→            limit: Max number of records to return (max 100).
+   139→            max_idx: When provided, only return records with idx <= max_idx.
+   140→
+   141→        Returns:
+   142→            IndexerInterestAndFundingData: List of interest/funding payments.
+   143→        """
+   144→        return await self.context.indexer_client.get_interest_and_funding_payments(
+   145→            IndexerInterestAndFundingParams(
+   146→                subaccount=subaccount,
+   147→                product_ids=product_ids,
+   148→                limit=limit,
+   149→                max_idx=max_idx,
+   150→            )
+   151→        )
+   152→
+   153→
+   154→__all__ = ["AsyncSubaccountAPI"]
+   155→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

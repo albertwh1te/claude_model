@@ -1,0 +1,505 @@
+     1→import json
+     2→from typing import Optional
+     3→import requests
+     4→
+     5→from nado_protocol.engine_client import EngineClientOpts
+     6→from nado_protocol.engine_client.types.models import (
+     7→    MarketType,
+     8→    Orderbook,
+     9→    ResponseStatus,
+    10→    SubaccountPosition,
+    11→)
+    12→from nado_protocol.engine_client.types.query import (
+    13→    AllProductsData,
+    14→    ContractsData,
+    15→    FeeRatesData,
+    16→    HealthGroupsData,
+    17→    LinkedSignerData,
+    18→    MarketLiquidityData,
+    19→    MarketPriceData,
+    20→    MaxLpMintableData,
+    21→    MaxOrderSizeData,
+    22→    MaxWithdrawableData,
+    23→    NoncesData,
+    24→    ProductSymbolsData,
+    25→    SubaccountOpenOrdersData,
+    26→    SubaccountMultiProductsOpenOrdersData,
+    27→    OrderData,
+    28→    QueryAllProductsParams,
+    29→    QueryContractsParams,
+    30→    QueryFeeRatesParams,
+    31→    QueryHealthGroupsParams,
+    32→    QueryLinkedSignerParams,
+    33→    QueryMarketLiquidityParams,
+    34→    QueryMarketPriceParams,
+    35→    QueryMaxLpMintableParams,
+    36→    QueryMaxOrderSizeParams,
+    37→    QueryMaxWithdrawableParams,
+    38→    QueryNoncesParams,
+    39→    QuerySubaccountOpenOrdersParams,
+    40→    QuerySubaccountMultiProductOpenOrdersParams,
+    41→    QueryOrderParams,
+    42→    QueryIsolatedPositionsParams,
+    43→    QueryRequest,
+    44→    QueryResponse,
+    45→    QueryStatusParams,
+    46→    QuerySubaccountInfoParams,
+    47→    QuerySubaccountInfoTx,
+    48→    StatusData,
+    49→    SubaccountInfoData,
+    50→    SymbolsData,
+    51→    QuerySymbolsParams,
+    52→    AssetsData,
+    53→    MarketPairsData,
+    54→    SpotsAprData,
+    55→    IsolatedPositionsData,
+    56→)
+    57→from nado_protocol.utils.exceptions import (
+    58→    BadStatusCodeException,
+    59→    QueryFailedException,
+    60→)
+    61→from nado_protocol.utils.model import ensure_data_type
+    62→
+    63→
+    64→class EngineQueryClient:
+    65→    """
+    66→    Client class for querying the off-chain engine.
+    67→    """
+    68→
+    69→    def __init__(self, opts: EngineClientOpts):
+    70→        """
+    71→        Initialize EngineQueryClient with provided options.
+    72→
+    73→        Args:
+    74→            opts (EngineClientOpts): Options for the client.
+    75→        """
+    76→        self._opts: EngineClientOpts = EngineClientOpts.parse_obj(opts)
+    77→        self.url: str = self._opts.url
+    78→        self.url_v2: str = self.url.replace("/v1", "") + "/v2"
+    79→        self.session = requests.Session()  # type: ignore
+    80→
+    81→    def query(self, req: QueryRequest) -> QueryResponse:
+    82→        """
+    83→        Send a query to the engine.
+    84→
+    85→        Args:
+    86→            req (QueryRequest): The query request parameters.
+    87→
+    88→        Returns:
+    89→            QueryResponse: The response from the engine.
+    90→
+    91→        Raises:
+    92→            BadStatusCodeException: If the response status code is not 200.
+    93→            QueryFailedException: If the query status is not "success".
+    94→        """
+    95→        res = self.session.post(f"{self.url}/query", json=req.dict())
+    96→        if res.status_code != 200:
+    97→            raise BadStatusCodeException(res.text)
+    98→        try:
+    99→            query_res = QueryResponse(**res.json())
+   100→        except Exception:
+   101→            raise QueryFailedException(res.text)
+   102→        if query_res.status != "success":
+   103→            raise QueryFailedException(res.text)
+   104→        return query_res
+   105→
+   106→    def _query_v2(self, url):
+   107→        res = self.session.get(url)
+   108→        if res.status_code != 200:
+   109→            raise Exception(res.text)
+   110→        return res.json()
+   111→
+   112→    def get_product_symbols(self) -> ProductSymbolsData:
+   113→        """
+   114→        Retrieves symbols for all available products.
+   115→
+   116→        Returns:
+   117→            ProductSymbolsData: Symbols for all available products.
+   118→        """
+   119→        res = self.session.get(f"{self.url}/symbols?")
+   120→        if res.status_code != 200:
+   121→            raise BadStatusCodeException(res.text)
+   122→        try:
+   123→            query_res = QueryResponse(
+   124→                status=ResponseStatus.SUCCESS,
+   125→                data=res.json(),
+   126→                error=None,
+   127→                error_code=None,
+   128→                request_type=None,
+   129→            )
+   130→        except Exception:
+   131→            raise QueryFailedException(res.text)
+   132→        return ensure_data_type(query_res.data, list)
+   133→
+   134→    def get_status(self) -> StatusData:
+   135→        """
+   136→        Query the engine for its status.
+   137→
+   138→        Returns:
+   139→            StatusData: The status of the engine.
+   140→        """
+   141→        return ensure_data_type(self.query(QueryStatusParams()).data, StatusData)
+   142→
+   143→    def get_contracts(self) -> ContractsData:
+   144→        """
+   145→        Query the engine for Nado contract addresses.
+   146→
+   147→        Use this to fetch verifying contracts needed for signing executes.
+   148→
+   149→        Returns:
+   150→            ContractsData: Nado contracts info.
+   151→        """
+   152→        return ensure_data_type(self.query(QueryContractsParams()).data, ContractsData)
+   153→
+   154→    def get_nonces(self, address: str) -> NoncesData:
+   155→        """
+   156→        Query the engine for nonces of a specific address.
+   157→
+   158→        Args:
+   159→            address (str): Wallet address to fetch nonces for.
+   160→
+   161→        Returns:
+   162→            NoncesData: The nonces of the address.
+   163→        """
+   164→        return ensure_data_type(
+   165→            self.query(QueryNoncesParams(address=address)).data, NoncesData
+   166→        )
+   167→
+   168→    def get_order(self, product_id: int, digest: str) -> OrderData:
+   169→        """
+   170→        Query the engine for an order with a specific product id and digest.
+   171→
+   172→        Args:
+   173→            product_id (int): The id of the product.
+   174→
+   175→            digest (str): The digest of the order.
+   176→
+   177→        Returns:
+   178→            OrderData: The order data.
+   179→        """
+   180→        return ensure_data_type(
+   181→            self.query(QueryOrderParams(product_id=product_id, digest=digest)).data,
+   182→            OrderData,
+   183→        )
+   184→
+   185→    def get_subaccount_info(
+   186→        self,
+   187→        subaccount: str,
+   188→        txs: Optional[list[QuerySubaccountInfoTx]] = None,
+   189→        pre_state: Optional[bool] = None,
+   190→    ) -> SubaccountInfoData:
+   191→        """
+   192→        Query the engine for the state of a subaccount, including balances.
+   193→
+   194→        Args:
+   195→            subaccount (str): Identifier of the subaccount (owner's address + subaccount name) sent as a hex string.
+   196→
+   197→            txs (list[QuerySubaccountInfoTx], optional): You can optionally provide a list of txs, to get an estimated view
+   198→            of what the subaccount state would look like if the transactions were applied.
+   199→
+   200→            pre_state (bool, optional): When True and txs are provided, returns the subaccount state before the
+   201→            transactions were applied in the pre_state field. Defaults to False.
+   202→
+   203→        Returns:
+   204→            SubaccountInfoData: Information about the specified subaccount.
+   205→        """
+   206→        txns_str = None
+   207→        if txs is not None:
+   208→            txns_str = json.dumps([tx.dict() for tx in txs])
+   209→
+   210→        pre_state_str = None
+   211→        if pre_state is not None:
+   212→            pre_state_str = str(pre_state).lower()
+   213→
+   214→        return ensure_data_type(
+   215→            self.query(
+   216→                QuerySubaccountInfoParams(
+   217→                    subaccount=subaccount, txns=txns_str, pre_state=pre_state_str
+   218→                )
+   219→            ).data,
+   220→            SubaccountInfoData,
+   221→        )
+   222→
+   223→    def get_subaccount_open_orders(
+   224→        self, product_id: int, sender: str
+   225→    ) -> SubaccountOpenOrdersData:
+   226→        """
+   227→        Retrieves the open orders for a subaccount on a specific product.
+   228→
+   229→        Args:
+   230→            product_id (int): The identifier of the product for which open orders are to be fetched.
+   231→
+   232→            sender (str): Identifier of the subaccount (owner's address + subaccount name) sent as a hex string.
+   233→
+   234→        Returns:
+   235→            SubaccountOpenOrdersData: A data object containing the open orders for the
+   236→            specified subaccount on the provided product.
+   237→        """
+   238→        return ensure_data_type(
+   239→            self.query(
+   240→                QuerySubaccountOpenOrdersParams(product_id=product_id, sender=sender)
+   241→            ).data,
+   242→            SubaccountOpenOrdersData,
+   243→        )
+   244→
+   245→    def get_subaccount_multi_products_open_orders(
+   246→        self, product_ids: list[int], sender: str
+   247→    ) -> SubaccountMultiProductsOpenOrdersData:
+   248→        """
+   249→        Retrieves the open orders for a subaccount on a specific product.
+   250→
+   251→        Args:
+   252→            product_ids (list[int]): List of product ids to fetch open orders for.
+   253→
+   254→            sender (str): Identifier of the subaccount (owner's address + subaccount name) sent as a hex string.
+   255→
+   256→        Returns:
+   257→            SubaccountMultiProductsOpenOrdersData: A data object containing the open orders for the
+   258→            specified subaccount on the provided product.
+   259→        """
+   260→        return ensure_data_type(
+   261→            self.query(
+   262→                QuerySubaccountMultiProductOpenOrdersParams(
+   263→                    product_ids=product_ids, sender=sender
+   264→                )
+   265→            ).data,
+   266→            SubaccountMultiProductsOpenOrdersData,
+   267→        )
+   268→
+   269→    def get_market_liquidity(self, product_id: int, depth: int) -> MarketLiquidityData:
+   270→        """
+   271→        Query the engine for market liquidity data for a specific product.
+   272→
+   273→        Args:
+   274→            product_id (int): The id of the product.
+   275→
+   276→            depth (int): The depth of the market.
+   277→
+   278→        Returns:
+   279→            MarketLiquidityData: Market liquidity data for the specified product.
+   280→        """
+   281→        return ensure_data_type(
+   282→            self.query(
+   283→                QueryMarketLiquidityParams(product_id=product_id, depth=depth)
+   284→            ).data,
+   285→            MarketLiquidityData,
+   286→        )
+   287→
+   288→    def get_symbols(
+   289→        self,
+   290→        product_type: Optional[str] = None,
+   291→        product_ids: Optional[list[int]] = None,
+   292→    ) -> SymbolsData:
+   293→        """
+   294→        Query engine for symbols and product info
+   295→
+   296→        Args:
+   297→            product_type (Optional[str): "spot" or "perp" products
+   298→
+   299→            product_ids (Optional[list[int]]): product_ids to return info for
+   300→
+   301→        """
+   302→        return ensure_data_type(
+   303→            self.query(
+   304→                QuerySymbolsParams(product_type=product_type, product_ids=product_ids)
+   305→            ).data,
+   306→            SymbolsData,
+   307→        )
+   308→
+   309→    def get_all_products(self) -> AllProductsData:
+   310→        """
+   311→        Retrieves info about all available products,
+   312→        including: product id, oracle price, configuration, state, etc.
+   313→
+   314→        Returns:
+   315→            AllProductsData: Data about all products.
+   316→        """
+   317→        return ensure_data_type(
+   318→            self.query(QueryAllProductsParams()).data, AllProductsData
+   319→        )
+   320→
+   321→    def get_market_price(self, product_id: int) -> MarketPriceData:
+   322→        """
+   323→        Retrieves the highest bid and lowest ask price levels
+   324→        from the orderbook for a given product.
+   325→
+   326→        Args:
+   327→            product_id (int): The id of the product.
+   328→
+   329→        Returns:
+   330→            MarketPriceData: Market price data for the specified product.
+   331→        """
+   332→        return ensure_data_type(
+   333→            self.query(QueryMarketPriceParams(product_id=product_id)).data,
+   334→            MarketPriceData,
+   335→        )
+   336→
+   337→    def get_max_order_size(self, params: QueryMaxOrderSizeParams) -> MaxOrderSizeData:
+   338→        """
+   339→        Retrieves the maximum order size of a given product for a specified subaccount.
+   340→
+   341→        Args:
+   342→            params (QueryMaxOrderSizeParams): The parameters object that contains
+   343→            the details of the subaccount and product for which the max order size is to be fetched.
+   344→
+   345→        Returns:
+   346→            MaxOrderSizeData: A data object containing the maximum order size possible
+   347→            for the given subaccount and product.
+   348→        """
+   349→        return ensure_data_type(
+   350→            self.query(QueryMaxOrderSizeParams.parse_obj(params)).data, MaxOrderSizeData
+   351→        )
+   352→
+   353→    def get_max_withdrawable(
+   354→        self, product_id: int, sender: str, spot_leverage: Optional[bool] = None
+   355→    ) -> MaxWithdrawableData:
+   356→        """
+   357→        Retrieves the maximum withdrawable amount for a given spot product for a subaccount.
+   358→
+   359→        Args:
+   360→            product_id (int): ID of the spot product.
+   361→
+   362→            sender (str): Identifier of the subaccount (owner's address + subaccount name) sent as a hex string.
+   363→
+   364→            spot_leverage (bool, optional): If False, calculates without borrowing. Defaults to True.
+   365→
+   366→        Returns:
+   367→            MaxWithdrawableData: Contains the maximum withdrawable amount.
+   368→        """
+   369→        return ensure_data_type(
+   370→            self.query(
+   371→                QueryMaxWithdrawableParams(
+   372→                    product_id=product_id, sender=sender, spot_leverage=spot_leverage
+   373→                )
+   374→            ).data,
+   375→            MaxWithdrawableData,
+   376→        )
+   377→
+   378→    def get_max_nlp_mintable(
+   379→        self, product_id: int, sender: str, spot_leverage: Optional[bool] = None
+   380→    ) -> MaxLpMintableData:
+   381→        """
+   382→        Retrieves the maximum LP token amount mintable for a given product for a subaccount.
+   383→
+   384→        Args:
+   385→            product_id (int): ID of the product.
+   386→
+   387→            sender (str): Identifier of the subaccount (owner's address + subaccount name) sent as a hex string.
+   388→
+   389→            spot_leverage (bool, optional): If False, calculates without considering borrowing. Defaults to True.
+   390→
+   391→        Returns:
+   392→            MaxLpMintableData: Contains the maximum LP token mintable amount.
+   393→        """
+   394→        return ensure_data_type(
+   395→            self.query(
+   396→                QueryMaxLpMintableParams(
+   397→                    product_id=product_id, sender=sender, spot_leverage=spot_leverage
+   398→                )
+   399→            ).data,
+   400→            MaxLpMintableData,
+   401→        )
+   402→
+   403→    def get_fee_rates(self, sender: str) -> FeeRatesData:
+   404→        """
+   405→        Retrieves the fee rates associated with a specific subaccount.
+   406→
+   407→        Args:
+   408→            sender (str): Identifier of the subaccount (owner's address + subaccount name) sent as a hex string.
+   409→
+   410→        Returns:
+   411→            FeeRatesData: Contains fee rates information associated with the subaccount.
+   412→        """
+   413→        return ensure_data_type(
+   414→            self.query(QueryFeeRatesParams(sender=sender)).data, FeeRatesData
+   415→        )
+   416→
+   417→    def get_health_groups(self) -> HealthGroupsData:
+   418→        """
+   419→        Retrieves all available health groups. A health group represents a set of perp
+   420→        and spot products whose health is calculated together, such as BTC
+   421→        and BTC-PERP.
+   422→
+   423→        Returns:
+   424→            HealthGroupsData: Contains health group information, each including both a spot
+   425→            and a perp product.
+   426→        """
+   427→        return ensure_data_type(
+   428→            self.query(QueryHealthGroupsParams()).data, HealthGroupsData
+   429→        )
+   430→
+   431→    def get_linked_signer(self, subaccount: str) -> LinkedSignerData:
+   432→        """
+   433→        Retrieves the current linked signer for the specified subaccount.
+   434→
+   435→        Args:
+   436→            subaccount (str): Identifier of the subaccount (owner's address + subaccount name) sent as a hex string.
+   437→
+   438→        Returns:
+   439→            LinkedSignerData: Information about the currently linked signer for the subaccount.
+   440→        """
+   441→        return ensure_data_type(
+   442→            self.query(QueryLinkedSignerParams(subaccount=subaccount)).data,
+   443→            LinkedSignerData,
+   444→        )
+   445→
+   446→    def get_isolated_positions(self, subaccount: str) -> IsolatedPositionsData:
+   447→        """
+   448→        Retrieves the isolated positions for a specific subaccount.
+   449→
+   450→        Args:
+   451→            subaccount (str): Identifier of the subaccount (owner's address + subaccount name) sent as a hex string.
+   452→
+   453→        Returns:
+   454→            IsolatedPositionsData: A data object containing the isolated positions for the specified subaccount.
+   455→        """
+   456→        return ensure_data_type(
+   457→            self.query(QueryIsolatedPositionsParams(subaccount=subaccount)).data,
+   458→            IsolatedPositionsData,
+   459→        )
+   460→
+   461→    def _get_subaccount_product_position(
+   462→        self, subaccount: str, product_id: int
+   463→    ) -> SubaccountPosition:
+   464→        summary = self.get_subaccount_info(subaccount)
+   465→        try:
+   466→            balance = [
+   467→                balance
+   468→                for balance in summary.spot_balances + summary.perp_balances
+   469→                if balance.product_id == product_id
+   470→            ][0]
+   471→            product = [
+   472→                product
+   473→                for product in summary.spot_products + summary.perp_products
+   474→                if product.product_id == product_id
+   475→            ][0]
+   476→        except Exception as e:
+   477→            raise Exception(f"Invalid product id provided {product_id}. Error: {e}")
+   478→        return SubaccountPosition(balance=balance, product=product)
+   479→
+   480→    def get_assets(self) -> AssetsData:
+   481→        return ensure_data_type(self._query_v2(f"{self.url_v2}/assets"), list)
+   482→
+   483→    def get_pairs(self, market_type: Optional[MarketType] = None) -> MarketPairsData:
+   484→        url = f"{self.url_v2}/pairs"
+   485→        if market_type is not None:
+   486→            url += f"?market={str(market_type)}"
+   487→        return ensure_data_type(self._query_v2(url), list)
+   488→
+   489→    def get_spots_apr(self) -> SpotsAprData:
+   490→        return ensure_data_type(self._query_v2(f"{self.url_v2}/apr"), list)
+   491→
+   492→    def get_orderbook(self, ticker_id: str, depth: int) -> Orderbook:
+   493→        return ensure_data_type(
+   494→            Orderbook.parse_obj(
+   495→                self._query_v2(
+   496→                    f"{self.url_v2}/orderbook?ticker_id={ticker_id}&depth={depth}"
+   497→                )
+   498→            ),
+   499→            Orderbook,
+   500→        )
+   501→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

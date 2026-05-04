@@ -1,0 +1,124 @@
+{
+  "version": 2,
+  "lastComputedDate": "2026-02-17",
+  "dailyActivity": [
+    {
+      "date": "2025-12-24",
+      "messageCount": 71,
+      "sessionCount": 6,
+      "toolCallCount": 7
+    },
+    {
+      "date": "2025-12-25",
+      "messageCount": 233,
+      "sessionCount": 5,
+      "toolCallCount": 58
+    },
+    {
+      "date": "2025-12-26",
+      "messageCount": 50,
+      "sessionCount": 5,
+      "toolCallCount": 6
+    },
+    {
+      "date": "2025-12-31",
+      "messageCount": 87,
+      "sessionCount": 3,
+      "toolCallCount": 28
+    },
+    {
+      "date": "2026-01-03",
+      "messageCount": 29,
+      "sessionCount": 1,
+      "toolCallCount": 8
+    },
+    {
+      "date": "2026-01-13",
+      "messageCount": 2,
+      "sessionCount": 1,
+      "toolCallCount": 0
+    },
+    {
+      "date": "2026-01-17",
+      "messageCount": 12,
+      "sessionCount": 1,
+      "toolCallCount": 0
+    }
+  ],
+  "dailyModelTokens": [
+    {
+      "date": "2025-12-24",
+      "tokensByModel": {
+        "claude-haiku-4-5-20251001": 7845
+      }
+    },
+    {
+      "date": "2025-12-25",
+      "tokensByModel": {
+        "claude-haiku-4-5-20251001": 48,
+        "claude-opus-4-5-20251101": 61133
+      }
+    },
+    {
+      "date": "2025-12-26",
+      "tokensByModel": {
+        "claude-haiku-4-5-20251001": 2547,
+        "claude-opus-4-5-20251101": 345
+      }
+    },
+    {
+      "date": "2025-12-31",
+      "tokensByModel": {
+        "claude-haiku-4-5-20251001": 9715
+      }
+    },
+    {
+      "date": "2026-01-03",
+      "tokensByModel": {
+        "claude-opus-4-5-20251101": 1269
+      }
+    }
+  ],
+  "modelUsage": {
+    "claude-opus-4-5-20251101": {
+      "inputTokens": 16581,
+      "outputTokens": 46166,
+      "cacheReadInputTokens": 7883753,
+      "cacheCreationInputTokens": 2952615,
+      "webSearchRequests": 0,
+      "costUSD": 0,
+      "contextWindow": 0,
+      "maxOutputTokens": 0
+    },
+    "claude-haiku-4-5-20251001": {
+      "inputTokens": 3277,
+      "outputTokens": 16878,
+      "cacheReadInputTokens": 1698196,
+      "cacheCreationInputTokens": 746382,
+      "webSearchRequests": 0,
+      "costUSD": 0,
+      "contextWindow": 0,
+      "maxOutputTokens": 0
+    }
+  },
+  "totalSessions": 22,
+  "totalMessages": 484,
+  "longestSession": {
+    "sessionId": "2044e761-e6f9-4ec8-96de-c140884543a2",
+    "duration": 40965874,
+    "messageCount": 19,
+    "timestamp": "2025-12-24T18:33:21.304Z"
+  },
+  "firstSessionDate": "2025-12-24T18:16:31.578Z",
+  "hourCounts": {
+    "2": 6,
+    "13": 1,
+    "15": 2,
+    "16": 2,
+    "17": 1,
+    "19": 1,
+    "21": 7,
+    "23": 2
+  },
+  "totalSpeculationTimeSavedMs": 0
+}

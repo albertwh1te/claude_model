@@ -1,0 +1,25 @@
+9-import numpy as np
+10-from scipy.stats import norm  # <--- 新增引入，用于计算 Gaussian Rank
+11-
+12:# target_columns = ["target_1hour", "target_4hour", "target_24hour"]
+13:target_columns = ["target_1hour"]
+14:# target_columns = ["target_1hour", "return"]
+15-
+16-# 关键时间窗口 (小时)
+17-key_windows = {
+--
+394-        # @info generate target
+395-        if target:
+396-            # 1小时target: 用未来4根15分钟K线的收盘价与当前收盘价计算收益
+397:            df["target_1hour"] = df["close"].shift(-4) / df["close"] - 1
+398-
+399-        if target:
+400-            return df[list(self.token_level_feature_names) + target_columns]
+--
+520-                        pct_rank = time_df[column].rank(pct=True)
+521-                        pct_rank = pct_rank * (1 - 2 * epsilon) + epsilon
+522-
+523:                        time_df[f"{column}_zscore"] = norm.ppf(pct_rank)
+524-
+525-                        # 🟢 FIX: 替换 pd.qcut 为 rank(pct=True)
+526-                        # 这等同于"无限精细"的 qcut，且不会因为 N 小而报错

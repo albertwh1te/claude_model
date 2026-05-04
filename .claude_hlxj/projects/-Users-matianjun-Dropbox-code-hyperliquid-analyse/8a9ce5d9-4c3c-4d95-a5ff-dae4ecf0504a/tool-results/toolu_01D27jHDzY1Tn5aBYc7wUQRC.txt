@@ -1,0 +1,200 @@
+b4e56a0 feat: Introduce hysteresis mechanism to prevent order flip-flop near grid price thresholds
+M	bot/nado_grid_trading_bot.py
+M	docs/grid_bot_dev_plan.md
+M	docs/ranker_executor_architecture.md
+M	online/ranker_process.py
+e73d88c feat: Enhance Nado grid trading bot with order synchronization and batch processing improvements
+M	bot/nado_grid_trading_bot.py
+M	commands/grid_commands.py
+M	commands/scripts_commands.py
+M	docs/nado_api_docs.md
+M	nado_api/types.py
+116b6f2 refactor: Remove unused wallet management and address analysis tools
+M	AGENTS.md
+M	CLAUDE.md
+A	GEMINI.md
+D	addresses.py
+A	commands/grid_commands.py
+M	docs/grid_bot_dev_plan.md
+A	docs/nado_api_docs.md
+M	main.py
+A	nado_api/README.md
+A	nado_api/__init__.py
+A	nado_api/apis/__init__.py
+A	nado_api/apis/base.py
+A	nado_api/apis/market.py
+A	nado_api/apis/perp.py
+A	nado_api/apis/spot.py
+A	nado_api/apis/subaccount.py
+A	nado_api/client.py
+A	nado_api/compat.py
+A	nado_api/context.py
+A	nado_api/eip712.py
+A	nado_api/engine/__init__.py
+A	nado_api/engine/execute.py
+A	nado_api/engine/query.py
+A	nado_api/http.py
+A	nado_api/indexer/__init__.py
+A	nado_api/nado_api/README.md
+A	nado_api/nado_api/__init__.py
+A	nado_api/nado_api/apis/__init__.py
+A	nado_api/nado_api/apis/base.py
+A	nado_api/nado_api/apis/market.py
+A	nado_api/nado_api/apis/perp.py
+A	nado_api/nado_api/apis/spot.py
+A	nado_api/nado_api/apis/subaccount.py
+A	nado_api/nado_api/client.py
+A	nado_api/nado_api/compat.py
+A	nado_api/nado_api/context.py
+A	nado_api/nado_api/eip712.py
+A	nado_api/nado_api/engine/__init__.py
+A	nado_api/nado_api/engine/execute.py
+A	nado_api/nado_api/engine/query.py
+A	nado_api/nado_api/http.py
+A	nado_api/nado_api/indexer/__init__.py
+A	nado_api/nado_api/tests/__init__.py
+A	nado_api/nado_api/tests/conftest.py
+A	nado_api/nado_api/tests/test_engine_client.py
+A	nado_api/nado_api/tests/test_indexer_client.py
+A	nado_api/nado_api/tests/test_market_api.py
+A	nado_api/nado_api/trigger/__init__.py
+A	nado_api/nado_api/types.py
+A	nado_api/tests/__init__.py
+A	nado_api/tests/conftest.py
+A	nado_api/tests/test_engine_client.py
+A	nado_api/tests/test_indexer_client.py
+A	nado_api/tests/test_market_api.py
+A	nado_api/trigger/__init__.py
+A	nado_api/types.py
+D	wallet_manager/__init__.py
+D	wallet_manager/sol_wallet_manager.py
+D	wallet_manager/wallet_analyse_tools.py
+74cfe57 feat: Implement Nado grid trading bot with strike-aligned geometric distribution
+A	bot/nado_grid_trading_bot.py
+A	tests/unit/test_nado_grid_bot.py
+e3071dc feat: Add unique symbol tracking and logging in analysis and training scripts; update regression model training parameters for improved performance
+M	analyse/ranker_results_analyse.py
+M	commands/ml_commands.py
+A	docs/grid_bot_dev_plan.md
+A	docs/grid_to_option.md
+M	experiments/run_experiments_v2.py
+M	ranker_model/regression_portfolio_optimizer_generator.py
+M	ranker_model/regression_train.py
+0369a93 feat: Enhance regression model training with hyperparameter updates and feature file support; add script for model transfer to MacBook Pro
+A	bash_scripts/scp_regression_model_to_mac_pro.sh
+M	commands/ml_commands.py
+M	ranker_model/regression_train.py
+2cb3aeb Add script to transfer PNG files from remote server to MacBook Pro
+M	bash_scripts/scp_feature_to_mac_pro.sh
+A	bash_scripts/scp_png_to_mac_pro.sh
+M	ignore_list_when_scp
+M	symbol_detail_info.json
+M	symbol_infos.json
+9a225c4 feat: Add comprehensive Kline data validation checks
+M	.DS_Store
+M	backtest/basic_backtest.py
+M	backtest_kline_cache.feather
+M	commands/ml_commands.py
+A	data/data_check.py
+M	docs/experiments_results/2025_12_28_lighter_symbol_experiment.md
+M	symbol_detail_info.json
+M	symbol_infos.json
+835ad6c refactor: Update ranker parameters for optimized asset selection; reduce maximum holdings and adjust entry/exit ranks for improved strategy performance
+M	ranker_model/regression_portfolio_optimizer_generator.py
+7f59bd5 feat: Add regression model tuning and training command; update ranker parameters for improved performance
+M	commands/ml_commands.py
+M	config/ranker_parameters.py
+M	docs/llm_coin_detail.md
+M	ranker_model/fine_tune_regression_model.py
+M	ranker_model/regression_train.py
+1ff384f feat: Update cryptocurrency data and LLM scores; enhance command notifications and symbol processing logic
+M	commands/ml_commands.py
+M	ranker_model/ranker_feature.py
+M	symbol_infos.json
+M	symbol_llm_score.json
+M	utils/typer_util.py
+0c46d48 feat: Integrate CoinGecko API for detailed coin information retrieval; update symbol info storage and enhance ranker features with LLM scores and new interaction features
+M	backtest/ranker_model_backtest_v5.py
+M	commands/ml_commands.py
+M	config/config.py
+M	config/ranker_parameters.py
+A	docs/llm_coin_detail.md
+M	ranker_model/ranker_feature.py
+M	ranker_model/regression_train.py
+A	symbol_detail_info.json
+M	symbol_infos.json
+A	symbol_llm_score.json
+M	utils/coin_gecko_util.py
+0cb7706 fix: Adjust learning rate in ranker parameters and fine-tune regression model; enhance feature calculation with Gaussian Rank and percentile normalization
+M	backtest_kline_cache.feather
+M	config/ranker_parameters.py
+A	docs/experiments_results/2025_12_28_lighter_symbol_experiment.md
+M	docs/fine_tunal_paramaters.md
+M	ranker_model/fine_tune_regression_model.py
+M	ranker_model/ranker_feature.py
+M	ranker_model/ranker_train_v2.py
+M	ranker_model/regression_train.py
+6635b7e feat: Update ranker model training and fine-tuning processes with symbol filtering and parameter adjustments; add script for SCP transfer of predicted results
+M	backtest/ranker_model_backtest_v5.py
+M	backtest_kline_cache.feather
+A	bash_scripts/scp_predicted_result_to_mac_pro.sh
+M	commands/ml_commands.py
+M	config/experiments_config/regression_lighter_symbol.toml
+M	config/ranker_parameters.py
+A	docs/fine_tunal_paramaters.md
+M	ranker_model/fine_tune_ranker_train.py
+M	ranker_model/fine_tune_regression_model.py
+M	ranker_model/regression_portfolio_optimizer_generator.py
+M	ranker_model/regression_train.py
+e1f43f7 WIP on master: 74c0a3d feat: Enhance backtesting functionality with new trading weights calculation and improved fee structure analysis
+a1796ad index on master: 74c0a3d feat: Enhance backtesting functionality with new trading weights calculation and improved fee structure analysis
+74c0a3d feat: Enhance backtesting functionality with new trading weights calculation and improved fee structure analysis
+M	.vscode/tasks.json
+M	backtest/basic_backtest.py
+M	backtest/position_manager.py
+M	backtest/ranker_model_backtest_v5.py
+M	commands/online_commands.py
+A	config/experiments_config/regression_lighter_symbol.toml
+A	docs/experiments_results/2025_12_26_regression_volume_decrase.md
+A	docs/online_logs.md
+M	ranker_model/regression_portfolio_optimizer_generator.py
+A	ranker_model/weight_apply_rebalance_buffer.py
+D	ranker_model/weight_generator.py
+6fa473d feat: Add command to sync trading symbols from Binance to Redis and refactor RankerProcess to use Redis for symbol retrieval
+M	commands/online_commands.py
+M	online/order_executor.py
+M	online/ranker_process.py
+f948254 feat: Introduce distributed trading architecture with Ranker and Executor processes for enhanced real-time trading capabilities
+M	.vscode/settings.json
+M	AGENTS.md
+M	CLAUDE.md
+M	commands/online_commands.py
+M	config/config.py
+M	docs/deployment_guide.md
+A	docs/example_supervisor.md
+A	docs/ranker_executor_architecture.md
+A	online/executor_process.py
+A	online/ranker_process.py
+A	tests/unit/test_ranker_executor.py
+fff7318 feat: Refine order execution process with improved synchronization and enhanced error handling
+A	docs/deployment_guide.md
+aeab157 feat: Update kline synchronization interval and enhance aggressive retry logic in order execution
+M	bot/hourly_kline.py
+M	online/order_executor.py
+eee08b4 feat: Enhance order execution strategy with aggressive retry logic and improved price handling
+M	binance_api/Binance_market_util.py
+M	binance_api/binance_perp_api.py
+M	mkdocs.yml
+A	online/online_trading_v4.py
+M	online/order_executor.py
+M	utils/online_util.py
+97fb6b0 docs: Add command section for running documentation server
+M	README.md
+f4bc4ce feat: Add market order ratio calculation and logging to position alignment
+M	online/order_executor.py
+63bcba3 feat: Enhance order execution logic with position alignment and timing improvements
+M	online/online_trading_v3.py
+M	online/order_executor.py
+eb2a044 feat: Improve order handling and validation in Binance API; update rebalance order generation
+M	binance_api/binance_perp_api.py
+M	config/config_types.py

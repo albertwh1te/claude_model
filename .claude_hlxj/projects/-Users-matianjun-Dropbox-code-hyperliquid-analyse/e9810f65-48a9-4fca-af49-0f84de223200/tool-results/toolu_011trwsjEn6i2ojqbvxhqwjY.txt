@@ -1,0 +1,609 @@
+     1→import pandas as pd
+     2→import json
+     3→from typing import Dict, List
+     4→from config.config import ALL_SYMBOL_INFOS, ALL_SYMBOL_LLM_SCORE
+     5→from logger import main_logger as logger
+     6→from data.data_model import sqlite_local
+     7→from random import randint
+     8→from tqdm import tqdm
+     9→import numpy as np
+    10→from scipy.stats import norm  # <--- 新增引入，用于计算 Gaussian Rank
+    11→
+    12→# target_columns = ["target_1hour", "target_4hour", "target_24hour"]
+    13→target_columns = ["target_1hour"]
+    14→# target_columns = ["target_1hour", "return"]
+    15→
+    16→# 关键时间窗口 (小时)
+    17→key_windows = {
+    18→    "momentum_15m": 1,  # 短期动量
+    19→    "momentum_30m": 2,  # 短期动量
+    20→    "momentum_1h": 4,  # 短期反转/噪音
+    21→    "momentum_4h": 4 * 4,  # 短期动量
+    22→    "momentum_12h": 12 * 4,  # 半日动量
+    23→    "momentum_24h": 24 * 4,  # 日动量
+    24→    "momentum_72h": 72 * 4,  # 3日动量
+    25→    "momentum_168h": 168 * 4,  # 7日动量
+    26→    "momentum_336h": 336 * 4,  # 14日动量
+    27→}
+    28→
+    29→# @todo add is vc coin category feature
+    30→# @todo add human score
+    31→
+    32→
+    33→class RankerFeature:
+    34→
+    35→    def __init__(
+    36→        self,
+    37→        symbols: List[str] = None,
+    38→        start_time: pd.Timestamp = None,
+    39→        end_time: pd.Timestamp = None,
+    40→        minute_level: int = 15,
+    41→        target: bool = True,
+    42→    ):
+    43→        self.symbols = symbols
+    44→        self.start_time = start_time
+    45→        self.end_time = end_time
+    46→        self.target = target
+    47→
+    48→        self.token_level_feature_names = set()
+    49→        self.cross_section_feature_names = set()
+    50→        self.static_feature = set()
+    51→        self.minutes_level = minute_level
+    52→        # @info 最低级别的分钟线，可以用15分钟的生成更长的Kline
+    53→        self.base_kline_level = 15
+    54→        self.symbols_info = json.load(open(ALL_SYMBOL_INFOS, "r"))
+    55→        self.symbols_llm_score = json.load(open(ALL_SYMBOL_LLM_SCORE, "r"))
+    56→
+    57→    def get_total_features(self):
+    58→        return (
+    59→            list(self.token_level_feature_names)
+    60→            + list(self.cross_section_feature_names)
+    61→            + list(self.static_feature)
+    62→        )
+    63→
+    64→    def get_numeric_feature_names(self):
+    65→        return list(
+    66→            self.token_level_feature_names - set(["market_cap", "supply_utilization"])
+    67→        )
+    68→
+    69→    def get_raw_data_from_db_by_symbol(self, symbol: str) -> pd.DataFrame:
+    70→        start_time_str = self.start_time.strftime("%Y-%m-%d %H:%M:%S")
+    71→        end_time_str = self.end_time.strftime("%Y-%m-%d %H:%M:%S")
+    72→
+    73→        sql = (
+    74→            f"SELECT * FROM binanceklinev2 "
+    75→            f"WHERE time >= '{start_time_str}' AND time <= '{end_time_str}' AND LEVEL = '{self.base_kline_level}'"
+    76→            f"AND symbol = '{symbol}'"
+    77→        )
+    78→
+    79→        cursor = sqlite_local.execute_sql(sql)
+    80→        logger.info(f"sql: {sql}")
+    81→
+    82→        # Convert the cursor result into a Pandas DataFrame
+    83→        df = pd.DataFrame(
+    84→            cursor.fetchall(), columns=[col[0] for col in cursor.description]
+    85→        )
+    86→        df["time"] = pd.to_datetime(df["time"])
+    87→        df.sort_values("time", ascending=True, inplace=True)
+    88→        return df
+    89→
+    90→    def calculate_rsi(self, prices: pd.Series, period: int = 14) -> pd.Series:
+    91→        """
+    92→        计算RSI指标
+    93→        """
+    94→        delta = prices.diff()
+    95→        gain = (
+    96→            (delta.where(delta > 0, 0))
+    97→            .rolling(window=period, min_periods=period)
+    98→            .mean()
+    99→        )
+   100→        loss = (
+   101→            (-delta.where(delta < 0, 0))
+   102→            .rolling(window=period, min_periods=period)
+   103→            .mean()
+   104→        )
+   105→
+   106→        rs = gain / loss
+   107→        rsi = 100 - (100 / (1 + rs))
+   108→        return rsi
+   109→
+   110→    def calculate_kdj(
+   111→        self,
+   112→        high: pd.Series,
+   113→        low: pd.Series,
+   114→        close: pd.Series,
+   115→        k_period: int = 9,
+   116→        d_period: int = 3,
+   117→        j_period: int = 3,
+   118→    ) -> tuple:
+   119→        """
+   120→        计算KDJ指标
+   121→        """
+   122→        # 计算RSV (Raw Stochastic Value)
+   123→        lowest_low = low.rolling(window=k_period, min_periods=k_period).min()
+   124→        highest_high = high.rolling(window=k_period, min_periods=k_period).max()
+   125→
+   126→        # 避免除零错误
+   127→        rsv = ((close - lowest_low) / (highest_high - lowest_low)).fillna(0) * 100
+   128→
+   129→        # 计算K值（使用指数移动平均）
+   130→        k_values = []
+   131→        k_prev = 50  # K值初始值设为50
+   132→
+   133→        for rsv_value in rsv:
+   134→            if pd.isna(rsv_value):
+   135→                k_current = k_prev
+   136→            else:
+   137→                k_current = (2 / 3) * k_prev + (1 / 3) * rsv_value
+   138→            k_values.append(k_current)
+   139→            k_prev = k_current
+   140→
+   141→        k_series = pd.Series(k_values, index=rsv.index)
+   142→
+   143→        # 计算D值（K值的指数移动平均）
+   144→        d_values = []
+   145→        d_prev = 50  # D值初始值设为50
+   146→
+   147→        for k_value in k_series:
+   148→            d_current = (2 / 3) * d_prev + (1 / 3) * k_value
+   149→            d_values.append(d_current)
+   150→            d_prev = d_current
+   151→
+   152→        d_series = pd.Series(d_values, index=k_series.index)
+   153→
+   154→        # 计算J值
+   155→        j_series = 3 * k_series - 2 * d_series
+   156→
+   157→        return k_series, d_series, j_series
+   158→
+   159→    def calculate_token_level_feature(self, df: pd.DataFrame, target: bool = True):
+   160→        df["time"] = pd.to_datetime(df["time"])
+   161→        df.sort_values("time", ascending=True, inplace=True)
+   162→        df.set_index("time", inplace=True)
+   163→
+   164→        symbol = df["symbol"].iloc[0]
+   165→
+   166→        # @info static feature
+   167→
+   168→        # @info 如果没有币种信息，设置一些默认值
+   169→        if not self.symbols_info.get(symbol):
+   170→            logger.error(f"no symbol info for {symbol}, please update ALL_SYMBOL_INFOS")
+   171→            df["supply_utilization"] = 0
+   172→            df["market_cap"] = randint(0, 10) / 10
+   173→        else:
+   174→            symbol_info = self.symbols_info[symbol]
+   175→
+   176→            # @info 计算总供应量利用率 = 流通供应量 / 最大供应量
+   177→            if not symbol_info["max_supply"]:
+   178→                # @info 如果没有最大供应量数据，设置为0,因为最大供应量为0，说明是无限供应的，分母无限大
+   179→                df["supply_utilization"] = 0
+   180→
+   181→            else:
+   182→                df["supply_utilization"] = (
+   183→                    symbol_info["circulating_supply"] / symbol_info["max_supply"]
+   184→                )
+   185→
+   186→            # @info market cap 是一个中间feature ，未来是用来计算market cap feature的
+   187→            df["market_cap"] = symbol_info["circulating_supply"] * df["close"]
+   188→
+   189→            if symbol.startswith("1000"):
+   190→                # @info 1000开头的币种，价格需要除以1000
+   191→                df["market_cap"] = (
+   192→                    symbol_info["circulating_supply"] * df["close"] / 1000
+   193→                )
+   194→        self.token_level_feature_names.add("supply_utilization")
+   195→        self.token_level_feature_names.add("market_cap")
+   196→
+   197→        # @info add llm score feature
+   198→        # example data:
+   199→        #   "btc": {
+   200→        #     "institutional_score": 10,
+   201→        #     "meme_factor": 2,
+   202→        #     "security_risk": 0,
+   203→        #     "value_capture": 2
+   204→        #   }
+   205→        llm_symbol = symbol.lower().replace("usdt", "").replace("1000", "")
+   206→        if llm_symbol in self.symbols_llm_score:
+   207→            data = self.symbols_llm_score[llm_symbol]
+   208→            df["institutional_score"] = data["institutional_score"]
+   209→            df["meme_factor"] = data["meme_factor"]
+   210→            df["security_risk"] = data["security_risk"]
+   211→            df["value_capture"] = data["value_capture"]
+   212→            df["has_llm_data"] = 1
+   213→        else:
+   214→            logger.error(
+   215→                f"no llm score for {llm_symbol}, please update ALL_SYMBOL_LLM_SCORE"
+   216→            )
+   217→
+   218→            # 【institutional_score】: 未知币种通常没有机构 -> 0
+   219→            df["institutional_score"] = 0
+   220→
+   221→            # 【meme_factor】: 未知币种很难判断，取中位数保险 -> 5 (或者 0)
+   222→            df["meme_factor"] = 0  # 假设它不是 Meme，或者 5 保持中立
+   223→
+   224→            # 【security_risk】: 未知币种代码未经过验证 -> 风险较高 -> 7 或 5
+   225→            # 千万不要填 0 或 -1
+   226→            df["security_risk"] = 5
+   227→
+   228→            # 【value_capture】: 未知币种通常没有分红能力 -> 0
+   229→            df["value_capture"] = 0
+   230→
+   231→            # 标记为缺失，让模型知道上述分数是猜测的
+   232→            df["has_llm_data"] = 0
+   233→
+   234→        self.token_level_feature_names.add("has_llm_data")
+   235→        self.token_level_feature_names.add("institutional_score")
+   236→        self.token_level_feature_names.add("meme_factor")
+   237→        self.token_level_feature_names.add("security_risk")
+   238→        self.token_level_feature_names.add("value_capture")
+   239→
+   240→        df["gross_ret"] = df["close"] / df["open"]
+   241→        df["return"] = df["gross_ret"] - 1
+   242→
+   243→        df["volume_usd"] = df["volume"] * df["close"]
+   244→
+   245→        df["return"] = df["gross_ret"] - 1
+   246→
+   247→        gross = df["gross_ret"]
+   248→
+   249→        for feature_name, hours in key_windows.items():
+   250→            if hours == 1:
+   251→                # 短期：直接用前一期收益率
+   252→                df[feature_name] = df["return"].shift(1)
+   253→            else:
+   254→                # 长期：累积收益率，跳过当前时刻
+   255→                df[feature_name] = (
+   256→                    gross.shift(1)
+   257→                    .rolling(window=hours, min_periods=max(1, hours // 2))
+   258→                    .apply(np.prod, raw=True)
+   259→                    - 1
+   260→                )
+   261→
+   262→            self.token_level_feature_names.add(feature_name)
+   263→
+   264→        # 添加短期反转
+   265→        df["reversal_15m"] = df["return"].shift(1)
+   266→        df["reversal_1h"] = df["return"].shift(4)
+   267→        self.token_level_feature_names.add("reversal_15m")
+   268→        self.token_level_feature_names.add("reversal_1h")
+   269→        # 计算波动率特征 (使用相同的时间窗口)
+   270→        for window_name, hours in key_windows.items():
+   271→            volatility_name = window_name.replace("momentum", "volatility")
+   272→
+   273→            if hours == 1:
+   274→                # 1小时波动率：使用前一期收益率的绝对值作为代理
+   275→                df[volatility_name] = df["return"].shift(1).abs()
+   276→            else:
+   277→                # 长期波动率：计算收益率的标准差，跳过当前时刻
+   278→                df[volatility_name] = (
+   279→                    df["return"]
+   280→                    .shift(1)
+   281→                    .rolling(window=hours, min_periods=max(1, hours // 2))
+   282→                    .std()
+   283→                )
+   284→
+   285→            self.token_level_feature_names.add(volatility_name)
+   286→
+   287→        # 添加rsi特征 ，技术分析的
+   288→        df["rsi_15m_14"] = self.calculate_rsi(df["close"], period=14)
+   289→        df["rsi_15m_28"] = self.calculate_rsi(df["close"], period=28)
+   290→        self.token_level_feature_names.add("rsi_15m_14")
+   291→        self.token_level_feature_names.add("rsi_15m_28")
+   292→
+   293→        # 添加KDJ特征
+   294→        # 计算标准9周期的KDJ
+   295→        k_9, d_9, j_9 = self.calculate_kdj(
+   296→            df["high"], df["low"], df["close"], k_period=9
+   297→        )
+   298→        df["kdj_k_9"] = k_9
+   299→        df["kdj_d_9"] = d_9
+   300→        df["kdj_j_9"] = j_9
+   301→        self.token_level_feature_names.add("kdj_k_9")
+   302→        self.token_level_feature_names.add("kdj_d_9")
+   303→        self.token_level_feature_names.add("kdj_j_9")
+   304→
+   305→        # 计算14周期的KDJ（适应RSI的周期）
+   306→        k_14, d_14, j_14 = self.calculate_kdj(
+   307→            df["high"], df["low"], df["close"], k_period=14
+   308→        )
+   309→        df["kdj_k_14"] = k_14
+   310→        df["kdj_d_14"] = d_14
+   311→        df["kdj_j_14"] = j_14
+   312→        self.token_level_feature_names.add("kdj_k_14")
+   313→        self.token_level_feature_names.add("kdj_d_14")
+   314→        self.token_level_feature_names.add("kdj_j_14")
+   315→
+   316→        # 计算21周期的KDJ（更长周期）
+   317→        k_21, d_21, j_21 = self.calculate_kdj(
+   318→            df["high"], df["low"], df["close"], k_period=21
+   319→        )
+   320→        df["kdj_k_21"] = k_21
+   321→        df["kdj_d_21"] = d_21
+   322→        df["kdj_j_21"] = j_21
+   323→        self.token_level_feature_names.add("kdj_k_21")
+   324→        self.token_level_feature_names.add("kdj_d_21")
+   325→        self.token_level_feature_names.add("kdj_j_21")
+   326→
+   327→        # 添加KDJ的衍生特征
+   328→        # K线与D线的差值（金叉死叉信号）
+   329→        df["kdj_kd_diff_9"] = df["kdj_k_9"] - df["kdj_d_9"]
+   330→        df["kdj_kd_diff_14"] = df["kdj_k_14"] - df["kdj_d_14"]
+   331→        self.token_level_feature_names.add("kdj_kd_diff_9")
+   332→        self.token_level_feature_names.add("kdj_kd_diff_14")
+   333→
+   334→        # J值的动量（J值的变化率）
+   335→        df["kdj_j_momentum_9"] = df["kdj_j_9"] - df["kdj_j_9"].shift(1)
+   336→        df["kdj_j_momentum_14"] = df["kdj_j_14"] - df["kdj_j_14"].shift(1)
+   337→        self.token_level_feature_names.add("kdj_j_momentum_9")
+   338→        self.token_level_feature_names.add("kdj_j_momentum_14")
+   339→
+   340→        # 添加已实现波动率特征 (基于高低价)
+   341→        df["high_low_ratio"] = df["high"] / df["low"] - 1
+   342→        for window_name, hours in key_windows.items():
+   343→            if hours > 1:  # 跳过1小时窗口
+   344→                realized_vol_name = window_name.replace("momentum", "realized_vol")
+   345→                df[realized_vol_name] = (
+   346→                    df["high_low_ratio"]
+   347→                    .shift(1)
+   348→                    .rolling(window=hours, min_periods=max(1, hours // 2))
+   349→                    .mean()
+   350→                )
+   351→                self.token_level_feature_names.add(realized_vol_name)
+   352→
+   353→        for periods in key_windows.values():
+   354→            feature_name = f"volume_sum_{periods}_periods"
+   355→            df[feature_name] = (
+   356→                df["volume_usd"].rolling(window=periods, min_periods=1).sum()
+   357→            )
+   358→            self.token_level_feature_names.add(feature_name)
+   359→
+   360→        # 组合特征
+   361→        # LLM Score (Interaction Features)
+   362→        # 1. Meme 因子放大器
+   363→        # 逻辑：Meme属性 乘以 波动率。Meme 币在波动率大时更活跃。
+   364→        df["inter_meme_vol_4h"] = df["meme_factor"] * df["volatility_4h"]
+   365→        self.token_level_feature_names.add("inter_meme_vol_4h")
+   366→
+   367→        # 2. 机构因子与反转
+   368→        # 逻辑：机构分高 x 跌幅 (负收益)。看是否有"错杀"后的强反弹。
+   369→        df["inter_inst_reversal_24h"] = df["institutional_score"] * (
+   370→            df["momentum_24h"] * -1
+   371→        ).clip(lower=0)
+   372→        self.token_level_feature_names.add("inter_inst_reversal_24h")
+   373→
+   374→        # 3. 安全分倒数 x 波动率 (Risk Premium)
+   375→        # 逻辑：高风险（Security 低） 的币，如果没有 高波动（Volatility 高），那就一文不值。只有在剧烈波动时，垃圾币才有博弈价值。
+   376→        df["inter_risk_vol"] = df["security_risk"] * df["volatility_4h"]
+   377→        self.token_level_feature_names.add("inter_risk_vol")
+   378→
+   379→        # 安全性高 x 波动率低。筛选出"定海神针"。
+   380→        # 如果模型预测目标是 Sharpe 或 风险调整后收益，这个特征很有用
+   381→        df["inter_safety_stable"] = (10 - df["security_risk"]).clip(lower=0) / (
+   382→            df["volatility_24h"] + 1e-6
+   383→        )
+   384→        self.token_level_feature_names.add("inter_safety_stable")
+   385→
+   386→        # 价值回归 (Value Reversion) - 72H 级别
+   387→        # 逻辑：有价值捕获能力的币，在 3 天动量极差时，均值回归动力强
+   388→        # momentum_72h 如果是负数，取绝对值表示跌幅
+   389→        df["inter_value_reversion_72h"] = df["value_capture"] * (
+   390→            df["momentum_72h"] * -1
+   391→        ).clip(lower=0)
+   392→        self.token_level_feature_names.add("inter_value_reversion_72h")
+   393→
+   394→        # @info generate target
+   395→        if target:
+   396→            # 1小时target: 用未来4根15分钟K线的收盘价与当前收盘价计算收益
+   397→            df["target_1hour"] = df["close"].shift(-4) / df["close"] - 1
+   398→
+   399→        if target:
+   400→            return df[list(self.token_level_feature_names) + target_columns]
+   401→        else:
+   402→            return df[list(self.token_level_feature_names)]
+   403→
+   404→    def full_feature_with_data_online(
+   405→        self, symbols_data: Dict[str, pd.DataFrame], last_batch_time: pd.Timestamp
+   406→    ):
+   407→        token_feature = self.token_level_feature_with_data_online(
+   408→            symbols_data=symbols_data
+   409→        )
+   410→
+   411→        # @info 只保留最后一个时间点的数据去计算横截面特征
+   412→        last_batch = token_feature[
+   413→            token_feature.index.get_level_values(0) == last_batch_time
+   414→        ]
+   415→        feature = self.cross_section_feature(df=last_batch, target=False)
+   416→        logger.info(f"finished cross section feature time")
+   417→        return feature
+   418→
+   419→    def token_level_feature_with_data_online(
+   420→        self, symbols_data: Dict[str, pd.DataFrame]
+   421→    ):
+   422→        dfs = []
+   423→        for symbol, symbol_df in symbols_data.items():
+   424→            try:
+   425→
+   426→                if symbol_df.empty:
+   427→                    logger.error(f"no data for {symbol}")
+   428→                    continue
+   429→
+   430→                feature_df = self.calculate_token_level_feature(
+   431→                    df=symbol_df, target=False
+   432→                )
+   433→                feature_df["symbol"] = symbol
+   434→                feature_df.set_index("symbol", append=True, inplace=True)
+   435→
+   436→                if feature_df.index.duplicated().any():
+   437→                    logger.error(f"wrong duplicated data {symbol}")
+   438→                    feature_df = feature_df[~feature_df.index.duplicated(keep="last")]
+   439→
+   440→                # @todo 思考计算feature 最少需要多少的数据
+   441→                if len(symbol_df) <= 14 * 24 * 4:  # 14天 * 24小时 * 4个15分钟周期
+   442→                    logger.warning(f"not enough data for {symbol}")
+   443→                    continue
+   444→
+   445→                dfs.append(feature_df)
+   446→            except Exception as e:
+   447→                logger.error(f"failed to calculate feature for {symbol}: {e}")
+   448→                # @todo delete me
+   449→                import ipdb
+   450→
+   451→                ipdb.set_trace()
+   452→
+   453→        df = pd.concat(dfs)
+   454→        logger.info(f"max time of token level feature {df.index.max()}")
+   455→        return df
+   456→
+   457→    def token_level_feature(self, symbols: List[str], target: bool = True):
+   458→        dfs = []
+   459→        for symbol in tqdm(symbols):
+   460→            symbol_df = self.get_raw_data_from_db_by_symbol(symbol)
+   461→
+   462→            if symbol_df.empty:
+   463→                logger.error(f"no data for {symbol}")
+   464→                continue
+   465→
+   466→            feature_df = self.calculate_token_level_feature(df=symbol_df, target=target)
+   467→            feature_df["symbol"] = symbol
+   468→            feature_df.set_index("symbol", append=True, inplace=True)
+   469→
+   470→            if feature_df.index.duplicated().any():
+   471→                duplicates_mask = feature_df.index.duplicated(keep="first")
+   472→                feature_df = feature_df[~duplicates_mask]
+   473→                logger.warning(f"wrong duplicated data {symbol}")
+   474→
+   475→            # @info symbol df 需要 max key window 的数据才行
+   476→            if len(symbol_df) <= max(key_windows.values()):
+   477→                logger.warning(f"not enough data for {symbol}, {len(symbol_df)} rows")
+   478→                continue
+   479→
+   480→            dfs.append(feature_df)
+   481→
+   482→        df = pd.concat(dfs)
+   483→        logger.info(f"max time of token level feature {df.index.max()}")
+   484→        return df
+   485→
+   486→    def cross_section_feature(self, df: pd.DataFrame, target: bool):
+   487→        # 🟢 彻底重构的 Cross Section 逻辑，适应 Varying Universe Size
+   488→
+   489→        if target:
+   490→            df.dropna(inplace=True)
+   491→            bar = tqdm(df.groupby(level=0))
+   492→        else:
+   493→            bar = df.groupby(level=0)
+   494→
+   495→        dfs = []
+   496→        for time, time_df in bar:
+   497→            if target:
+   498→                bar.set_description(f"{time} , total symbol: {len(time_df)}")
+   499→            try:
+   500→                # 🟢 FIX: 放宽最小 symbol 数量限制，只要有5个以上就算
+   501→                if len(time_df) < 5:
+   502→                    logger.warning(
+   503→                        f"Skipping time {time} due to extremely low symbol count: {len(time_df)}"
+   504→                    )
+   505→                    continue
+   506→
+   507→                # -----------------------------------------------------
+   508→                # 1. Target 处理 (Gaussian Rank)
+   509→                # -----------------------------------------------------
+   510→                if target:
+   511→                    for column in target_columns:
+   512→                        # 保存原始收益率
+   513→                        time_df[f"{column}_number"] = time_df[column]
+   514→
+   515→                        # 🟢 FIX: 使用 Gaussian Rank 替代普通 Z-Score
+   516→                        # 核心逻辑: Rank(Pct) -> Inverse Normal CDF (ppf)
+   517→                        # 优点: 强制分布为 N(0,1)，消除 N=10 和 N=500 的方差差异
+   518→
+   519→                        epsilon = 1e-6  # 防止 rank 为 0 或 1 导致无穷大
+   520→                        pct_rank = time_df[column].rank(pct=True)
+   521→                        pct_rank = pct_rank * (1 - 2 * epsilon) + epsilon
+   522→
+   523→                        time_df[f"{column}_zscore"] = norm.ppf(pct_rank)
+   524→
+   525→                        # 🟢 FIX: 替换 pd.qcut 为 rank(pct=True)
+   526→                        # 这等同于"无限精细"的 qcut，且不会因为 N 小而报错
+   527→                        # 如果需要整数分类，可以在外面乘 10 取整，但这里保留小数更精确
+   528→                        time_df[column] = time_df[column].rank(pct=True)
+   529→
+   530→                # -----------------------------------------------------
+   531→                # 2. Market Cap / Momentum Label 处理
+   532→                # -----------------------------------------------------
+   533→                if not target and not all(time_df["momentum_1h"].isna()):
+   534→                    # 替换 qcut
+   535→                    time_df["momentum_1h_label"] = time_df["momentum_1h"].rank(pct=True)
+   536→
+   537→                # 替换 Market Cap qcut
+   538→                time_df["market_cap_rank_50"] = time_df["market_cap"].rank(pct=True)
+   539→                time_df["market_cap_rank_10"] = time_df["market_cap"].rank(pct=True)
+   540→
+   541→                # -----------------------------------------------------
+   542→                # 3. Numeric Features 标准化 (Percentile Rank)
+   543→                # -----------------------------------------------------
+   544→                numeric_features_to_standardize = self.get_numeric_feature_names()
+   545→
+   546→                volatility_features = [
+   547→                    f.replace("momentum", "volatility") for f in key_windows.keys()
+   548→                ]
+   549→                features_to_exclude = set(volatility_features)
+   550→                numeric_features_to_standardize = [
+   551→                    f
+   552→                    for f in numeric_features_to_standardize
+   553→                    if f not in features_to_exclude
+   554→                ]
+   555→
+   556→                # 🟢 FIX: 使用 Percentile Rank 替代 Z-Score Standardization
+   557→                # 这将特征归一化到 [0, 1]，对离群值和 N 的变化极度鲁棒
+   558→                time_df[numeric_features_to_standardize] = time_df[
+   559→                    numeric_features_to_standardize
+   560→                ].rank(pct=True)
+   561→
+   562→                # 保留均值特征 (注意：现在是 Rank 后的均值，代表"相对位置的平均")
+   563→                # 如果你想算原始值的均值，需要在 rank 之前算。
+   564→                # 但在 rank 体系下，均值通常趋向于 0.5。保留着防止下游代码报错。
+   565→                time_df["momentum_15m_mean"] = time_df["momentum_15m"].mean()
+   566→                time_df["momentum_1h_mean"] = time_df["momentum_1h"].mean()
+   567→                time_df["momentum_4h_mean"] = time_df["momentum_15m"].mean()
+   568→                time_df["momentum_24h_mean"] = time_df["momentum_15m"].mean()
+   569→
+   570→                dfs.append(time_df)
+   571→
+   572→            except Exception as e:
+   573→                logger.error(
+   574→                    f"Failed to generate cross section feature {time}: {e}",
+   575→                    exc_info=True,
+   576→                )
+   577→
+   578→        df = pd.concat(dfs)
+   579→
+   580→        # @info day of week feature, hour of day feature
+   581→        df["day_of_week"] = df.index.get_level_values(0).dayofweek
+   582→        df["hour_of_day"] = df.index.get_level_values(0).hour
+   583→
+   584→        # @info mark btc and eth because they are the most important tokens
+   585→        df["is_btc"] = (df.index.get_level_values(1) == "BTCUSDT").astype(int)
+   586→        df["is_eth"] = (df.index.get_level_values(1) == "ETHUSDT").astype(int)
+   587→
+   588→        df.sort_values("time", inplace=True)
+   589→        return df
+   590→
+   591→    def create_feature(self, save_token_feature: bool = True):
+   592→        logger.info(f"start create feature, total symbol number: {len(self.symbols)}")
+   593→        token_feature = self.token_level_feature(
+   594→            symbols=self.symbols, target=self.target
+   595→        )
+   596→        logger.info(f"finished token level feature {token_feature.shape}")
+   597→        if save_token_feature:
+   598→            logger.info("start saving token level feature")
+   599→            token_feature.to_csv("token_level_feature.csv")
+   600→        logger.info("start cross section feature time")
+   601→        feature = self.cross_section_feature(df=token_feature, target=self.target)
+   602→        logger.info(f"finished cross section feature time")
+   603→        # feature_importance = self.calculate_feature_importance(feature)
+   604→        return feature
+   605→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

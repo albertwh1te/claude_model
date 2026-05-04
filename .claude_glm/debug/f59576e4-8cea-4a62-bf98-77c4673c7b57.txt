@@ -1,0 +1,468 @@
+2026-05-04T03:22:01.439Z [DEBUG] [init] configureGlobalMTLS starting
+2026-05-04T03:22:01.442Z [DEBUG] [init] configureGlobalMTLS complete
+2026-05-04T03:22:01.442Z [DEBUG] [init] configureGlobalAgents starting
+2026-05-04T03:22:01.442Z [DEBUG] [init] configureGlobalAgents complete
+2026-05-04T03:22:01.451Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-05-04T03:22:01.472Z [DEBUG] Loading plugin planning-with-files from source: "./"
+2026-05-04T03:22:01.473Z [DEBUG] Using manifest version for planning-with-files@planning-with-files: 2.3.0
+2026-05-04T03:22:01.473Z [DEBUG] [ToolSearch:optimistic] mode=standard, ENABLE_TOOL_SEARCH=undefined, result=false
+2026-05-04T03:22:01.474Z [DEBUG] [STARTUP] Running setup()...
+2026-05-04T03:22:01.474Z [DEBUG] Plugin planning-with-files@planning-with-files version 2.3.0 already cached at /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/cache/planning-with-files/planning-with-files/2.3.0
+2026-05-04T03:22:01.476Z [DEBUG] Copied local plugin planning-with-files to versioned cache: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/cache/planning-with-files/planning-with-files/2.3.0
+2026-05-04T03:22:01.481Z [WARN] Failed to read cached marketplace claude-plugins-official: Invalid schema: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/marketplaces/claude-plugins-official/.claude-plugin/marketplace.json plugins.56.source: Invalid input
+2026-05-04T03:22:01.482Z [WARN] Failed to read cached marketplace claude-plugins-official: Invalid schema: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/marketplaces/claude-plugins-official/.claude-plugin/marketplace.json plugins.56.source: Invalid input
+2026-05-04T03:22:01.483Z [DEBUG] Loading skills from: managed=/Library/Application Support/ClaudeCode/.claude/skills, user=/Users/matianjun/Dropbox/code/claude_model/.claude_glm/skills, project=[]
+2026-05-04T03:22:01.483Z [DEBUG] Error log sink initialized
+2026-05-04T03:22:01.486Z [DEBUG] Found 1 plugins (1 enabled, 0 disabled)
+2026-05-04T03:22:01.489Z [DEBUG] [STARTUP] setup() completed in 15ms
+2026-05-04T03:22:01.489Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-05-04T03:22:01.489Z [DEBUG] Plugin not available for MCP: pyright-lsp@claude-plugins-official - error type: plugin-not-found
+2026-05-04T03:22:01.489Z [DEBUG] Plugin not available for MCP: context7@claude-plugins-official - error type: plugin-not-found
+2026-05-04T03:22:01.489Z [DEBUG] Plugin loading errors: Plugin pyright-lsp not found in marketplace claude-plugins-official, Plugin context7 not found in marketplace claude-plugins-official
+2026-05-04T03:22:01.489Z [DEBUG] getPluginSkills: Processing 1 enabled plugins
+2026-05-04T03:22:01.489Z [DEBUG] Checking plugin planning-with-files: skillsPath=exists, skillsPaths=0 paths
+2026-05-04T03:22:01.489Z [DEBUG] Attempting to load skills from plugin planning-with-files default skillsPath: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/cache/planning-with-files/planning-with-files/2.3.0/skills
+2026-05-04T03:22:01.495Z [DEBUG] Plugin loading errors: Plugin pyright-lsp not found in marketplace claude-plugins-official, Plugin context7 not found in marketplace claude-plugins-official
+2026-05-04T03:22:01.495Z [DEBUG] Total plugin commands loaded: 0
+2026-05-04T03:22:01.496Z [DEBUG] Loaded 1 skills from plugin planning-with-files default directory
+2026-05-04T03:22:01.496Z [DEBUG] Total plugin skills loaded: 1
+2026-05-04T03:22:01.496Z [DEBUG] Registered 0 hooks from 1 plugins
+2026-05-04T03:22:01.496Z [DEBUG] Plugin loading errors: Plugin pyright-lsp not found in marketplace claude-plugins-official, Plugin context7 not found in marketplace claude-plugins-official
+2026-05-04T03:22:01.496Z [DEBUG] Total plugin agents loaded: 0
+2026-05-04T03:22:01.496Z [DEBUG] Loaded 0 unique skills (0 unconditional, 0 conditional, managed: 0, user: 0, project: 0, additional: 0, legacy commands: 0)
+2026-05-04T03:22:01.496Z [DEBUG] getSkills returning: 0 skill dir commands, 1 plugin skills, 2 bundled skills
+2026-05-04T03:22:01.497Z [DEBUG] [STARTUP] Commands and agents loaded in 8ms
+2026-05-04T03:22:01.497Z [DEBUG] Layout engine: yoga
+2026-05-04T03:22:01.502Z [DEBUG] [Claude in Chrome] Found chrome profiles: Default, Profile 1, Profile 2, Profile 3
+2026-05-04T03:22:01.512Z [DEBUG] [STARTUP] Running showSetupScreens()...
+2026-05-04T03:22:01.530Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-05-04T03:22:01.531Z [DEBUG] [STARTUP] showSetupScreens() completed in 19ms
+2026-05-04T03:22:01.531Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-05-04T03:22:01.531Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-05-04T03:22:01.531Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-05-04T03:22:01.552Z [DEBUG] [STARTUP] MCP configs loaded in 101ms
+2026-05-04T03:22:01.564Z [DEBUG] All plugins already exist, skipping migration
+2026-05-04T03:22:01.565Z [DEBUG] [Reconnection] computeInitialTeamContext: No teammate context set (not a teammate)
+2026-05-04T03:22:01.568Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864921568
+2026-05-04T03:22:01.568Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:22:01.569Z [DEBUG] Temp file written successfully, size: 12031 bytes
+2026-05-04T03:22:01.569Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:22:01.569Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864921568 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:22:01.569Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:22:01.571Z [DEBUG] Getting matching hook commands for SessionStart with query: startup
+2026-05-04T03:22:01.571Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:22:01.571Z [DEBUG] Matched 0 unique hooks for query "startup" (0 before deduplication)
+2026-05-04T03:22:01.577Z [DEBUG] Loaded 3 installed plugins from /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/installed_plugins.json
+2026-05-04T03:22:01.577Z [DEBUG] Initialized versioned plugins system with 3 plugins
+2026-05-04T03:22:01.601Z [DEBUG] [keybindings] KeybindingSetup initialized with 101 bindings, 0 warnings
+2026-05-04T03:22:01.638Z [DEBUG] [REPL:mount] REPL mounted, disabled=false
+2026-05-04T03:22:01.640Z [DEBUG] Official marketplace auto-install skipped: already_attempted
+2026-05-04T03:22:01.641Z [DEBUG] performStartupChecks called
+2026-05-04T03:22:01.641Z [DEBUG] Starting background plugin installations
+2026-05-04T03:22:01.641Z [DEBUG] performBackgroundPluginInstallations called
+2026-05-04T03:22:01.642Z [DEBUG] Loaded 1 CLAUDE.md/rules files:
+  [Project] /Users/matianjun/Dropbox/obsidian_zettelkasten/CLAUDE.md (4032 chars)
+2026-05-04T03:22:01.647Z [DEBUG] Watching for changes in setting files /Users/matianjun/Dropbox/code/claude_model/.claude_glm/settings.json...
+2026-05-04T03:22:01.648Z [DEBUG] Plugin not available for MCP: pyright-lsp@claude-plugins-official - error type: plugin-not-found
+2026-05-04T03:22:01.648Z [DEBUG] Plugin not available for MCP: context7@claude-plugins-official - error type: plugin-not-found
+2026-05-04T03:22:01.648Z [DEBUG] Plugin not available for MCP: pyright-lsp@claude-plugins-official - error type: plugin-not-found
+2026-05-04T03:22:01.648Z [DEBUG] Plugin not available for MCP: context7@claude-plugins-official - error type: plugin-not-found
+2026-05-04T03:22:01.648Z [DEBUG] Found 3 enabled plugins
+2026-05-04T03:22:01.648Z [DEBUG] All plugins already exist, skipping migration
+2026-05-04T03:22:01.648Z [DEBUG] Found 3 installed plugins (V2 format)
+2026-05-04T03:22:01.649Z [DEBUG] [claudeai-mcp] Checking gate (cached)...
+2026-05-04T03:22:01.649Z [DEBUG] [claudeai-mcp] Gate returned: true
+2026-05-04T03:22:01.649Z [DEBUG] [claudeai-mcp] No access token
+2026-05-04T03:22:01.649Z [DEBUG] Loaded plugins - Enabled: 1, Disabled: 0, Commands: 0, Agents: 0, Errors: 2
+2026-05-04T03:22:01.649Z [DEBUG] Found 0 missing plugins (not installed):
+2026-05-04T03:22:01.649Z [DEBUG] Setting installation status: 0 marketplaces, 0 installable plugins, 0 uninstallable plugins
+2026-05-04T03:22:01.658Z [DEBUG] Total LSP servers loaded: 0
+2026-05-04T03:22:01.658Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 0 server(s)
+2026-05-04T03:22:01.658Z [DEBUG] LSP manager initialized with 0 servers
+2026-05-04T03:22:01.658Z [DEBUG] LSP server manager initialized successfully
+2026-05-04T03:22:01.658Z [DEBUG] LSP notification handlers registered successfully for all 0 server(s)
+2026-05-04T03:22:01.659Z [DEBUG] [keybindings] Watching for changes to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/keybindings.json
+2026-05-04T03:22:01.675Z [DEBUG] [Claude in Chrome] Found brave profiles: Default
+2026-05-04T03:22:01.677Z [DEBUG] Git remote URL: git@github.com:albertwh1te/obsidian_zettelkasten.git
+2026-05-04T03:22:01.678Z [DEBUG] Parsed repository: albertwh1te/obsidian_zettelkasten from git@github.com:albertwh1te/obsidian_zettelkasten.git
+2026-05-04T03:22:01.678Z [DEBUG] Parsed repository: albertwh1te/obsidian_zettelkasten from URL: git@github.com:albertwh1te/obsidian_zettelkasten.git
+2026-05-04T03:22:01.678Z [DEBUG] Path /Users/matianjun/Dropbox/obsidian_zettelkasten already tracked for repo albertwh1te/obsidian_zettelkasten
+2026-05-04T03:22:01.679Z [DEBUG] [Claude in Chrome] Extension not found in any browser
+2026-05-04T03:22:01.739Z [DEBUG] Ripgrep first use test: PASSED (mode=builtin, path=/Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/arm64-darwin/rg)
+2026-05-04T03:22:01.764Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:22:01.764Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:22:01.765Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:22:01.895Z [DEBUG] AutoUpdaterWrapper: Installation type: unknown
+2026-05-04T03:22:02.238Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864922238
+2026-05-04T03:22:02.238Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:22:02.239Z [DEBUG] Temp file written successfully, size: 12030 bytes
+2026-05-04T03:22:02.239Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:22:02.239Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864922238 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:22:02.239Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:22:02.242Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864922242
+2026-05-04T03:22:02.242Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:22:02.243Z [DEBUG] Temp file written successfully, size: 12075 bytes
+2026-05-04T03:22:02.243Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:22:02.243Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864922242 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:22:02.243Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:22:02.245Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864922245
+2026-05-04T03:22:02.245Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:22:02.245Z [DEBUG] Temp file written successfully, size: 12074 bytes
+2026-05-04T03:22:02.246Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:22:02.246Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864922245 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:22:02.246Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:22:02.247Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864922247
+2026-05-04T03:22:02.247Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:22:02.247Z [DEBUG] Temp file written successfully, size: 12075 bytes
+2026-05-04T03:22:02.247Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:22:02.247Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864922247 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:22:02.248Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:22:02.249Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864922249
+2026-05-04T03:22:02.249Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:22:02.250Z [DEBUG] Temp file written successfully, size: 12074 bytes
+2026-05-04T03:22:02.250Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:22:02.250Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864922249 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:22:02.250Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:22:02.251Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T03:22:02.252Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.9af; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:22:02.254Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:22:02.254Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:22:02.255Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:22:03.529Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:22:03.542Z [DEBUG] AutoUpdater: Detected installation type: unknown
+2026-05-04T03:22:03.542Z [DEBUG] AutoUpdater: Unknown installation type, falling back to config
+2026-05-04T03:22:04.205Z [DEBUG] AutoUpdaterWrapper: Installation type: unknown
+2026-05-04T03:22:07.204Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T03:22:07.204Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T03:22:07.205Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T03:22:07.205Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T03:22:07.205Z [DEBUG] Sending 2 skills via attachment (initial, 2 total sent)
+2026-05-04T03:22:07.205Z [DEBUG] Skill prompt: showing "planning-with-files:planning-with-files" (userFacingName="planning-with-files")
+2026-05-04T03:22:07.207Z [DEBUG] Getting matching hook commands for UserPromptSubmit with query: undefined
+2026-05-04T03:22:07.207Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:22:07.208Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-05-04T03:22:07.208Z [DEBUG] FileHistory: Added snapshot for 5eeba55c-67a0-4439-be84-f996e8e37d10, tracking 0 files
+2026-05-04T03:22:07.209Z [DEBUG] [useDeferredValue] Messages deferred by 2 (0→2)
+2026-05-04T03:22:07.251Z [DEBUG] Started caffeinate to prevent sleep
+2026-05-04T03:22:07.254Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864927254
+2026-05-04T03:22:07.254Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:22:07.254Z [DEBUG] Temp file written successfully, size: 12542 bytes
+2026-05-04T03:22:07.254Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:22:07.254Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864927254 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:22:07.254Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:22:07.255Z [DEBUG] [SystemPrompt] path=simple proactive=false
+2026-05-04T03:22:07.258Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864927258
+2026-05-04T03:22:07.258Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:22:07.258Z [DEBUG] Temp file written successfully, size: 12543 bytes
+2026-05-04T03:22:07.258Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:22:07.258Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864927258 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:22:07.258Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:22:07.259Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864927259
+2026-05-04T03:22:07.259Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:22:07.259Z [DEBUG] Temp file written successfully, size: 12544 bytes
+2026-05-04T03:22:07.259Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:22:07.259Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864927259 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:22:07.260Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:22:07.261Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T03:22:07.261Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.ab0; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:22:07.261Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:22:07.261Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:22:07.262Z [DEBUG] Plugin loading errors: Plugin pyright-lsp not found in marketplace claude-plugins-official, Plugin context7 not found in marketplace claude-plugins-official
+2026-05-04T03:22:07.262Z [DEBUG] Total plugin output styles loaded: 0
+2026-05-04T03:22:07.262Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:22:07.268Z [DEBUG] autocompact: tokens=159 threshold=167000 effectiveWindow=180000
+2026-05-04T03:22:07.269Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-05-04T03:22:07.271Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:22:07.272Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:22:07.272Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:22:07.272Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:22:07.276Z [DEBUG] [useDeferredValue] Messages deferred by 2 (0→2)
+2026-05-04T03:22:07.282Z [DEBUG] Stats cache stale (2026-03-11), processing 2026-03-12 to 2026-05-03 in background
+2026-05-04T03:22:07.285Z [DEBUG] Failed to read session file /Users/matianjun/Dropbox/code/claude_model/.claude_glm/projects/-Users-matianjun-Dropbox-code/d9e0f36c-6e9d-4503-90f4-9c3496a6c1a8.jsonl: ENOENT: no such file or directory, stat '/Users/matianjun/Dropbox/code/claude_model/.claude_glm/projects/-Users-matianjun-Dropbox-code/d9e0f36c-6e9d-4503-90f4-9c3496a6c1a8.jsonl'
+2026-05-04T03:22:07.294Z [DEBUG] Stats cache saved successfully (lastComputedDate: 2026-05-03)
+2026-05-04T03:22:07.294Z [DEBUG] Stats cache updated with 6 new sessions
+2026-05-04T03:22:08.297Z [ERROR] API error (attempt 1/11): 400 400 {"type":"error","error":{"type":"invalid_request_error","message":"invalid params"}}
+2026-05-04T03:22:08.316Z [ERROR] Error in API request: 400 {"type":"error","error":{"type":"invalid_request_error","message":"invalid params"}}
+2026-05-04T03:22:08.316Z [ERROR] Error: Error: 400 {"type":"error","error":{"type":"invalid_request_error","message":"invalid params"}}
+    at E4.generate (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:354:8788)
+    at aC.makeStatusError (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:393:2195)
+    at aC.makeRequest (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:393:5420)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-05-04T03:22:08.317Z [ERROR] SyntaxError: SyntaxError: Unexpected token 'A', "API Error:"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:54:1088
+    at K (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:8:7612)
+    at NR7 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1176:5128)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-05-04T03:22:11.169Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864931169
+2026-05-04T03:22:11.169Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:22:11.169Z [DEBUG] Temp file written successfully, size: 12544 bytes
+2026-05-04T03:22:11.169Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:22:11.169Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864931169 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:22:11.169Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:22:11.489Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:22:12.113Z [DEBUG] [useDeferredValue] Messages deferred by 1 (2→3)
+2026-05-04T03:22:12.257Z [DEBUG] [useDeferredValue] Messages deferred by 1 (3→4)
+2026-05-04T03:22:12.275Z [DEBUG] Getting matching hook commands for Stop with query: undefined
+2026-05-04T03:22:12.275Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:22:12.275Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-05-04T03:22:12.278Z [DEBUG] Stopped caffeinate, allowing sleep
+2026-05-04T03:22:12.281Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864932281
+2026-05-04T03:22:12.281Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:22:12.281Z [DEBUG] Temp file written successfully, size: 12544 bytes
+2026-05-04T03:22:12.281Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:22:12.281Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864932281 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:22:12.281Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:22:12.284Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864932284
+2026-05-04T03:22:12.284Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:22:12.284Z [DEBUG] Temp file written successfully, size: 12544 bytes
+2026-05-04T03:22:12.284Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:22:12.284Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864932284 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:22:12.284Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:22:13.699Z [ERROR] Failed to refresh marketplace claude-plugins-official: The marketplace.json file is no longer present in this repository.
+
+This marketplace may have been deprecated or moved to a new location.
+Source: anthropics/claude-plugins-official
+
+You can remove this marketplace with: claude plugin marketplace remove "claude-plugins-official"
+2026-05-04T03:22:13.699Z [WARN] Plugin autoupdate: failed to refresh marketplace claude-plugins-official: Failed to refresh marketplace 'claude-plugins-official': The marketplace.json file is no longer present in this repository.
+
+This marketplace may have been deprecated or moved to a new location.
+Source: anthropics/claude-plugins-official
+
+You can remove this marketplace with: claude plugin marketplace remove "claude-plugins-official"
+2026-05-04T03:22:13.699Z [DEBUG] Plugin autoupdate: checking installed plugins
+2026-05-04T03:22:13.704Z [WARN] Failed to read cached marketplace claude-plugins-official: Invalid schema: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/marketplaces/claude-plugins-official/.claude-plugin/marketplace.json plugins.0.source: Invalid input, plugins.1.source: Invalid input, plugins.5.source: Invalid input, plugins.10.source: Invalid input, plugins.11.source: Invalid input, plugins.19.source: Invalid input, plugins.21.source: Invalid input, plugins.22.source: Invalid input, plugins.23.source: Invalid input, plugins.27.source: Invalid input, plugins.51.source: Invalid input, plugins.54.source: Invalid input, plugins.55.source: Invalid input, plugins.56.source: Invalid input, plugins.61.source: Invalid input, plugins.79.source: Invalid input, plugins.89.source: Invalid input, plugins.91.source: Invalid input, plugins.92.source: Invalid input, plugins.93.source: Invalid input, plugins.99.source: Invalid input, plugins.101.source: Invalid input, plugins.103.source: Invalid input, plugins.109.source: Invalid input, plugins.123.source: Invalid input, plugins.129.source: Invalid input, plugins.136.source: Invalid input, plugins.141.source: Invalid input, plugins.144.source: Invalid input, plugins.150.source: Invalid input, plugins.156.source: Invalid input, plugins.164.source: Invalid input, plugins.165.source: Invalid input, plugins.174.source: Invalid input
+2026-05-04T03:22:13.708Z [WARN] Failed to read cached marketplace claude-plugins-official: Invalid schema: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/marketplaces/claude-plugins-official/.claude-plugin/marketplace.json plugins.0.source: Invalid input, plugins.1.source: Invalid input, plugins.5.source: Invalid input, plugins.10.source: Invalid input, plugins.11.source: Invalid input, plugins.19.source: Invalid input, plugins.21.source: Invalid input, plugins.22.source: Invalid input, plugins.23.source: Invalid input, plugins.27.source: Invalid input, plugins.51.source: Invalid input, plugins.54.source: Invalid input, plugins.55.source: Invalid input, plugins.56.source: Invalid input, plugins.61.source: Invalid input, plugins.79.source: Invalid input, plugins.89.source: Invalid input, plugins.91.source: Invalid input, plugins.92.source: Invalid input, plugins.93.source: Invalid input, plugins.99.source: Invalid input, plugins.101.source: Invalid input, plugins.103.source: Invalid input, plugins.109.source: Invalid input, plugins.123.source: Invalid input, plugins.129.source: Invalid input, plugins.136.source: Invalid input, plugins.141.source: Invalid input, plugins.144.source: Invalid input, plugins.150.source: Invalid input, plugins.156.source: Invalid input, plugins.164.source: Invalid input, plugins.165.source: Invalid input, plugins.174.source: Invalid input
+2026-05-04T03:22:13.712Z [WARN] Cache corrupted or missing for marketplace claude-plugins-official, re-fetching from source: Invalid schema: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/marketplaces/claude-plugins-official/.claude-plugin/marketplace.json plugins.0.source: Invalid input, plugins.1.source: Invalid input, plugins.5.source: Invalid input, plugins.10.source: Invalid input, plugins.11.source: Invalid input, plugins.19.source: Invalid input, plugins.21.source: Invalid input, plugins.22.source: Invalid input, plugins.23.source: Invalid input, plugins.27.source: Invalid input, plugins.51.source: Invalid input, plugins.54.source: Invalid input, plugins.55.source: Invalid input, plugins.56.source: Invalid input, plugins.61.source: Invalid input, plugins.79.source: Invalid input, plugins.89.source: Invalid input, plugins.91.source: Invalid input, plugins.92.source: Invalid input, plugins.93.source: Invalid input, plugins.99.source: Invalid input, plugins.101.source: Invalid input, plugins.103.source: Invalid input, plugins.109.source: Invalid input, plugins.123.source: Invalid input, plugins.129.source: Invalid input, plugins.136.source: Invalid input, plugins.141.source: Invalid input, plugins.144.source: Invalid input, plugins.150.source: Invalid input, plugins.156.source: Invalid input, plugins.164.source: Invalid input, plugins.165.source: Invalid input, plugins.174.source: Invalid input
+2026-05-04T03:22:17.404Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864937404
+2026-05-04T03:22:17.404Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:22:17.404Z [DEBUG] Temp file written successfully, size: 12715 bytes
+2026-05-04T03:22:17.404Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:22:17.404Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864937404 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:22:17.405Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:22:22.043Z [DEBUG] Reading marketplace from /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/marketplaces/anthropics-claude-plugins-official/.claude-plugin/marketplace.json
+2026-05-04T03:22:22.108Z [DEBUG] Could not find plugin pyright-lsp@claude-plugins-official: Invalid schema: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/marketplaces/anthropics-claude-plugins-official/.claude-plugin/marketplace.json plugins.0.source: Invalid input, plugins.1.source: Invalid input, plugins.5.source: Invalid input, plugins.10.source: Invalid input, plugins.11.source: Invalid input, plugins.19.source: Invalid input, plugins.21.source: Invalid input, plugins.22.source: Invalid input, plugins.23.source: Invalid input, plugins.27.source: Invalid input, plugins.51.source: Invalid input, plugins.54.source: Invalid input, plugins.55.source: Invalid input, plugins.56.source: Invalid input, plugins.61.source: Invalid input, plugins.79.source: Invalid input, plugins.89.source: Invalid input, plugins.91.source: Invalid input, plugins.92.source: Invalid input, plugins.93.source: Invalid input, plugins.99.source: Invalid input, plugins.101.source: Invalid input, plugins.103.source: Invalid input, plugins.109.source: Invalid input, plugins.123.source: Invalid input, plugins.129.source: Invalid input, plugins.136.source: Invalid input, plugins.141.source: Invalid input, plugins.144.source: Invalid input, plugins.150.source: Invalid input, plugins.156.source: Invalid input, plugins.164.source: Invalid input, plugins.165.source: Invalid input, plugins.174.source: Invalid input
+2026-05-04T03:22:22.108Z [DEBUG] Could not find plugin context7@claude-plugins-official: Invalid schema: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/plugins/marketplaces/anthropics-claude-plugins-official/.claude-plugin/marketplace.json plugins.0.source: Invalid input, plugins.1.source: Invalid input, plugins.5.source: Invalid input, plugins.10.source: Invalid input, plugins.11.source: Invalid input, plugins.19.source: Invalid input, plugins.21.source: Invalid input, plugins.22.source: Invalid input, plugins.23.source: Invalid input, plugins.27.source: Invalid input, plugins.51.source: Invalid input, plugins.54.source: Invalid input, plugins.55.source: Invalid input, plugins.56.source: Invalid input, plugins.61.source: Invalid input, plugins.79.source: Invalid input, plugins.89.source: Invalid input, plugins.91.source: Invalid input, plugins.92.source: Invalid input, plugins.93.source: Invalid input, plugins.99.source: Invalid input, plugins.101.source: Invalid input, plugins.103.source: Invalid input, plugins.109.source: Invalid input, plugins.123.source: Invalid input, plugins.129.source: Invalid input, plugins.136.source: Invalid input, plugins.141.source: Invalid input, plugins.144.source: Invalid input, plugins.150.source: Invalid input, plugins.156.source: Invalid input, plugins.164.source: Invalid input, plugins.165.source: Invalid input, plugins.174.source: Invalid input
+2026-05-04T03:22:22.109Z [WARN] Plugin autoupdate: failed to update pyright-lsp@claude-plugins-official: Plugin "pyright-lsp" not found
+2026-05-04T03:22:22.109Z [WARN] Plugin autoupdate: failed to update context7@claude-plugins-official: Plugin "context7" not found
+2026-05-04T03:22:39.004Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T03:22:39.004Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T03:22:39.004Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T03:22:39.004Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T03:22:39.006Z [DEBUG] Getting matching hook commands for UserPromptSubmit with query: undefined
+2026-05-04T03:22:39.006Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:22:39.006Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-05-04T03:22:39.006Z [DEBUG] FileHistory: Making snapshot for message 645f2833-b621-48bf-9e08-a9cd43a8b7fe
+2026-05-04T03:22:39.006Z [DEBUG] FileHistory: Added snapshot for 645f2833-b621-48bf-9e08-a9cd43a8b7fe, tracking 0 files
+2026-05-04T03:22:39.007Z [DEBUG] [useDeferredValue] Messages deferred by 1 (4→5)
+2026-05-04T03:22:39.018Z [DEBUG] Started caffeinate to prevent sleep
+2026-05-04T03:22:39.021Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864959021
+2026-05-04T03:22:39.021Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:22:39.022Z [DEBUG] Temp file written successfully, size: 12715 bytes
+2026-05-04T03:22:39.022Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:22:39.022Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864959021 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:22:39.022Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:22:39.022Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T03:22:39.023Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.3f1; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:22:39.023Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:22:39.023Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:22:39.023Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:22:39.025Z [DEBUG] autocompact: tokens=18933 threshold=167000 effectiveWindow=180000
+2026-05-04T03:22:39.026Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T03:22:39.028Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:22:39.030Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:22:39.030Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:22:39.030Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:22:39.033Z [DEBUG] [useDeferredValue] Messages deferred by 1 (4→5)
+2026-05-04T03:22:39.283Z [ERROR] API error (attempt 1/11): 400 400 {"type":"error","error":{"type":"invalid_request_error","message":"invalid params"}}
+2026-05-04T03:22:39.283Z [ERROR] Error in API request: 400 {"type":"error","error":{"type":"invalid_request_error","message":"invalid params"}}
+2026-05-04T03:22:39.283Z [ERROR] Error: Error: 400 {"type":"error","error":{"type":"invalid_request_error","message":"invalid params"}}
+    at E4.generate (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:354:8788)
+    at aC.makeStatusError (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:393:2195)
+    at aC.makeRequest (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:393:5420)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-05-04T03:22:42.458Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:22:42.980Z [DEBUG] [useDeferredValue] Messages deferred by 1 (5→6)
+2026-05-04T03:22:43.333Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-05-04T03:22:43.334Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-05-04T03:22:43.334Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:22:43.334Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T03:22:43.337Z [DEBUG] tree-sitter: WASM files not found
+2026-05-04T03:22:43.342Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864963342
+2026-05-04T03:22:43.342Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:22:43.342Z [DEBUG] Temp file written successfully, size: 12743 bytes
+2026-05-04T03:22:43.342Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:22:43.342Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864963342 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:22:43.343Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:22:43.343Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T03:22:43.343Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.611; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:22:43.343Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:22:43.343Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:22:43.344Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:22:43.345Z [DEBUG] [useDeferredValue] Messages deferred by 1 (6→7)
+2026-05-04T03:22:43.350Z [DEBUG] [useDeferredValue] Messages deferred by 1 (6→7)
+2026-05-04T03:22:43.354Z [WARN] [PROMPT CACHE BREAK] system prompt changed (-1928 chars), tools changed (tool prompt/schema changed, same tool set) [source=repl_main_thread, call #2, cache read: 2304 → 0, creation: 0]
+2026-05-04T03:22:44.234Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:22:46.875Z [DEBUG] Creating shell snapshot for zsh (/bin/zsh)
+2026-05-04T03:22:46.875Z [DEBUG] Looking for shell config file: /Users/matianjun/.zshrc
+2026-05-04T03:22:46.876Z [DEBUG] Snapshots directory: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/shell-snapshots
+2026-05-04T03:22:46.877Z [DEBUG] Creating snapshot at: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/shell-snapshots/snapshot-zsh-1777864966876-v2ob8k.sh
+2026-05-04T03:22:46.877Z [DEBUG] Shell binary exists: true
+2026-05-04T03:22:46.877Z [DEBUG] Execution timeout: 10000ms
+2026-05-04T03:22:48.307Z [DEBUG] Shell snapshot created successfully (175971 bytes)
+2026-05-04T03:22:48.307Z [DEBUG] No session environment scripts found
+2026-05-04T03:22:50.311Z [DEBUG] [useDeferredValue] Messages deferred by 1 (7→8)
+2026-05-04T03:22:51.313Z [DEBUG] [useDeferredValue] Messages deferred by 1 (8→9)
+2026-05-04T03:22:52.313Z [DEBUG] [useDeferredValue] Messages deferred by 1 (9→10)
+2026-05-04T03:22:53.313Z [DEBUG] [useDeferredValue] Messages deferred by 1 (10→11)
+2026-05-04T03:22:54.314Z [DEBUG] [useDeferredValue] Messages deferred by 1 (11→12)
+2026-05-04T03:22:55.316Z [DEBUG] [useDeferredValue] Messages deferred by 1 (12→13)
+2026-05-04T03:22:55.664Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T03:22:55.664Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.85e; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:22:55.665Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:22:55.665Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:22:55.665Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-05-04T03:22:55.665Z [DEBUG] Found 5 hook matchers in settings
+2026-05-04T03:22:55.665Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T03:22:55.665Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:22:55.667Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T03:22:55.667Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T03:22:55.667Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T03:22:55.667Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T03:22:55.667Z [DEBUG] autocompact: tokens=19185 threshold=167000 effectiveWindow=180000
+2026-05-04T03:22:55.667Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T03:22:55.669Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:22:55.670Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:22:55.670Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:22:55.670Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:22:55.673Z [DEBUG] [useDeferredValue] Messages deferred by 1 (13→14)
+2026-05-04T03:22:56.461Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:22:58.488Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:22:59.072Z [DEBUG] [useDeferredValue] Messages deferred by 1 (14→15)
+2026-05-04T03:22:59.074Z [DEBUG] [useDeferredValue] Messages deferred by 1 (14→15)
+2026-05-04T03:22:59.232Z [DEBUG] [useDeferredValue] Messages deferred by 1 (15→16)
+2026-05-04T03:22:59.257Z [DEBUG] High write ratio: blit=0, write=1047 (100.0% writes), screen=28x212
+2026-05-04T03:22:59.537Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-05-04T03:22:59.537Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-05-04T03:22:59.537Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:22:59.537Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T03:22:59.540Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T03:22:59.540Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.91b; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:22:59.541Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:22:59.541Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:22:59.541Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:22:59.543Z [DEBUG] [useDeferredValue] Messages deferred by 1 (16→17)
+2026-05-04T03:22:59.567Z [DEBUG] High write ratio: blit=0, write=1112 (100.0% writes), screen=31x212
+2026-05-04T03:23:00.257Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:23:05.272Z [DEBUG] [useDeferredValue] Messages deferred by 1 (17→18)
+2026-05-04T03:23:06.279Z [DEBUG] [useDeferredValue] Messages deferred by 1 (18→19)
+2026-05-04T03:23:07.274Z [DEBUG] [useDeferredValue] Messages deferred by 1 (19→20)
+2026-05-04T03:23:08.276Z [DEBUG] [useDeferredValue] Messages deferred by 1 (20→21)
+2026-05-04T03:23:09.283Z [DEBUG] [useDeferredValue] Messages deferred by 1 (21→22)
+2026-05-04T03:23:09.442Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T03:23:09.443Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.91b; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:23:09.443Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:23:09.443Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:23:09.443Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-05-04T03:23:09.443Z [DEBUG] Found 5 hook matchers in settings
+2026-05-04T03:23:09.443Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-05-04T03:23:09.443Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:23:09.445Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T03:23:09.445Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T03:23:09.445Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T03:23:09.445Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T03:23:09.446Z [DEBUG] autocompact: tokens=21452 threshold=167000 effectiveWindow=180000
+2026-05-04T03:23:09.446Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-05-04T03:23:09.449Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:23:09.450Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:23:09.450Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:23:09.451Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:23:09.454Z [DEBUG] [useDeferredValue] Messages deferred by 1 (22→23)
+2026-05-04T03:23:09.458Z [DEBUG] High write ratio: blit=0, write=1132 (100.0% writes), screen=31x212
+2026-05-04T03:23:12.613Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:23:13.210Z [DEBUG] [useDeferredValue] Messages deferred by 1 (23→24)
+2026-05-04T03:23:13.368Z [DEBUG] [useDeferredValue] Messages deferred by 1 (24→25)
+2026-05-04T03:23:13.373Z [DEBUG] [useDeferredValue] Messages deferred by 1 (24→25)
+2026-05-04T03:23:13.381Z [DEBUG] Getting matching hook commands for Stop with query: undefined
+2026-05-04T03:23:13.381Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:23:13.381Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-05-04T03:23:13.385Z [DEBUG] [useDeferredValue] Messages deferred by 2 (24→26)
+2026-05-04T03:23:13.388Z [DEBUG] Stopped caffeinate, allowing sleep
+2026-05-04T03:23:13.391Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864993391
+2026-05-04T03:23:13.391Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:23:13.391Z [DEBUG] Temp file written successfully, size: 12743 bytes
+2026-05-04T03:23:13.391Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:23:13.391Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777864993391 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:23:13.391Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:23:13.393Z [DEBUG] [useDeferredValue] Messages deferred by 2 (24→26)
+2026-05-04T03:23:13.782Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:24:13.392Z [DEBUG] Getting matching hook commands for Notification with query: idle_prompt
+2026-05-04T03:24:13.392Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:24:13.392Z [DEBUG] Matched 0 unique hooks for query "idle_prompt" (0 before deduplication)
+2026-05-04T03:27:01.556Z [DEBUG] Metrics opt-out check failed: No API key available
+2026-05-04T03:27:01.557Z [DEBUG] Metrics check failed, defaulting to disabled
+2026-05-04T03:27:01.557Z [DEBUG] Metrics export disabled by organization setting
+2026-05-04T03:28:49.680Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-05-04T03:28:49.681Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-05-04T03:28:49.681Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-05-04T03:28:49.681Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-05-04T03:28:49.691Z [DEBUG] Started caffeinate to prevent sleep
+2026-05-04T03:28:49.759Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T03:28:49.759Z [DEBUG] FileHistory: Making snapshot for message 3501051c-e167-4337-a274-0ff68aa20773
+2026-05-04T03:28:49.759Z [DEBUG] FileHistory: Added snapshot for 3501051c-e167-4337-a274-0ff68aa20773, tracking 0 files
+2026-05-04T03:28:49.759Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.2af; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:28:49.759Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:28:49.759Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:28:49.760Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:28:49.762Z [DEBUG] [useDeferredValue] Messages deferred by 3 (26→29)
+2026-05-04T03:28:49.765Z [DEBUG] High write ratio: blit=0, write=1734 (100.0% writes), screen=54x212
+2026-05-04T03:28:49.769Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-05-04T03:28:49.769Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.59b; cc_entrypoint=cli; cch=00000;
+2026-05-04T03:28:49.769Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-05-04T03:28:49.769Z [DEBUG] [API:auth] OAuth token check starting
+2026-05-04T03:28:49.770Z [DEBUG] [API:auth] OAuth token check complete
+2026-05-04T03:28:49.777Z [DEBUG] [useDeferredValue] Messages deferred by 3 (26→29)
+2026-05-04T03:28:49.779Z [DEBUG] Stopped caffeinate, allowing sleep
+2026-05-04T03:28:50.070Z [ERROR] API error (attempt 1/11): 400 400 {"type":"error","error":{"type":"invalid_request_error","message":"invalid params"}}
+2026-05-04T03:28:50.070Z [ERROR] Error in API request: 400 {"type":"error","error":{"type":"invalid_request_error","message":"invalid params"}}
+2026-05-04T03:28:50.071Z [ERROR] Error: Error: 400 {"type":"error","error":{"type":"invalid_request_error","message":"invalid params"}}
+    at E4.generate (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:354:8788)
+    at aC.makeStatusError (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:393:2195)
+    at aC.makeRequest (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:393:5420)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-05-04T03:29:05.898Z [DEBUG] Stream started - received first chunk
+2026-05-04T03:29:10.457Z [DEBUG] Full reset (shrink->below): prevHeight=60, nextHeight=55, viewport=56
+2026-05-04T03:29:10.622Z [DEBUG] AutoUpdaterWrapper: Installation type: unknown
+2026-05-04T03:29:11.655Z [DEBUG] AutoUpdater: Detected installation type: unknown
+2026-05-04T03:29:11.655Z [DEBUG] AutoUpdater: Unknown installation type, falling back to config
+2026-05-04T03:29:13.595Z [DEBUG] Full reset (shrink->below): prevHeight=60, nextHeight=55, viewport=56
+2026-05-04T03:29:13.727Z [DEBUG] AutoUpdaterWrapper: Installation type: unknown
+2026-05-04T03:29:13.861Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777865353861
+2026-05-04T03:29:13.861Z [DEBUG] Preserving file permissions: 100600
+2026-05-04T03:29:13.861Z [DEBUG] Temp file written successfully, size: 12743 bytes
+2026-05-04T03:29:13.861Z [DEBUG] Applied original permissions to temp file
+2026-05-04T03:29:13.861Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json.tmp.84225.1777865353861 to /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json
+2026-05-04T03:29:13.861Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_glm/.claude.json written atomically
+2026-05-04T03:29:15.453Z [DEBUG] Full reset (shrink->below): prevHeight=60, nextHeight=55, viewport=56
+2026-05-04T03:29:15.591Z [DEBUG] AutoUpdaterWrapper: Installation type: unknown
+2026-05-04T03:29:16.487Z [DEBUG] AutoUpdater: Detected installation type: unknown
+2026-05-04T03:29:16.487Z [DEBUG] AutoUpdater: Unknown installation type, falling back to config
+2026-05-04T03:29:16.902Z [DEBUG] Getting matching hook commands for SessionEnd with query: prompt_input_exit
+2026-05-04T03:29:16.902Z [DEBUG] Found 0 hook matchers in settings
+2026-05-04T03:29:16.902Z [DEBUG] Matched 0 unique hooks for query "prompt_input_exit" (0 before deduplication)
+2026-05-04T03:29:16.906Z [DEBUG] Cleaned up session snapshot: /Users/matianjun/Dropbox/code/claude_model/.claude_glm/shell-snapshots/snapshot-zsh-1777864966876-v2ob8k.sh
+2026-05-04T03:29:16.907Z [DEBUG] FileHistory: Making snapshot for message e4385fb7-a742-432f-bf27-1638aad46cc1
+2026-05-04T03:29:16.907Z [DEBUG] FileHistory: Added snapshot for e4385fb7-a742-432f-bf27-1638aad46cc1, tracking 0 files
+2026-05-04T03:29:16.907Z [DEBUG] LSP server manager shut down successfully
+2026-05-04T03:29:16.907Z [DEBUG] Metrics opt-out check failed: No API key available
+2026-05-04T03:29:16.907Z [DEBUG] Metrics check failed, defaulting to disabled
+2026-05-04T03:29:16.907Z [DEBUG] Metrics export disabled by organization setting
+2026-05-04T03:29:16.907Z [DEBUG] BigQuery metrics exporter flush complete
+2026-05-04T03:29:16.907Z [DEBUG] BigQuery metrics exporter flush complete
+2026-05-04T03:29:16.907Z [DEBUG] BigQuery metrics exporter shutdown complete
+2026-05-04T03:29:16.908Z [DEBUG] [useDeferredValue] Messages deferred by 3 (29→32)
+2026-05-04T03:29:16.913Z [DEBUG] Started caffeinate to prevent sleep
+2026-05-04T03:29:16.915Z [DEBUG] [useDeferredValue] Messages deferred by 3 (29→32)
+2026-05-04T03:29:16.917Z [DEBUG] Stopped caffeinate, allowing sleep
+2026-05-04T03:29:17.278Z [DEBUG] Full reset (shrink->below): prevHeight=58, nextHeight=53, viewport=56

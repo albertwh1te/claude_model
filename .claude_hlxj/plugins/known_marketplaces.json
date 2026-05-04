@@ -1,0 +1,26 @@
+{
+  "claude-plugins-official": {
+    "source": {
+      "source": "github",
+      "repo": "anthropics/claude-plugins-official"
+    },
+    "installLocation": "/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/plugins/marketplaces/claude-plugins-official",
+    "lastUpdated": "2026-03-03T18:06:02.161Z"
+  },
+  "claude-code-lsps": {
+    "source": {
+      "source": "github",
+      "repo": "boostvolt/claude-code-lsps"
+    },
+    "installLocation": "/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/plugins/marketplaces/claude-code-lsps",
+    "lastUpdated": "2026-01-04T10:24:53.017Z"
+  },
+  "planning-with-files": {
+    "source": {
+      "source": "github",
+      "repo": "OthmanAdi/planning-with-files"
+    },
+    "installLocation": "/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/plugins/marketplaces/planning-with-files",
+    "lastUpdated": "2026-01-17T08:46:08.026Z"
+  }
+}

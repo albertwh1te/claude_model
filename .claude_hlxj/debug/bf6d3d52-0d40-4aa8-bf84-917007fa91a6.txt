@@ -1,0 +1,313 @@
+2026-03-03T18:05:56.168Z [DEBUG] [init] configureGlobalMTLS starting
+2026-03-03T18:05:56.170Z [DEBUG] [init] configureGlobalMTLS complete
+2026-03-03T18:05:56.170Z [DEBUG] [init] configureGlobalAgents starting
+2026-03-03T18:05:56.170Z [DEBUG] [init] configureGlobalAgents complete
+2026-03-03T18:05:56.180Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-03-03T18:05:56.210Z [DEBUG] Loading plugin pyright-lsp from source: "./plugins/pyright-lsp"
+2026-03-03T18:05:56.211Z [DEBUG] Using provided version for pyright-lsp@claude-plugins-official: 1.0.0
+2026-03-03T18:05:56.211Z [DEBUG] [ToolSearch:optimistic] mode=standard, ENABLE_TOOL_SEARCH=undefined, result=false
+2026-03-03T18:05:56.211Z [DEBUG] [STARTUP] Running setup()...
+2026-03-03T18:05:56.212Z [DEBUG] Plugin pyright-lsp@claude-plugins-official version 1.0.0 already cached at /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/plugins/cache/claude-plugins-official/pyright-lsp/1.0.0
+2026-03-03T18:05:56.214Z [DEBUG] Copied local plugin pyright-lsp to versioned cache: /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/plugins/cache/claude-plugins-official/pyright-lsp/1.0.0
+2026-03-03T18:05:56.214Z [DEBUG] Plugin pyright-lsp has no entry.skills defined
+2026-03-03T18:05:56.216Z [DEBUG] Loading plugin pyright from source: "./pyright"
+2026-03-03T18:05:56.217Z [DEBUG] Using manifest version for pyright@claude-code-lsps: 1.0.0
+2026-03-03T18:05:56.218Z [DEBUG] Loading skills from: managed=/Library/Application Support/ClaudeCode/.claude/skills, user=/Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/skills, project=[]
+2026-03-03T18:05:56.218Z [DEBUG] Error log sink initialized
+2026-03-03T18:05:56.225Z [DEBUG] Plugin pyright@claude-code-lsps version 1.0.0 already cached at /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/plugins/cache/claude-code-lsps/pyright/1.0.0
+2026-03-03T18:05:56.226Z [DEBUG] [STARTUP] setup() completed in 15ms
+2026-03-03T18:05:56.226Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-03-03T18:05:56.226Z [DEBUG] Copied local plugin pyright to versioned cache: /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/plugins/cache/claude-code-lsps/pyright/1.0.0
+2026-03-03T18:05:56.227Z [DEBUG] Loaded hooks from standard location for plugin pyright: /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/plugins/cache/claude-code-lsps/pyright/1.0.0/hooks/hooks.json
+2026-03-03T18:05:56.228Z [DEBUG] Found 2 plugins (2 enabled, 0 disabled)
+2026-03-03T18:05:56.228Z [DEBUG] getPluginSkills: Processing 2 enabled plugins
+2026-03-03T18:05:56.228Z [DEBUG] Checking plugin pyright-lsp: skillsPath=none, skillsPaths=0 paths
+2026-03-03T18:05:56.228Z [DEBUG] Checking plugin pyright: skillsPath=none, skillsPaths=0 paths
+2026-03-03T18:05:56.228Z [DEBUG] Total plugin skills loaded: 0
+2026-03-03T18:05:56.228Z [DEBUG] Total plugin commands loaded: 0
+2026-03-03T18:05:56.228Z [DEBUG] Loading hooks from plugin: pyright
+2026-03-03T18:05:56.228Z [DEBUG] Registered 1 hooks from 2 plugins
+2026-03-03T18:05:56.229Z [DEBUG] Total plugin agents loaded: 0
+2026-03-03T18:05:56.229Z [DEBUG] Loaded 0 unique skills (0 unconditional, 0 conditional, managed: 0, user: 0, project: 0, additional: 0, legacy commands: 0)
+2026-03-03T18:05:56.229Z [DEBUG] getSkills returning: 0 skill dir commands, 0 plugin skills, 2 bundled skills
+2026-03-03T18:05:56.229Z [DEBUG] [STARTUP] Commands and agents loaded in 3ms
+2026-03-03T18:05:56.230Z [DEBUG] Layout engine: yoga
+2026-03-03T18:05:56.235Z [DEBUG] [Claude in Chrome] Found chrome profiles: Default, Profile 1, Profile 2, Profile 3
+2026-03-03T18:05:56.248Z [DEBUG] [STARTUP] Running showSetupScreens()...
+2026-03-03T18:05:56.265Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-03-03T18:05:56.266Z [DEBUG] [STARTUP] showSetupScreens() completed in 18ms
+2026-03-03T18:05:56.266Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-03-03T18:05:56.266Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-03-03T18:05:56.266Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-03-03T18:05:56.288Z [DEBUG] [STARTUP] MCP configs loaded in 108ms
+2026-03-03T18:05:56.299Z [DEBUG] All plugins already exist, skipping migration
+2026-03-03T18:05:56.301Z [DEBUG] [Reconnection] computeInitialTeamContext: No teammate context set (not a teammate)
+2026-03-03T18:05:56.305Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json.tmp.48067.1772561156305
+2026-03-03T18:05:56.305Z [DEBUG] Preserving file permissions: 100600
+2026-03-03T18:05:56.305Z [DEBUG] Temp file written successfully, size: 22268 bytes
+2026-03-03T18:05:56.305Z [DEBUG] Applied original permissions to temp file
+2026-03-03T18:05:56.305Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json.tmp.48067.1772561156305 to /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json
+2026-03-03T18:05:56.306Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json written atomically
+2026-03-03T18:05:56.308Z [DEBUG] Getting matching hook commands for SessionStart with query: startup
+2026-03-03T18:05:56.308Z [DEBUG] Found 1 hook matchers in settings
+2026-03-03T18:05:56.309Z [DEBUG] Matched 1 unique hooks for query "startup" (1 before deduplication)
+2026-03-03T18:05:56.316Z [DEBUG] Loaded 2 installed plugins from /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/plugins/installed_plugins.json
+2026-03-03T18:05:56.316Z [DEBUG] Initialized versioned plugins system with 2 plugins
+2026-03-03T18:05:56.333Z [DEBUG] Loaded 1 LSP server(s) from plugin: pyright-lsp
+2026-03-03T18:05:56.346Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-03-03T18:05:56.356Z [DEBUG] [keybindings] KeybindingSetup initialized with 101 bindings, 0 warnings
+2026-03-03T18:05:56.396Z [DEBUG] [REPL:mount] REPL mounted, disabled=false
+2026-03-03T18:05:56.399Z [DEBUG] Official marketplace auto-install skipped: already_attempted
+2026-03-03T18:05:56.399Z [DEBUG] performStartupChecks called
+2026-03-03T18:05:56.399Z [DEBUG] Starting background plugin installations
+2026-03-03T18:05:56.399Z [DEBUG] performBackgroundPluginInstallations called
+2026-03-03T18:05:56.401Z [DEBUG] Loaded 1 CLAUDE.md/rules files:
+  [Project] /Users/matianjun/Dropbox/code/quant_dash_board/CLAUDE.md (3763 chars)
+2026-03-03T18:05:56.413Z [DEBUG] Watching for changes in setting files /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/settings.json...
+2026-03-03T18:05:56.414Z [DEBUG] Found 2 enabled plugins
+2026-03-03T18:05:56.414Z [DEBUG] All plugins already exist, skipping migration
+2026-03-03T18:05:56.414Z [DEBUG] Found 2 installed plugins (V2 format)
+2026-03-03T18:05:56.415Z [DEBUG] Loaded plugins - Enabled: 2, Disabled: 0, Commands: 0, Agents: 0, Errors: 0
+2026-03-03T18:05:56.415Z [DEBUG] Found 0 missing plugins (not installed):
+2026-03-03T18:05:56.415Z [DEBUG] Setting installation status: 0 marketplaces, 0 installable plugins, 0 uninstallable plugins
+2026-03-03T18:05:56.415Z [DEBUG] [claudeai-mcp] Checking gate (cached)...
+2026-03-03T18:05:56.415Z [DEBUG] [claudeai-mcp] Gate returned: true
+2026-03-03T18:05:56.415Z [DEBUG] [claudeai-mcp] No access token
+2026-03-03T18:05:56.418Z [DEBUG] [keybindings] Watching for changes to /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/keybindings.json
+2026-03-03T18:05:56.442Z [DEBUG] Loaded 1 LSP server(s) from plugin: pyright
+2026-03-03T18:05:56.442Z [DEBUG] Total LSP servers loaded: 2
+2026-03-03T18:05:56.442Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 2 server(s)
+2026-03-03T18:05:56.443Z [DEBUG] Queued request handler for plugin:pyright-lsp:pyright.workspace/configuration (connection not ready)
+2026-03-03T18:05:56.443Z [DEBUG] Starting LSP server instance: plugin:pyright-lsp:pyright
+2026-03-03T18:05:56.453Z [DEBUG] Queued request handler for plugin:pyright:python.workspace/configuration (connection not ready)
+2026-03-03T18:05:56.453Z [DEBUG] Starting LSP server instance: plugin:pyright:python
+2026-03-03T18:05:56.484Z [DEBUG] LSP manager initialized with 2 servers
+2026-03-03T18:05:56.484Z [DEBUG] LSP server manager initialized successfully
+2026-03-03T18:05:56.485Z [DEBUG] Queued notification handler for plugin:pyright-lsp:pyright.textDocument/publishDiagnostics (connection not ready)
+2026-03-03T18:05:56.485Z [DEBUG] Registered diagnostics handler for plugin:pyright-lsp:pyright
+2026-03-03T18:05:56.485Z [DEBUG] Queued notification handler for plugin:pyright:python.textDocument/publishDiagnostics (connection not ready)
+2026-03-03T18:05:56.485Z [DEBUG] Registered diagnostics handler for plugin:pyright:python
+2026-03-03T18:05:56.485Z [DEBUG] LSP notification handlers registered successfully for all 2 server(s)
+2026-03-03T18:05:56.488Z [DEBUG] Applied queued notification handler for plugin:pyright-lsp:pyright.textDocument/publishDiagnostics
+2026-03-03T18:05:56.488Z [DEBUG] Applied queued request handler for plugin:pyright-lsp:pyright.workspace/configuration
+2026-03-03T18:05:56.488Z [DEBUG] LSP client started for plugin:pyright-lsp:pyright
+2026-03-03T18:05:56.490Z [DEBUG] Applied queued notification handler for plugin:pyright:python.textDocument/publishDiagnostics
+2026-03-03T18:05:56.490Z [DEBUG] Applied queued request handler for plugin:pyright:python.workspace/configuration
+2026-03-03T18:05:56.490Z [DEBUG] LSP client started for plugin:pyright:python
+2026-03-03T18:05:56.491Z [DEBUG] [LSP PROTOCOL plugin:pyright-lsp:pyright] Sending request 'initialize - (0)'.
+2026-03-03T18:05:56.491Z [DEBUG] [LSP PROTOCOL plugin:pyright:python] Sending request 'initialize - (0)'.
+2026-03-03T18:05:56.492Z [DEBUG] [Claude in Chrome] Found brave profiles: Default
+2026-03-03T18:05:56.520Z [DEBUG] Git remote URL: git@github.com:albertwh1te/quant_dash_board.git
+2026-03-03T18:05:56.520Z [DEBUG] Parsed repository: albertwh1te/quant_dash_board from git@github.com:albertwh1te/quant_dash_board.git
+2026-03-03T18:05:56.523Z [DEBUG] Parsed repository: albertwh1te/quant_dash_board from URL: git@github.com:albertwh1te/quant_dash_board.git
+2026-03-03T18:05:56.523Z [DEBUG] Path /Users/matianjun/Dropbox/code/quant_dash_board already tracked for repo albertwh1te/quant_dash_board
+2026-03-03T18:05:56.525Z [DEBUG] [Claude in Chrome] Extension not found in any browser
+2026-03-03T18:05:56.532Z [DEBUG] Ripgrep first use test: PASSED (mode=builtin, path=/Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/arm64-darwin/rg)
+2026-03-03T18:05:56.633Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-03T18:05:56.633Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-03T18:05:56.633Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-03T18:05:56.760Z [DEBUG] AutoUpdaterWrapper: Installation type: unknown
+2026-03-03T18:05:56.880Z [DEBUG] [LSP PROTOCOL plugin:pyright:python] Received response 'initialize - (0)' in 389ms.
+2026-03-03T18:05:56.880Z [DEBUG] [LSP PROTOCOL plugin:pyright:python] Sending notification 'initialized'.
+2026-03-03T18:05:56.881Z [DEBUG] LSP server plugin:pyright:python initialized
+2026-03-03T18:05:56.881Z [DEBUG] LSP server instance started: plugin:pyright:python
+2026-03-03T18:05:56.881Z [DEBUG] [LSP PROTOCOL plugin:pyright-lsp:pyright] Received response 'initialize - (0)' in 390ms.
+2026-03-03T18:05:56.881Z [DEBUG] [LSP PROTOCOL plugin:pyright-lsp:pyright] Sending notification 'initialized'.
+2026-03-03T18:05:56.881Z [DEBUG] LSP server plugin:pyright-lsp:pyright initialized
+2026-03-03T18:05:56.881Z [DEBUG] LSP server instance started: plugin:pyright-lsp:pyright
+2026-03-03T18:05:57.081Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json.tmp.48067.1772561157081
+2026-03-03T18:05:57.081Z [DEBUG] Preserving file permissions: 100600
+2026-03-03T18:05:57.081Z [DEBUG] Temp file written successfully, size: 22269 bytes
+2026-03-03T18:05:57.081Z [DEBUG] Applied original permissions to temp file
+2026-03-03T18:05:57.081Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json.tmp.48067.1772561157081 to /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json
+2026-03-03T18:05:57.081Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json written atomically
+2026-03-03T18:05:57.083Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json.tmp.48067.1772561157083
+2026-03-03T18:05:57.083Z [DEBUG] Preserving file permissions: 100600
+2026-03-03T18:05:57.084Z [DEBUG] Temp file written successfully, size: 22270 bytes
+2026-03-03T18:05:57.084Z [DEBUG] Applied original permissions to temp file
+2026-03-03T18:05:57.084Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json.tmp.48067.1772561157083 to /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json
+2026-03-03T18:05:57.084Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json written atomically
+2026-03-03T18:05:57.084Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-03T18:05:57.086Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-03T18:05:57.086Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-03T18:05:57.087Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-03T18:05:58.218Z [ERROR] Stream completed without receiving message_start event - triggering non-streaming fallback
+2026-03-03T18:05:58.218Z [ERROR] Error streaming, falling back to non-streaming mode: Stream ended without receiving any events
+2026-03-03T18:05:58.218Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-03T18:05:58.218Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-03T18:05:58.218Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-03T18:05:58.459Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-03T18:05:58.459Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-03T18:05:58.459Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-03T18:05:58.459Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-03T18:05:58.459Z [DEBUG] Sending 1 skills via attachment (initial, 1 total sent)
+2026-03-03T18:05:58.461Z [DEBUG] Getting matching hook commands for UserPromptSubmit with query: undefined
+2026-03-03T18:05:58.461Z [DEBUG] Found 0 hook matchers in settings
+2026-03-03T18:05:58.461Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-03-03T18:05:58.461Z [DEBUG] FileHistory: Added snapshot for 98da0ec2-9065-4d7f-8a24-53c9186b9cb9, tracking 0 files
+2026-03-03T18:05:58.462Z [DEBUG] [useDeferredValue] Messages deferred by 2 (2→4)
+2026-03-03T18:05:58.492Z [DEBUG] Started caffeinate to prevent sleep
+2026-03-03T18:05:58.496Z [DEBUG] [SystemPrompt] path=simple proactive=false
+2026-03-03T18:05:58.504Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-03T18:05:58.504Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-03T18:05:58.504Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-03T18:05:58.504Z [DEBUG] Total plugin output styles loaded: 0
+2026-03-03T18:05:58.505Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-03T18:05:58.512Z [DEBUG] autocompact: tokens=128 threshold=167000 effectiveWindow=180000
+2026-03-03T18:05:58.513Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-03-03T18:05:58.517Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-03T18:05:58.517Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-03T18:05:58.517Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-03T18:05:58.521Z [DEBUG] [useDeferredValue] Messages deferred by 2 (2→4)
+2026-03-03T18:05:58.529Z [DEBUG] Stats cache stale (2026-02-28), processing 2026-03-01 to 2026-03-02 in background
+2026-03-03T18:05:58.556Z [DEBUG] Stats cache saved successfully (lastComputedDate: 2026-03-02)
+2026-03-03T18:05:58.556Z [DEBUG] Stats cache updated with 1 new sessions
+2026-03-03T18:05:58.593Z [ERROR] API error (attempt 1/11): 500 500 {"error":{"message":"Anthropic 官方服务器异常，请稍后重试","type":"api_error"}}
+2026-03-03T18:05:58.751Z [ERROR] Error: Error: 404 用户不存在
+    at E4.generate (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:354:8893)
+    at aC.makeStatusError (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:393:2195)
+    at aC.makeRequest (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:393:5420)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:961:3741
+    at async file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:961:2624
+    at async w99 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:960:3930)
+    at async NL7 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:961:2557)
+    at async pU1 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:3530:10195)
+    at async Yc (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:3530:10891)
+2026-03-03T18:05:58.751Z [DEBUG] countTokensWithFallback: API returned null, trying haiku fallback (21 tools)
+2026-03-03T18:05:58.751Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-03T18:05:58.751Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-03T18:05:58.751Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-03T18:05:59.230Z [DEBUG] AutoUpdater: Detected installation type: unknown
+2026-03-03T18:05:59.230Z [DEBUG] AutoUpdater: Unknown installation type, falling back to config
+2026-03-03T18:05:59.490Z [ERROR] API error (attempt 2/11): 500 500 {"error":{"message":"Anthropic 官方服务器异常，请稍后重试","type":"api_error"}}
+2026-03-03T18:05:59.692Z [ERROR] Stream completed without receiving message_start event - triggering non-streaming fallback
+2026-03-03T18:05:59.692Z [ERROR] Error streaming, falling back to non-streaming mode: Stream ended without receiving any events
+2026-03-03T18:05:59.692Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-03T18:05:59.692Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-03T18:05:59.692Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-03T18:06:00.079Z [ERROR] API error (attempt 1/11): 500 500 {"error":{"message":"Anthropic 官方服务器异常，请稍后重试","type":"api_error"}}
+2026-03-03T18:06:00.502Z [ERROR] Stream completed without receiving message_start event - triggering non-streaming fallback
+2026-03-03T18:06:00.502Z [ERROR] Error streaming, falling back to non-streaming mode: Stream ended without receiving any events
+2026-03-03T18:06:00.502Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-03T18:06:00.502Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-03T18:06:00.503Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-03T18:06:00.910Z [ERROR] API error (attempt 3/11): 500 500 {"error":{"message":"Anthropic 官方服务器异常，请稍后重试","type":"api_error"}}
+2026-03-03T18:06:00.971Z [ERROR] API error (attempt 2/11): 500 500 {"error":{"message":"Anthropic 官方服务器异常，请稍后重试","type":"api_error"}}
+2026-03-03T18:06:02.138Z [ERROR] Error: Error: 1P event logging: 66 events failed to export (status=429, code=ERR_BAD_REQUEST, Request failed with status code 429)
+    at SGA.queueFailedEvents (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1960:2315)
+    at async SGA.doExport (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1960:1197)
+2026-03-03T18:06:02.139Z [ERROR] Error: Error: {"stack":"Error: Failed to export 66 events (status=429, code=ERR_BAD_REQUEST, Request failed with status code 429)\n    at SGA.doExport (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1960:1372)","message":"Failed to export 66 events (status=429, code=ERR_BAD_REQUEST, Request failed with status code 429)","name":"Error"}
+    at PTA.error (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:2003:34863)
+    at JMA.error (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1529:6318)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1955:28975
+    at GQ9 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1955:29521)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1956:20245
+2026-03-03T18:06:02.173Z [DEBUG] Successfully refreshed marketplace: claude-plugins-official
+2026-03-03T18:06:02.173Z [DEBUG] Plugin autoupdate: checking installed plugins
+2026-03-03T18:06:02.177Z [DEBUG] Using provided version for pyright-lsp@claude-plugins-official: 1.0.0
+2026-03-03T18:06:02.290Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json.tmp.48067.1772561162290
+2026-03-03T18:06:02.290Z [DEBUG] Preserving file permissions: 100600
+2026-03-03T18:06:02.290Z [DEBUG] Temp file written successfully, size: 22270 bytes
+2026-03-03T18:06:02.290Z [DEBUG] Applied original permissions to temp file
+2026-03-03T18:06:02.290Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json.tmp.48067.1772561162290 to /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json
+2026-03-03T18:06:02.291Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json written atomically
+2026-03-03T18:06:02.513Z [ERROR] API error (attempt 3/11): 500 500 {"error":{"message":"Anthropic 官方服务器异常，请稍后重试","type":"api_error"}}
+2026-03-03T18:06:03.164Z [ERROR] API error (attempt 1/11): 500 500 {"error":{"message":"Anthropic 官方服务器异常，请稍后重试","type":"api_error"}}
+2026-03-03T18:06:03.165Z [DEBUG] [useDeferredValue] Messages deferred by 1 (4→5)
+2026-03-03T18:06:03.361Z [ERROR] API error (attempt 4/11): 500 500 {"error":{"message":"Anthropic 官方服务器异常，请稍后重试","type":"api_error"}}
+2026-03-03T18:06:03.673Z [DEBUG] countTokensWithFallback: haiku fallback failed: 500 {"error":{"message":"Anthropic 官方服务器异常，请稍后重试","type":"api_error"}}
+2026-03-03T18:06:03.674Z [ERROR] Error: Error: 500 {"error":{"message":"Anthropic 官方服务器异常，请稍后重试","type":"api_error"}}
+    at E4.generate (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:354:9032)
+    at aC.makeStatusError (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:393:2195)
+    at aC.makeRequest (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:393:5420)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async RL7 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:961:4563)
+    at async pU1 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:3530:10467)
+    at async Yc (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:3530:10891)
+    at async n1q (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:3547:554)
+2026-03-03T18:06:03.674Z [DEBUG] countToolDefinitionTokens returned null for 21 tools: Task, TaskOutput, Bash, Glob, Grep, ExitPlanMode, Read, Edit, Write, NotebookEdit, WebFetch, WebSear...
+2026-03-03T18:06:04.502Z [ERROR] API error (attempt 2/11): 500 500 {"error":{"message":"Anthropic 官方服务器异常，请稍后重试","type":"api_error"}}
+2026-03-03T18:06:04.503Z [DEBUG] [useDeferredValue] Messages deferred by 1 (5→6)
+2026-03-03T18:06:05.314Z [ERROR] API error (attempt 4/11): 500 500 {"error":{"message":"Anthropic 官方服务器异常，请稍后重试","type":"api_error"}}
+2026-03-03T18:06:05.988Z [ERROR] API error (attempt 3/11): 500 500 {"error":{"message":"Anthropic 官方服务器异常，请稍后重试","type":"api_error"}}
+2026-03-03T18:06:05.988Z [DEBUG] [useDeferredValue] Messages deferred by 1 (6→7)
+2026-03-03T18:06:07.367Z [ERROR] Error: Error: 1P event logging: 16 events failed to export (status=429, code=ERR_BAD_REQUEST, Request failed with status code 429)
+    at SGA.queueFailedEvents (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1960:2315)
+    at async SGA.doExport (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1960:1197)
+2026-03-03T18:06:07.367Z [ERROR] Error: Error: {"stack":"Error: Failed to export 16 events (status=429, code=ERR_BAD_REQUEST, Request failed with status code 429)\n    at SGA.doExport (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1960:1372)","message":"Failed to export 16 events (status=429, code=ERR_BAD_REQUEST, Request failed with status code 429)","name":"Error"}
+    at PTA.error (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:2003:34863)
+    at JMA.error (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1529:6318)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1955:28975
+    at GQ9 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1955:29521)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1956:20245
+2026-03-03T18:06:08.539Z [ERROR] API error (attempt 4/11): 500 500 {"error":{"message":"Anthropic 官方服务器异常，请稍后重试","type":"api_error"}}
+2026-03-03T18:06:08.541Z [DEBUG] [useDeferredValue] Messages deferred by 1 (7→8)
+2026-03-03T18:06:09.243Z [ERROR] API error (attempt 5/11): 500 500 {"error":{"message":"Anthropic 官方服务器异常，请稍后重试","type":"api_error"}}
+2026-03-03T18:06:10.017Z [DEBUG] [onCancel] focusedInputDialog=undefined streamMode=requesting
+2026-03-03T18:06:10.018Z [ERROR] Error in API request: Request was aborted.
+2026-03-03T18:06:10.019Z [ERROR] Error: Error: Request was aborted.
+    at AbortSignal.w (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:904:35263)
+    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:843:20)
+    at AbortSignal.dispatchEvent (node:internal/event_target:776:26)
+    at runAbort (node:internal/abort_controller:488:10)
+    at abortSignal (node:internal/abort_controller:459:3)
+    at AbortController.abort (node:internal/abort_controller:507:5)
+    at QE (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:7498:76328)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:7490:8282
+    at Object.current (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:911:7982)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:911:2655
+2026-03-03T18:06:10.020Z [DEBUG] [useDeferredValue] Messages deferred by 1 (8→9)
+2026-03-03T18:06:10.022Z [DEBUG] Stopped caffeinate, allowing sleep
+2026-03-03T18:06:10.025Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json.tmp.48067.1772561170025
+2026-03-03T18:06:10.025Z [DEBUG] Preserving file permissions: 100600
+2026-03-03T18:06:10.026Z [DEBUG] Temp file written successfully, size: 22270 bytes
+2026-03-03T18:06:10.026Z [DEBUG] Applied original permissions to temp file
+2026-03-03T18:06:10.026Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json.tmp.48067.1772561170025 to /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json
+2026-03-03T18:06:10.026Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json written atomically
+2026-03-03T18:06:10.028Z [DEBUG] Writing to temp file: /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json.tmp.48067.1772561170028
+2026-03-03T18:06:10.028Z [DEBUG] Preserving file permissions: 100600
+2026-03-03T18:06:10.028Z [DEBUG] Temp file written successfully, size: 22270 bytes
+2026-03-03T18:06:10.028Z [DEBUG] Applied original permissions to temp file
+2026-03-03T18:06:10.028Z [DEBUG] Renaming /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json.tmp.48067.1772561170028 to /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json
+2026-03-03T18:06:10.028Z [DEBUG] File /Users/matianjun/Dropbox/code/claude_model/.claude_hlxj/.claude.json written atomically
+2026-03-03T18:06:10.029Z [DEBUG] [useDeferredValue] Messages deferred by 1 (8→9)
+2026-03-03T18:06:10.192Z [DEBUG] Getting matching hook commands for SessionEnd with query: prompt_input_exit
+2026-03-03T18:06:10.192Z [DEBUG] Found 0 hook matchers in settings
+2026-03-03T18:06:10.192Z [DEBUG] Matched 0 unique hooks for query "prompt_input_exit" (0 before deduplication)
+2026-03-03T18:06:10.193Z [DEBUG] [LSP PROTOCOL plugin:pyright-lsp:pyright] Sending request 'shutdown - (1)'.
+2026-03-03T18:06:10.195Z [DEBUG] Metrics opt-out check failed: No API key available
+2026-03-03T18:06:10.196Z [DEBUG] Metrics check failed, defaulting to disabled
+2026-03-03T18:06:10.196Z [DEBUG] Metrics export disabled by organization setting
+2026-03-03T18:06:10.196Z [DEBUG] BigQuery metrics exporter flush complete
+2026-03-03T18:06:10.196Z [DEBUG] BigQuery metrics exporter flush complete
+2026-03-03T18:06:10.196Z [DEBUG] BigQuery metrics exporter shutdown complete
+2026-03-03T18:06:10.200Z [DEBUG] [LSP PROTOCOL plugin:pyright-lsp:pyright] Received response 'shutdown - (1)' in 7ms.
+2026-03-03T18:06:10.200Z [DEBUG] [LSP PROTOCOL plugin:pyright-lsp:pyright] Sending notification 'exit'.
+2026-03-03T18:06:10.200Z [DEBUG] LSP client stopped for plugin:pyright-lsp:pyright
+2026-03-03T18:06:10.200Z [DEBUG] LSP server instance stopped: plugin:pyright-lsp:pyright
+2026-03-03T18:06:10.200Z [DEBUG] [LSP PROTOCOL plugin:pyright:python] Sending request 'shutdown - (1)'.
+2026-03-03T18:06:10.202Z [DEBUG] [LSP PROTOCOL plugin:pyright:python] Received response 'shutdown - (1)' in 2ms.
+2026-03-03T18:06:10.202Z [DEBUG] [LSP PROTOCOL plugin:pyright:python] Sending notification 'exit'.
+2026-03-03T18:06:10.202Z [DEBUG] LSP client stopped for plugin:pyright:python
+2026-03-03T18:06:10.202Z [DEBUG] LSP server instance stopped: plugin:pyright:python
+2026-03-03T18:06:10.202Z [DEBUG] LSP server manager shut down successfully
+2026-03-03T18:06:10.403Z [ERROR] Error: Error: 1P event logging: 10 events failed to export (status=429, code=ERR_BAD_REQUEST, Request failed with status code 429)
+    at SGA.queueFailedEvents (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1960:2315)
+    at async SGA.doExport (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1960:1197)
+2026-03-03T18:06:10.403Z [ERROR] Error: Error: {"stack":"Error: Failed to export 10 events (status=429, code=ERR_BAD_REQUEST, Request failed with status code 429)\n    at SGA.doExport (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1960:1372)","message":"Failed to export 10 events (status=429, code=ERR_BAD_REQUEST, Request failed with status code 429)","name":"Error"}
+    at PTA.error (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:2003:34863)
+    at JMA.error (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1529:6318)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1955:28975
+    at GQ9 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1955:29521)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1956:20245
+2026-03-03T18:06:10.494Z [ERROR] API error (attempt 5/11): 500 500 {"error":{"message":"Anthropic 官方服务器异常，请稍后重试","type":"api_error"}}
+2026-03-03T18:06:10.601Z [ERROR] Error: Error: 1P event logging: 1 events failed to export (status=429, code=ERR_BAD_REQUEST, Request failed with status code 429)
+    at SGA.queueFailedEvents (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1960:2315)
+    at async SGA.doExport (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1960:1197)
+2026-03-03T18:06:10.601Z [ERROR] Error: Error: {"stack":"Error: Failed to export 1 events (status=429, code=ERR_BAD_REQUEST, Request failed with status code 429)\n    at SGA.doExport (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1960:1372)","message":"Failed to export 1 events (status=429, code=ERR_BAD_REQUEST, Request failed with status code 429)","name":"Error"}
+    at PTA.error (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:2003:34863)
+    at JMA.error (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1529:6318)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1955:28975
+    at GQ9 (file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1955:29521)
+    at file:///Users/matianjun/Dropbox/code/claude_model/node_modules/@anthropic-ai/claude-code/cli.js:1956:20245

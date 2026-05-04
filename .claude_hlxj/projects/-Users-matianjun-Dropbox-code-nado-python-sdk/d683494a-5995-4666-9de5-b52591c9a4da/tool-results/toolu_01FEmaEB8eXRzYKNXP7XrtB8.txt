@@ -1,0 +1,93 @@
+     1→import logging
+     2→from dataclasses import dataclass
+     3→from typing import Optional
+     4→from eth_account import Account
+     5→
+     6→from pydantic import AnyUrl, BaseModel
+     7→from nado_protocol.contracts import NadoContracts, NadoContractsContext
+     8→from eth_account.signers.local import LocalAccount
+     9→from nado_protocol.engine_client import EngineClient
+    10→from nado_protocol.engine_client.types import EngineClientOpts
+    11→from nado_protocol.utils.backend import Signer
+    12→from nado_protocol.indexer_client import IndexerClient
+    13→from nado_protocol.trigger_client import TriggerClient
+    14→from nado_protocol.indexer_client.types import IndexerClientOpts
+    15→from nado_protocol.trigger_client.types import TriggerClientOpts
+    16→
+    17→
+    18→@dataclass
+    19→class NadoClientContext:
+    20→    """
+    21→    Context required to use the Nado client.
+    22→    """
+    23→
+    24→    signer: Optional[LocalAccount]
+    25→    engine_client: EngineClient
+    26→    indexer_client: IndexerClient
+    27→    trigger_client: Optional[TriggerClient]
+    28→    contracts: NadoContracts
+    29→
+    30→
+    31→class NadoClientContextOpts(BaseModel):
+    32→    contracts_context: Optional[NadoContractsContext]
+    33→    rpc_node_url: Optional[AnyUrl]
+    34→    engine_endpoint_url: Optional[AnyUrl]
+    35→    indexer_endpoint_url: Optional[AnyUrl]
+    36→    trigger_endpoint_url: Optional[AnyUrl]
+    37→
+    38→
+    39→def create_nado_client_context(
+    40→    opts: NadoClientContextOpts, signer: Optional[Signer] = None
+    41→) -> NadoClientContext:
+    42→    """
+    43→    Initializes a NadoClientContext instance with the provided signer and options.
+    44→
+    45→    Args:
+    46→        opts (NadoClientContextOpts): Options including endpoints for the engine and indexer clients.
+    47→
+    48→        signer (Signer, optional): An instance of LocalAccount or a private key string for signing transactions.
+    49→
+    50→    Returns:
+    51→        NadoClientContext: The initialized Nado client context.
+    52→
+    53→    Note:
+    54→        This helper attempts to fully set up the engine, indexer and trigger clients, including the necessary verifying contracts
+    55→        to correctly sign executes. If this step fails, it is skipped and can be set up later, while logging the error.
+    56→    """
+    57→    assert opts.contracts_context is not None, "Missing contracts context"
+    58→    assert opts.rpc_node_url is not None, "Missing RPC node URL"
+    59→    assert opts.engine_endpoint_url is not None, "Missing engine endpoint URL"
+    60→    assert opts.indexer_endpoint_url is not None, "Missing indexer endpoint URL"
+    61→
+    62→    signer = Account.from_key(signer) if isinstance(signer, str) else signer
+    63→    engine_client = EngineClient(
+    64→        EngineClientOpts(url=opts.engine_endpoint_url, signer=signer)
+    65→    )
+    66→    trigger_client = None
+    67→    try:
+    68→        contracts = engine_client.get_contracts()
+    69→        engine_client.endpoint_addr = contracts.endpoint_addr
+    70→        engine_client.chain_id = int(contracts.chain_id)
+    71→
+    72→        if opts.trigger_endpoint_url is not None:
+    73→            trigger_client = TriggerClient(
+    74→                TriggerClientOpts(url=opts.trigger_endpoint_url, signer=signer)
+    75→            )
+    76→            trigger_client.endpoint_addr = contracts.endpoint_addr
+    77→            trigger_client.chain_id = int(contracts.chain_id)
+    78→    except Exception as e:
+    79→        logging.warning(
+    80→            f"Failed to setup engine client verifying contracts with error: {e}"
+    81→        )
+    82→    return NadoClientContext(
+    83→        signer=signer,
+    84→        engine_client=engine_client,
+    85→        trigger_client=trigger_client,
+    86→        indexer_client=IndexerClient(IndexerClientOpts(url=opts.indexer_endpoint_url)),
+    87→        contracts=NadoContracts(opts.rpc_node_url, opts.contracts_context),
+    88→    )
+    89→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>

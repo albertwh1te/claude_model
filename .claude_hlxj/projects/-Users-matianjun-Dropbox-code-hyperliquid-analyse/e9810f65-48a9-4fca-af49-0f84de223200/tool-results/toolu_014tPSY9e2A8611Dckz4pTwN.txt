@@ -1,0 +1,2 @@
+13:target_columns = ["target_4hour"]
+398:            df["target_4hour"] = df["close"].shift(-16) / df["close"] - 1

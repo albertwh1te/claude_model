@@ -1,0 +1,327 @@
+     1→from typing import Optional, List
+     2→from nado_protocol.engine_client.types.execute import (
+     3→    BurnNlpParams,
+     4→    CancelAndPlaceParams,
+     5→    CancelOrdersParams,
+     6→    CancelProductOrdersParams,
+     7→    ExecuteResponse,
+     8→    MintNlpParams,
+     9→    PlaceMarketOrderParams,
+    10→    PlaceOrderParams,
+    11→)
+    12→from nado_protocol.client.apis.base import NadoBaseAPI
+    13→from nado_protocol.trigger_client.types.execute import (
+    14→    PlaceTriggerOrderParams,
+    15→    CancelTriggerOrdersParams,
+    16→    CancelProductTriggerOrdersParams,
+    17→)
+    18→from nado_protocol.utils.exceptions import MissingTriggerClient
+    19→from nado_protocol.utils.subaccount import Subaccount
+    20→from nado_protocol.utils.expiration import OrderType
+    21→
+    22→
+    23→class MarketExecuteAPI(NadoBaseAPI):
+    24→    """
+    25→    Provides functionality to interact with the Nado's market execution APIs.
+    26→    This class contains methods that allow clients to execute operations such as minting LP tokens, burning LP tokens,
+    27→    placing and cancelling orders on the Nado market.
+    28→
+    29→    Attributes:
+    30→        context (NadoClientContext): The context that provides connectivity configuration for NadoClient.
+    31→
+    32→    Note:
+    33→        This class should not be instantiated directly, it is designed to be used through a NadoClient instance.
+    34→    """
+    35→
+    36→    def mint_nlp(self, params: MintNlpParams) -> ExecuteResponse:
+    37→        """
+    38→        Mint NLP tokens through the engine.
+    39→
+    40→        Args:
+    41→            params (MintNlpParams): Parameters required to mint NLP tokens.
+    42→
+    43→        Returns:
+    44→            ExecuteResponse: The response from the engine execution.
+    45→
+    46→        Raises:
+    47→            Exception: If there is an error during the execution or the response status is not "success".
+    48→        """
+    49→        return self.context.engine_client.mint_nlp(params)
+    50→
+    51→    def burn_nlp(self, params: BurnNlpParams) -> ExecuteResponse:
+    52→        """
+    53→        Burn NLP tokens through the engine.
+    54→
+    55→        Args:
+    56→            params (BurnNlpParams): Parameters required to burn NLP tokens.
+    57→
+    58→        Returns:
+    59→            ExecuteResponse: The response from the engine execution.
+    60→
+    61→        Raises:
+    62→            Exception: If there is an error during the execution or the response status is not "success".
+    63→        """
+    64→        return self.context.engine_client.burn_nlp(params)
+    65→
+    66→    def place_order(self, params: PlaceOrderParams) -> ExecuteResponse:
+    67→        """
+    68→        Places an order through the engine.
+    69→
+    70→        Args:
+    71→            params (PlaceOrderParams): Parameters required to place an order.
+    72→
+    73→        Returns:
+    74→            ExecuteResponse: The response from the engine execution.
+    75→
+    76→        Raises:
+    77→            Exception: If there is an error during the execution or the response status is not "success".
+    78→        """
+    79→        return self.context.engine_client.place_order(params)
+    80→
+    81→    def place_market_order(self, params: PlaceMarketOrderParams) -> ExecuteResponse:
+    82→        """
+    83→        Places a market order through the engine.
+    84→
+    85→        Args:
+    86→            params (PlaceMarketOrderParams): Parameters required to place a market order.
+    87→
+    88→        Returns:
+    89→            ExecuteResponse: The response from the engine execution.
+    90→
+    91→        Raises:
+    92→            Exception: If there is an error during the execution or the response status is not "success".
+    93→        """
+    94→        return self.context.engine_client.place_market_order(params)
+    95→
+    96→    def cancel_orders(self, params: CancelOrdersParams) -> ExecuteResponse:
+    97→        """
+    98→        Cancels orders through the engine.
+    99→
+   100→        Args:
+   101→            params (CancelOrdersParams): Parameters required to cancel orders.
+   102→
+   103→        Returns:
+   104→            ExecuteResponse: The response from the engine execution containing information about the canceled product orders.
+   105→
+   106→        Raises:
+   107→            Exception: If there is an error during the execution or the response status is not "success".
+   108→        """
+   109→        return self.context.engine_client.cancel_orders(params)
+   110→
+   111→    def cancel_product_orders(
+   112→        self, params: CancelProductOrdersParams
+   113→    ) -> ExecuteResponse:
+   114→        """
+   115→        Cancels all orders for provided products through the engine.
+   116→
+   117→        Args:
+   118→            params (CancelProductOrdersParams): Parameters required to cancel product orders.
+   119→
+   120→        Returns:
+   121→            ExecuteResponse: The response from the engine execution containing information about the canceled product orders.
+   122→
+   123→        Raises:
+   124→            Exception: If there is an error during the execution or the response status is not "success".
+   125→        """
+   126→        return self.context.engine_client.cancel_product_orders(params)
+   127→
+   128→    def cancel_and_place(self, params: CancelAndPlaceParams) -> ExecuteResponse:
+   129→        """
+   130→        Cancels orders and places a new one through the engine on the same request.
+   131→
+   132→        Args:
+   133→            params (CancelAndPlaceParams): Parameters required to cancel orders and place a new one.
+   134→
+   135→        Returns:
+   136→            ExecuteResponse: The response from the engine execution.
+   137→
+   138→        Raises:
+   139→            Exception: If there is an error during the execution or the response status is not "success".
+   140→        """
+   141→        return self.context.engine_client.cancel_and_place(params)
+   142→
+   143→    def close_position(
+   144→        self, subaccount: Subaccount, product_id: int
+   145→    ) -> ExecuteResponse:
+   146→        """
+   147→        Places an order through the engine to close a position for the provided `product_id`.
+   148→
+   149→        Attributes:
+   150→            subaccount (Subaccount): The subaccount to close position for.
+   151→            product_id (int): The ID of the product to close position for.
+   152→
+   153→         Returns:
+   154→            ExecuteResponse: The response from the engine execution.
+   155→
+   156→        Raises:
+   157→            Exception: If there is an error during the execution or the response status is not "success".
+   158→        """
+   159→        return self.context.engine_client.close_position(subaccount, product_id)
+   160→
+   161→    def place_trigger_order(self, params: PlaceTriggerOrderParams) -> ExecuteResponse:
+   162→        if self.context.trigger_client is None:
+   163→            raise MissingTriggerClient()
+   164→        return self.context.trigger_client.place_trigger_order(params)
+   165→
+   166→    def cancel_trigger_orders(
+   167→        self, params: CancelTriggerOrdersParams
+   168→    ) -> ExecuteResponse:
+   169→        if self.context.trigger_client is None:
+   170→            raise MissingTriggerClient()
+   171→        return self.context.trigger_client.cancel_trigger_orders(params)
+   172→
+   173→    def cancel_trigger_product_orders(
+   174→        self, params: CancelProductTriggerOrdersParams
+   175→    ) -> ExecuteResponse:
+   176→        if self.context.trigger_client is None:
+   177→            raise MissingTriggerClient()
+   178→        return self.context.trigger_client.cancel_product_trigger_orders(params)
+   179→
+   180→    def place_twap_order(
+   181→        self,
+   182→        product_id: int,
+   183→        price_x18: str,
+   184→        total_amount_x18: str,
+   185→        times: int,
+   186→        slippage_frac: float,
+   187→        interval_seconds: int,
+   188→        sender: Optional[str] = None,
+   189→        subaccount_owner: Optional[str] = None,
+   190→        subaccount_name: str = "default",
+   191→        expiration: Optional[int] = None,
+   192→        nonce: Optional[int] = None,
+   193→        custom_amounts_x18: Optional[List[str]] = None,
+   194→        reduce_only: bool = False,
+   195→        spot_leverage: Optional[bool] = None,
+   196→        id: Optional[int] = None,
+   197→    ) -> ExecuteResponse:
+   198→        """
+   199→        Place a TWAP (Time-Weighted Average Price) order.
+   200→
+   201→        This is a convenience method that creates a TWAP trigger order with the specified parameters.
+   202→
+   203→        Args:
+   204→            product_id (int): The product ID for the order.
+   205→            price_x18 (str): The limit price multiplied by 1e18.
+   206→            total_amount_x18 (str): The total amount to trade multiplied by 1e18 (signed, negative for sell).
+   207→            times (int): Number of TWAP executions (1-500).
+   208→            slippage_frac (float): Slippage tolerance as a fraction (e.g., 0.01 for 1%).
+   209→            interval_seconds (int): Time interval between executions in seconds.
+   210→            sender (Optional[str]): The sender address (32 bytes hex or SubaccountParams). If provided, takes precedence over subaccount_owner/subaccount_name.
+   211→            subaccount_owner (Optional[str]): The subaccount owner address. If not provided, uses client's signer address. Ignored if sender is provided.
+   212→            subaccount_name (str): The subaccount name. Defaults to "default". Ignored if sender is provided.
+   213→            expiration (Optional[int]): Order expiration timestamp. If not provided, calculated as min(((times - 1) * interval_seconds) + 1 hour, 25 hours) from now.
+   214→            nonce (Optional[int]): Order nonce. If not provided, will be auto-generated.
+   215→            custom_amounts_x18 (Optional[List[str]]): Custom amounts for each execution multiplied by 1e18.
+   216→            reduce_only (bool): Whether this is a reduce-only order. Defaults to False.
+   217→            spot_leverage (Optional[bool]): Whether to use spot leverage.
+   218→            id (Optional[int]): Optional order ID.
+   219→
+   220→        Returns:
+   221→            ExecuteResponse: The response from placing the TWAP order.
+   222→
+   223→        Raises:
+   224→            MissingTriggerClient: If trigger client is not configured.
+   225→        """
+   226→        if self.context.trigger_client is None:
+   227→            raise MissingTriggerClient()
+   228→        return self.context.trigger_client.place_twap_order(
+   229→            product_id=product_id,
+   230→            price_x18=price_x18,
+   231→            total_amount_x18=total_amount_x18,
+   232→            times=times,
+   233→            slippage_frac=slippage_frac,
+   234→            interval_seconds=interval_seconds,
+   235→            sender=sender,
+   236→            subaccount_owner=subaccount_owner,
+   237→            subaccount_name=subaccount_name,
+   238→            expiration=expiration,
+   239→            nonce=nonce,
+   240→            custom_amounts_x18=custom_amounts_x18,
+   241→            reduce_only=reduce_only,
+   242→            spot_leverage=spot_leverage,
+   243→            id=id,
+   244→        )
+   245→
+   246→    def place_price_trigger_order(
+   247→        self,
+   248→        product_id: int,
+   249→        price_x18: str,
+   250→        amount_x18: str,
+   251→        trigger_price_x18: str,
+   252→        trigger_type: str,
+   253→        sender: Optional[str] = None,
+   254→        subaccount_owner: Optional[str] = None,
+   255→        subaccount_name: str = "default",
+   256→        expiration: Optional[int] = None,
+   257→        nonce: Optional[int] = None,
+   258→        reduce_only: bool = False,
+   259→        order_type: OrderType = OrderType.DEFAULT,
+   260→        spot_leverage: Optional[bool] = None,
+   261→        id: Optional[int] = None,
+   262→        dependency: Optional[dict] = None,
+   263→    ) -> ExecuteResponse:
+   264→        """
+   265→        Place a price trigger order.
+   266→
+   267→        This is a convenience method that creates a price trigger order with the specified parameters.
+   268→
+   269→        Args:
+   270→            product_id (int): The product ID for the order.
+   271→            price_x18 (str): The limit price multiplied by 1e18.
+   272→            amount_x18 (str): The amount to trade multiplied by 1e18 (signed, negative for sell).
+   273→            trigger_price_x18 (str): The trigger price multiplied by 1e18.
+   274→            trigger_type (str): Type of price trigger - one of:
+   275→                "last_price_above", "last_price_below",
+   276→                "oracle_price_above", "oracle_price_below",
+   277→                "mid_price_above", "mid_price_below".
+   278→            sender (Optional[str]): The sender address (32 bytes hex or SubaccountParams). If provided, takes precedence over subaccount_owner/subaccount_name.
+   279→            subaccount_owner (Optional[str]): The subaccount owner address. If not provided, uses client's signer address. Ignored if sender is provided.
+   280→            subaccount_name (str): The subaccount name. Defaults to "default". Ignored if sender is provided.
+   281→            expiration (Optional[int]): Order expiration timestamp. If not provided, defaults to 7 days from now.
+   282→            nonce (Optional[int]): Order nonce. If not provided, will be auto-generated.
+   283→            reduce_only (bool): Whether this is a reduce-only order. Defaults to False.
+   284→            order_type (OrderType): Order execution type (DEFAULT, IOC, FOK, POST_ONLY). Defaults to DEFAULT.
+   285→            spot_leverage (Optional[bool]): Whether to use spot leverage.
+   286→            id (Optional[int]): Optional order ID.
+   287→            dependency (Optional[dict]): Optional dependency trigger dict with 'digest' and 'on_partial_fill' keys.
+   288→
+   289→        Returns:
+   290→            ExecuteResponse: The response from placing the price trigger order.
+   291→
+   292→        Raises:
+   293→            MissingTriggerClient: If trigger client is not configured.
+   294→            ValueError: If trigger_type is not supported.
+   295→        """
+   296→        if self.context.trigger_client is None:
+   297→            raise MissingTriggerClient()
+   298→
+   299→        # Convert dict to Dependency if provided
+   300→        dependency_obj = None
+   301→        if dependency is not None:
+   302→            from nado_protocol.trigger_client.types.models import Dependency
+   303→
+   304→            dependency_obj = Dependency.parse_obj(dependency)
+   305→
+   306→        return self.context.trigger_client.place_price_trigger_order(
+   307→            product_id=product_id,
+   308→            price_x18=price_x18,
+   309→            amount_x18=amount_x18,
+   310→            trigger_price_x18=trigger_price_x18,
+   311→            trigger_type=trigger_type,
+   312→            sender=sender,
+   313→            subaccount_owner=subaccount_owner,
+   314→            subaccount_name=subaccount_name,
+   315→            expiration=expiration,
+   316→            nonce=nonce,
+   317→            reduce_only=reduce_only,
+   318→            order_type=order_type,
+   319→            spot_leverage=spot_leverage,
+   320→            id=id,
+   321→            dependency=dependency_obj,
+   322→        )
+   323→
+
+<system-reminder>
+Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+</system-reminder>
